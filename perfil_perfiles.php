@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $queryeliminar="DELETE FROM detalle_perfiles WHERE perfil_id='".$_POST["id"]."'";
 
-    $resultadoeliminar=$mysqli->query($queryeliminar);
+    $resultadoeliminar=sqlsrv_query( $mysqli,$queryeliminar, array(), array('Scrollable' => 'buffered'));
     
     // Preparar la consulta para insertar las opciones en la tabla "detalle_perfiles"
  
@@ -20,24 +20,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         
      $query3 = "SELECT * FROM menu_items WHERE id = '$opcionId'";
-    $resultado3 = $mysqli->query($query3);
+    $resultado3=sqlsrv_query( $mysqli,$query3, array(), array('Scrollable' => 'buffered'));
     
-    $row_opcion = $resultado3->fetch_assoc();
+    $row_opcion = sqlsrv_fetch_array($resultado3, SQLSRV_FETCH_ASSOC);
     
     if($row_opcion['padre_id'] > 0){
         
     $stmtDetalle = "INSERT INTO detalle_perfiles (opcion_id, perfil_id) VALUES ('".$row_opcion['padre_id']."','$perfilID')";
-    $mysqli->query($stmtDetalle);
+    sqlsrv_query( $mysqli,$stmtDetalle, array(), array('Scrollable' => 'buffered'));
     
     $query4 = "SELECT * FROM menu_items WHERE id = '".$row_opcion['padre_id']."'";
-    $resultado4 = $mysqli->query($query4);
+    $resultado4=sqlsrv_query( $mysqli,$query4, array(), array('Scrollable' => 'buffered'));
     
-    $row_papa = $resultado4->fetch_assoc();
+    $row_papa = sqlsrv_fetch_array($resultado4, SQLSRV_FETCH_ASSOC);
     
     if($row_papa['padre_id'] > 0){
         
     $stmtDetalle = "INSERT INTO detalle_perfiles (opcion_id, perfil_id) VALUES ('".$row_papa['padre_id']."','$perfilID')";
-    $mysqli->query($stmtDetalle);
+    sqlsrv_query( $mysqli,$stmtDetalle, array(), array('Scrollable' => 'buffered'));
         
     }
         
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     
         $stmtDetalle = $mysqli->prepare("INSERT INTO detalle_perfiles (perfil_id, opcion_id, fecha,fechayhora) VALUES ('$perfilID', '$opcionId','$fecha','$fechayhora')");
-        if (!$stmtDetalle->execute()) {
+        if (!sqlsrv_execute( $stmtDetalle ))) {
             die('Error al guardar la opción: ' . $stmtDetalle->error);
         }
     }
@@ -57,9 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Consulta para obtener los registros de detalle_perfiles relacionados al perfil
 $query = "SELECT opcion_id FROM detalle_perfiles WHERE perfil_id = '$perfilID'";
-$resultado = $mysqli->query($query);
+$resultado=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
-$resultado2 = $mysqli->query($query);
+$resultado2=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
 // Crear un array para almacenar las opciones seleccionadas
 $opcionesSeleccionadas = array();
@@ -87,7 +87,7 @@ $opcionesSeleccionadas = array();
                      <label for="nombre">Permisos:</label>
 <?php
 // Obtener las opciones seleccionadas de la consulta y agregarlas al array
-while ($row2 = $resultado2->fetch_assoc()) {
+while ($row2 = sqlsrv_fetch_array($resultado2, SQLSRV_FETCH_ASSOC)) {
     $opcionesSeleccionadas[] = $row2['opcion_id'];
 }
 
@@ -106,18 +106,18 @@ echo '<option style="margin-left: 15px;" value="Liquidaciones"' . (in_array('Liq
 
  // Obtener los menús existentes desde la base de datos
                                     $sql = "SELECT id, nombre FROM menu_items";
-                                    $result = $mysqli->query($sql);
+                                    $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
-                                    if ($result->num_rows > 0) {
+                                    if (sqlsrv_num_rows($result) > 0) {
                                         echo '<optgroup label="Menús existentes">';
-                                        while ($row = $result->fetch_assoc()) {
+                                        while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
                                            $opcionID =  $row['id'];
        
         echo "<optgroup class='center-optgroup' label='" . ucwords($row['nombre']) . "' >";
         $consulta_sub = "SELECT * FROM menu_items WHERE padre_id = '" . $row['id'] . "'";
-        $resultado_sub = $mysqli->query($consulta_sub);
+        $resultado_sub=sqlsrv_query( $mysqli,$consulta_sub, array(), array('Scrollable' => 'buffered'));
 
-        while ($row_sub = $resultado_sub->fetch_assoc()) {
+        while ($row_sub = sqlsrv_fetch_array($resultado_sub, SQLSRV_FETCH_ASSOC)) {
             $opcionID =  $row_sub['id'];
             echo '<option style="margin-left: 15px;" value="' . $row_sub['id'] . '"' . (in_array($opcionID, $opcionesSeleccionadas) ? ' selected' : '') . '>' . $row_sub['nombre'] . '</option>';
         }

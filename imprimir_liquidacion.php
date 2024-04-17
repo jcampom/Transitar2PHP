@@ -28,19 +28,19 @@ $generator = new BarcodeGeneratorPNG();
 
 
 $sql_liquidacion = "SELECT * FROM liquidaciones where id = '".$_GET['id']."'";
-$resultado_liquidacion = $mysqli->query($sql_liquidacion);
-$row_liquidacion = $resultado_liquidacion->fetch_assoc();
+$resultado_liquidacion=sqlsrv_query( $mysqli,$sql_liquidacion, array(), array('Scrollable' => 'buffered'));
+$row_liquidacion = sqlsrv_fetch_array($resultado_liquidacion, SQLSRV_FETCH_ASSOC);
 
 $sql_ciudadano = "SELECT * FROM ciudadanos where numero_documento like '%".trim($row_liquidacion['ciudadano'])."%'";
-$resultado_ciudadano = $mysqli->query($sql_ciudadano);
-$row_ciudadano = $resultado_ciudadano->fetch_assoc();
+$resultado_ciudadano=sqlsrv_query( $mysqli,$sql_ciudadano, array(), array('Scrollable' => 'buffered'));
+$row_ciudadano = sqlsrv_fetch_array($resultado_ciudadano, SQLSRV_FETCH_ASSOC);
 
 $vigencia = date("Y-m-d", strtotime($row_liquidacion['fecha'] . "+60 days"));
 
 $sql_detalle_liquidacion = "SELECT * FROM detalle_liquidaciones where liquidacion = '".$_GET['id']."'";
-$resultado_detalle_liquidacion = $mysqli->query($sql_detalle_liquidacion);
-$resultado_detalle_liquidacion2 = $mysqli->query($sql_detalle_liquidacion);
-$row_detalle_liquidacion = $resultado_detalle_liquidacion->fetch_assoc();
+$resultado_detalle_liquidacion=sqlsrv_query( $mysqli,$sql_detalle_liquidacion, array(), array('Scrollable' => 'buffered'));
+$resultado_detalle_liquidacion2=sqlsrv_query( $mysqli,$sql_detalle_liquidacion, array(), array('Scrollable' => 'buffered'));
+$row_detalle_liquidacion = sqlsrv_fetch_array($resultado_detalle_liquidacion, SQLSRV_FETCH_ASSOC);
 
 $html = '
 <style>
@@ -84,11 +84,11 @@ body {
 <br>
 ';
 $total = 0;
-while($row_detalle_liquidacion2 = $resultado_detalle_liquidacion2->fetch_assoc()){
+while($row_detalle_liquidacion2 = sqlsrv_fetch_array($resultado_detalle_liquidacion2, SQLSRV_FETCH_ASSOC)){
     
     $sql_tramites = "SELECT * FROM tramites where id = '".$row_detalle_liquidacion2['tramite']."'";
-    $resultado_tramites = $mysqli->query($sql_tramites);
-    $row_tramites = $resultado_tramites->fetch_assoc();  
+    $resultado_tramites=sqlsrv_query( $mysqli,$sql_tramites, array(), array('Scrollable' => 'buffered'));
+    $row_tramites = sqlsrv_fetch_array($resultado_tramites, SQLSRV_FETCH_ASSOC);  
     
     $html .= '<div style="background-color:#c5c5c5"><b>TRAMITE: '.$row_tramites['nombre'].'';
     if($row_liquidacion['tipo_tramite'] == 4){ 
@@ -110,14 +110,14 @@ while($row_detalle_liquidacion2 = $resultado_detalle_liquidacion2->fetch_assoc()
    }else{
       $sql_detalle_tramite = "SELECT * FROM detalle_conceptos_liquidaciones where tramite = '".$row_detalle_liquidacion2['tramite']."' and liquidacion = '".$row_detalle_liquidacion2['liquidacion']."'";   
    }
-    $resultado_detalle_tramite = $mysqli->query($sql_detalle_tramite);
+    $resultado_detalle_tramite=sqlsrv_query( $mysqli,$sql_detalle_tramite, array(), array('Scrollable' => 'buffered'));
     $total_tramite = 0;
     $mora = 0;
     
   if($row_liquidacion['tipo_tramite'] == 4){   
 $sql_comparendo = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '".$row_detalle_liquidacion2['comparendo']."'";
-$result_comparendo = $mysqli->query($sql_comparendo);
-$row_comparendo = $result_comparendo->fetch_assoc();
+$result_comparendo=sqlsrv_query( $mysqli,$sql_comparendo, array(), array('Scrollable' => 'buffered'));
+$row_comparendo = sqlsrv_fetch_array($result_comparendo, SQLSRV_FETCH_ASSOC);
 
     if($row_comparendo['Tcomparendos_ayudas'] == "true"){
         $ayudas = "SI";
@@ -138,7 +138,7 @@ $row_comparendo = $result_comparendo->fetch_assoc();
 $html .= '<div style="background-color:#f4f4f4"><b>Ayudas Tec.: </b> '.$ayudas.' - <b>Fecha: </b>'.$fechini.' - <b>Origen: </b>'.$origen.' <b>Infracción: </b> '.$row_comparendo['Tcomparendos_codinfraccion'].' - <b>Placa: </b> '.$row_comparendo['Tcomparendos_placa'].'</div>';
 
 }
-    while($row_detalle_tramite = $resultado_detalle_tramite->fetch_assoc()){
+    while($row_detalle_tramite = sqlsrv_fetch_array($resultado_detalle_tramite, SQLSRV_FETCH_ASSOC)){
         
         $honorario2 = $row_detalle_tramite['honorario'];
         $cobranza2 = $row_detalle_tramite['cobranza'];
@@ -153,8 +153,8 @@ $html .= '<div style="background-color:#f4f4f4"><b>Ayudas Tec.: </b> '.$ayudas.'
          
         }
 
-        $resultado_conceptos = $mysqli->query($sql_conceptos);
-        $row_conceptos = $resultado_conceptos->fetch_assoc();
+        $resultado_conceptos=sqlsrv_query( $mysqli,$sql_conceptos, array(), array('Scrollable' => 'buffered'));
+        $row_conceptos = sqlsrv_fetch_array($resultado_conceptos, SQLSRV_FETCH_ASSOC);
 
         if($row_conceptos['id'] > 0){
             $valor = $row_detalle_tramite['valor'];
@@ -170,9 +170,9 @@ if($row_conceptos['nombre'] == "CUOTA ACUERDO DE PAGO"){
     
       $consulta_acuerdo="SELECT * FROM acuerdos_pagos where TAcuerdop_numero = '".$row_detalle_liquidacion2['acuerdo']."'";
 
-            $resultado_acuerdo=$mysqli->query($consulta_acuerdo);
+            $resultado_acuerdo=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
 
-            $row_acuerdo=$resultado_acuerdo->fetch_assoc();
+            $row_acuerdo=sqlsrv_fetch_array($resultado_acuerdo, SQLSRV_FETCH_ASSOC);
             
  $html .= ' No. '.$row_detalle_liquidacion2['acuerdo'].' ' . $row_detalle_liquidacion2['cuota'] .'/'. $row_acuerdo['TAcuerdop_cuotas'].' ';   
 }

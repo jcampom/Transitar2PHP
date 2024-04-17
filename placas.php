@@ -5,7 +5,7 @@ if(!empty($_POST)){
   $insertQuery = "INSERT INTO especies_venales (tipo, tipo_servicio, clase_vehiculo, docasignacion, entasignacion, asignacion, cantidad, proveedor, factura, fecha, usuario, fecha_factura, clasificacion) VALUES (6, '".$_POST['tipo_servicio']."', '".$_POST['clase_vehiculo']."', '".$_POST['documento_asignacion']."', '".$_POST['entidad_asignacion']."', '".$_POST['documento_asignacion']."', '".$_POST['cantidad']."', '".$_POST['proveedor']."', '".$_POST['factura']."', '".$_POST['fecha']."', '$idusuario', '".$_POST['fecha_factura']."', '".$_POST['clasificacion']."')";
 
     // Ejecutar la consulta de inserción
-    if ($mysqli->query($insertQuery)) {
+    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
   
 
     // Ejecutar la consulta de inserción
@@ -18,7 +18,7 @@ for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
  $placa = $_POST['letras'].$i.$_POST['letras_motos'];       
  $insert_detalle = "INSERT INTO placas (Tplacas_placa, Tplacas_estado, Tplacas_servicio, Tplacas_clase, Tplacas_clasif, tplacas_tercero, Tplacas_fechac, Tplacas_fechau, Tplacas_IDAdmin, Tplacas_user) VALUES ('$placa', '".$_POST['estado']."', '".$_POST['tipo_servicio']."', '".$_POST['clase_vehiculo']."', '".$_POST['clasificacion']."', '".$_POST['entidad_asignacion']."', '$fechayhora', '$fechayhora', '$ultimoIdInsertado', '$idusuario')";
  
-    $mysqli->query($insert_detalle);
+    sqlsrv_query( $mysqli,$insert_detalle, array(), array('Scrollable' => 'buffered'));
 }
 
 
@@ -54,9 +54,9 @@ for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM especies_venales_estados ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -125,9 +125,9 @@ for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_servicio ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -147,9 +147,9 @@ for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_clase ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -170,9 +170,9 @@ for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_clasificacion ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -192,9 +192,9 @@ for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros where Tterceros_tipo = 2 ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -223,9 +223,9 @@ for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros where Tterceros_tipo = 1 ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>

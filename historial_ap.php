@@ -14,8 +14,8 @@ if(empty($_POST)){
 	$ap_numero = "";
 }
 $query_param = "SELECT Tparamgenerales_img_logo, Tparamgenerales_img_fondo, Tparamgenerales_titulo_app, Tparamgenerales_nombre_app from parametros_generales WHERE Tparamgenerales_ID = 1";
-$result = $mysqli->query($query_param);
-$row_param = $result->fetch_assoc();
+$result=sqlsrv_query( $mysqli,$query_param, array(), array('Scrollable' => 'buffered'));
+$row_param = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 $OK='';
 
 if (isset($_POST['guardar'])) {
@@ -31,12 +31,12 @@ if (isset($_POST['guardar'])) {
     echo "<script>alert(\"".$mensaje."\");</script>";
 
     $query_ap = "SELECT TAcuerdop_numero FROM acuerdos_pagos WHERE TAcuerdop_numero='".$_POST['ap']."' ORDER BY TAcuerdop_cuota";
-    $result_ap = $mysqli->query($query_ap);
+    $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered'));
 
     $query_ap="BEGIN TRANSACTION InsertAP;\r";
     $query_ap=$query_ap."UPDATE comparendos SET Tcomparendos_estado=3 WHERE Tcomparendos_comparendo=".$_POST['documento'].";\r";
 
-    if ($result_ap->num_rows == 0) {
+    if (sqlsrv_num_rows($result_ap) == 0) {
         for ($i = 1; $i <= $_POST['cuotas']; $i++) {
             $query_ap=$query_ap. "INSERT INTO acuerdos_pagos (TAcuerdop_numero, TAcuerdop_comparendo, TAcuerdop_valor, TAcuerdop_periodicidad, TAcuerdop_cuota, TAcuerdop_cuotas, TAcuerdop_identificacion, TAcuerdop_estado, TAcuerdop_fechapago, TAcuerdop_tipodoc, TAcuerdop_fecha, TAcuerdop_user) 
                VALUES (".$_POST['ap'].", ".$_POST['documento'].", ".$_POST['valor_'.$i].", ".$_POST['periodicidad'].", ".$i.", ".$_POST['cuotas'].", ".$_POST['infractor'].", ".$_POST['APEstado_'.$i].", '".$_POST['fecha_AP_'.$i]."', 'COM', '".$_POST['fecha_AP']."', 'User');\r";
@@ -59,7 +59,7 @@ if (isset($_POST['guardar'])) {
     }
     
     $query_ap=$query_ap."COMMIT TRANSACTION InsertAP;\r";
-    $result_ap = $mysqli->query($query_ap);
+    $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered'));
 }
 
 if (isset($_POST['comparendo']) && isset($_POST['generar'])) {
@@ -72,10 +72,10 @@ if ($_POST['documento']=="") {
 
 if (isset($_POST['generar'])) {
     $query_ap = "SELECT TAcuerdop_numero, TAcuerdop_comparendo FROM acuerdos_pagos WHERE TAcuerdop_numero='".$_POST['ap']."' ORDER BY TAcuerdop_cuota";
-    $result_ap = $mysqli->query($query_ap);
+    $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered'));
 
-    if ($result_ap->num_rows > 0) {
-        while ($row_ap = $result_ap->fetch_assoc()) {
+    if (sqlsrv_num_rows($result_ap) > 0) {
+        while ($row_ap = sqlsrv_fetch_array($result_ap, SQLSRV_FETCH_ASSOC)) {
             if($row_ap['TAcuerdop_comparendo']!=$_POST['documento']) {
                 $_POST['ap']="";
                 echo "<script>alert(\"Este AP ya está creado y le pertenece a otro comparendo.\");</script>";
@@ -151,8 +151,8 @@ body {
 if ($_POST['documento']!="")  // Si el comparendo no está vacío
 {
     $query_comp = "SELECT Tcomparendos_fecha, Tcomparendos_placa, Tcomparendos_codinfraccion, Tcomparendos_idinfractor, Tcomparendos_estado FROM comparendos WHERE Tcomparendos_comparendo='".$_POST['documento']."'";
-    $result_comp = $mysqli->query($query_comp);
-    if ($result_comp->num_rows == 0) {
+    $result_comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffered'));
+    if (sqlsrv_num_rows($result_comp) == 0) {
         echo "<tr><td align='center' colspan=5><p><strong>Comparendo NO encontrado</strong></td></tr>";
     } else {
         echo "<tr><td align='center' colspan=5><p><strong>Comparendo encontrado</strong></td></tr>";
@@ -163,7 +163,7 @@ if ($_POST['documento']!="")  // Si el comparendo no está vacío
         echo "<td align='center'><strong>Infracción</strong></td>";
         echo "<td align='center'><strong>Infractor</strong></td>";
         echo "<td align='center'><strong>Estado</strong></td></tr>";
-        $row_comp = $result_comp->fetch_assoc(); // Escribe información del comparendo
+        $row_comp = sqlsrv_fetch_array($result_comp, SQLSRV_FETCH_ASSOC); // Escribe información del comparendo
         $fechacomp = date("Y-m-d", strtotime($row_comp['Tcomparendos_fecha']));
         echo "<tr><td align='center'>".$fechacomp."</td>"; // Imprime la fecha
         echo "<td align='center'>".$row_comp['Tcomparendos_placa']."</td>"; // Imprime placa
@@ -175,9 +175,9 @@ if ($_POST['documento']!="")  // Si el comparendo no está vacío
         echo "<td align='center'>";
           $query_consulta="SELECT * FROM comparendos_estados where id = '".$row_comp['Tcomparendos_estado']."'";
 
-      $resultado_consulta=$mysqli->query($query_consulta);
+      $resultado_consulta=sqlsrv_query( $mysqli,$query_consulta, array(), array('Scrollable' => 'buffered'));
 
-      $existe=$resultado_consulta->fetch_assoc();
+      $existe=sqlsrv_fetch_array($resultado_consulta, SQLSRV_FETCH_ASSOC);
       
       echo $existe['nombre'];
         echo "</td></tr>   </table>";
@@ -185,13 +185,13 @@ if ($_POST['documento']!="")  // Si el comparendo no está vacío
 
         // Como encontré el comparendo busco si tiene AP creados
         $query_ap  = "SELECT TAcuerdop_numero, TAcuerdop_cuotas FROM acuerdos_pagos WHERE TAcuerdop_comparendo='".$_POST['documento']."'";
-        $result_ap = $mysqli->query($query_ap) or die(guardar_error(__LINE__));
+        $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
         $ap_numero = "";
         $ap_cuotas = "";
         $deshabilitar = "";
         $mensaje = "";
-        if ($result_ap->num_rows) { // Si encontró AP de comparendo buscado
-            $row_ap = $result_ap->fetch_assoc(); // Escribe información del comparendo
+        if (sqlsrv_num_rows($result_ap)) { // Si encontró AP de comparendo buscado
+            $row_ap = sqlsrv_fetch_array($result_ap, SQLSRV_FETCH_ASSOC); // Escribe información del comparendo
             $ap_numero = trim($row_ap['TAcuerdop_numero']);
             $ap_cuotas = $row_ap['TAcuerdop_cuotas'];
             $deshabilitar = " readonly ";
@@ -232,9 +232,9 @@ if ($_POST['documento']!="")  // Si el comparendo no está vacío
 
 if ((@$_POST['ap']!="" || $ap_numero!="") && ((@$_POST['cuotas']!="" && @$_POST['cuotas']>1) || $ap_cuotas!="")  && isset($_POST['generar'])) { // Genero las cuotas
     $query_ap = "SELECT TAcuerdop_numero, TAcuerdop_comparendo, TAcuerdop_valor, TAcuerdop_periodicidad, TAcuerdop_cuota, TAcuerdop_cuotas, TAcuerdop_identificacion, TAcuerdop_estado, TAcuerdop_fechapago, TAcuerdop_tipodoc, TAcuerdop_fecha, TAcuerdop_user FROM acuerdos_pagos WHERE TAcuerdop_numero='".$ap_numero."' ORDER BY TAcuerdop_cuota";
-    $result_ap = $mysqli->query($query_ap);
+    $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered'));
     $inicial = 0;
-    if ($result_ap->num_rows == 0) {
+    if (sqlsrv_num_rows($result_ap) == 0) {
         echo "<tr><td align='center' colspan=2><p><strong>Fecha del AP:</strong>";
         $input_name="fecha_AP";
         $buttom_name="cal_fecha_AP";
@@ -257,16 +257,16 @@ if ((@$_POST['ap']!="" || $ap_numero!="") && ((@$_POST['cuotas']!="" && @$_POST[
             echo "</td>";
             echo "<td align='center' colspan=2>";
             $query_TAcuerdopestado="SELECT id, nombre FROM acuerdos_pagos ORDER BY id";
-            $result_TAcuerdopestado=$mysqli->query($query_TAcuerdopestado);
+            $result_TAcuerdopestado=sqlsrv_query( $mysqli,$query_TAcuerdopestado, array(), array('Scrollable' => 'buffered'));
             echo "<select name='APEstado_".$i."' id='APEstado_".$i."'  style='width:120px'>";
-            while($columnas=$result_TAcuerdopestado->fetch_assoc()) {
+            while($columnas=sqlsrv_fetch_array($result_TAcuerdopestado, SQLSRV_FETCH_ASSOC)) {
                 $Combo=$Combo."<option value='".$columnas['id']."'>".trim($columnas['nombre'])."</option>";
             }
             echo $Combo=$Combo."</select>";
             echo "</td></tr>";
         }
     } else {
-        while ($row_ap = $result_ap->fetch_assoc()) { // Escribe información del AP
+        while ($row_ap = sqlsrv_fetch_array($result_ap, SQLSRV_FETCH_ASSOC)) { // Escribe información del AP
             if ($inicial == 0) {
                 echo "<tr><td align='center' colspan=2><p><strong>Fecha del AP:</strong>";
                 $input_name="fecha_AP";
@@ -293,9 +293,9 @@ echo "</td>";
 
 echo "<td align='center' colspan=2>";
 $query_TAcuerdopestado = "SELECT id, nombre FROM acuerdosp_estados ORDER BY id";
-$result_TAcuerdopestado = $mysqli->query($query_TAcuerdopestado);
+$result_TAcuerdopestado=sqlsrv_query( $mysqli,$query_TAcuerdopestado, array(), array('Scrollable' => 'buffered'));
 $Combo = "<select name='APEstado_" . $row_ap['TAcuerdop_cuota'] . "' id='APEstado_" . $row_ap['TAcuerdop_cuota'] . "'  style='width:120px'>";
-while ($columnas = $result_TAcuerdopestado->fetch_assoc()) {
+while ($columnas = sqlsrv_fetch_array($result_TAcuerdopestado, SQLSRV_FETCH_ASSOC)) {
     if ($columnas['id'] == $row_ap['TAcuerdop_estado']) {
         $seleccionar = " selected ";
     } else {

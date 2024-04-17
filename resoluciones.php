@@ -15,9 +15,9 @@ if(!empty($_GET)){
  if(!empty($_GET['tipo'])){
     $consulta_plantilla="SELECT * FROM plantillas_resoluciones where tipo_resolucion = '".$_GET['tipo']."'";
 
-            $resultado_plantilla=$mysqli->query($consulta_plantilla);
+$resultado_plantilla=sqlsrv_query( $mysqli,$consulta_plantilla, array(), array('Scrollable' => 'buffered'));
 
-            $row_plantilla=$resultado_plantilla->fetch_assoc(); 
+            $row_plantilla=sqlsrv_fetch_array($resultado_plantilla, SQLSRV_FETCH_ASSOC); 
             
             $plantilla = $row_plantilla['id'];
             
@@ -34,15 +34,15 @@ $comparendo = $_GET['comparendo'];
 
     $consulta_comparendo="SELECT * FROM comparendos where Tcomparendos_comparendo = '$comparendo'";
 
-            $resultado_comparendo=$mysqli->query($consulta_comparendo);
+            $resultado_comparendo=sqlsrv_query( $mysqli,$consulta_comparendo, array(), array('Scrollable' => 'buffered'));
 
-            $row_comparendo=$resultado_comparendo->fetch_assoc();
+            $row_comparendo=sqlsrv_fetch_array($resultado_comparendo, SQLSRV_FETCH_ASSOC);
             
             $consulta_tipo="SELECT * FROM plantillas_resoluciones where id= '$plantilla'";
 
-            $resultado_tipo=$mysqli->query($consulta_tipo);
+            $resultado_tipo=sqlsrv_query( $mysqli,$consulta_tipo, array(), array('Scrollable' => 'buffered'));
 
-            $row_tipo=$resultado_tipo->fetch_assoc();
+            $row_tipo=sqlsrv_fetch_array($resultado_tipo, SQLSRV_FETCH_ASSOC);
             
             $estados_permitidos = explode(",", $row_tipo['estados_permitidos']);
             
@@ -53,12 +53,12 @@ if(!empty($_POST['contenido'])){
   $insert_resolucion = "INSERT INTO resolucion_sancion (ressan_ano, ressan_numero, ressan_tipo, ressan_comparendo, ressan_archivo, ressan_fecha, ressan_observaciones, ressan_exportado, ressan_resant, ressan_compid) VALUES ('$ano', '$comparendo', '$tipo_resolucion', '$comparendo', '0', '$fecha', '', 'False', '".$row_comparendo['Tcomparendos_ID']."',  '".$row_comparendo['Tcomparendos_ID']."')";
 
  // Ejecutar la consulta de inserción
-     if ($mysqli->query($insert_resolucion)) {
+     if (sqlsrv_query( $mysqli,$insert_resolucion, array(), array('Scrollable' => 'buffered'))){
   echo '<div class="alert alert-success"><strong>¡Muy bien!</strong> La resolución ha sido creada con éxito</div>';
   
   if($row_tipo['estado_cambio'] > 0){
  $actualizar_comparendo = "UPDATE comparendos SET Tcomparendos_estado = '".$row_tipo['estado_cambio']."' WHERE Tcomparendos_comparendo = '$comparendo' ";
- $resultado_actualizar_comparendo = $mysqli->query($actualizar_comparendo);
+            $resultado_actualizar_comparendo=sqlsrv_query( $mysqli,$actualizar_comparendo, array(), array('Scrollable' => 'buffered'));
   }
   
 
@@ -145,9 +145,9 @@ if(!empty($_POST['contenido'])){
     if($row_tipo['resoluciones_creadas'] > 0){
         $consulta_resolucion="SELECT * FROM resolucion_sancion where ressan_comparendo = '$comparendo' and ressan_tipo = '".$row_tipo['resoluciones_creadas']."'";
 
-            $resultado_resolucion=$mysqli->query($consulta_resolucion);
+            $resultado_resolucion=sqlsrv_query( $mysqli,$consulta_resolucion, array(), array('Scrollable' => 'buffered'));
     
-      if ($resultado_resolucion->num_rows > 0) {  
+      if (sqlsrv_num_rows($resultado_resolucion) > 0) {  
        $tiene_resolucion = 1;   
       }else{
        $tiene_resolucion = 2;   
@@ -170,9 +170,9 @@ if(!empty($_POST['contenido'])){
   }else{
     $consulta_comparendos_estados="SELECT * FROM comparendos_estados where id= '".$row_comparendo['Tcomparendos_estado']."'";
 
-            $resultado_comparendos_estados=$mysqli->query($consulta_comparendos_estados);
+            $resultado_comparendos_estados=sqlsrv_query( $mysqli,$consulta_comparendos_estados, array(), array('Scrollable' => 'buffered'));
 
-            $row_comparendos_estados=$resultado_comparendos_estados->fetch_assoc();
+            $row_comparendos_estados=sqlsrv_fetch_array($resultado_comparendos_estados, SQLSRV_FETCH_ASSOC);
    
             
   echo "<div class='col-md-12'><font color='red'><h4><b>
@@ -188,9 +188,9 @@ if($row_tipo['resoluciones_creadas'] > 0){
  
      $consulta_comparendos_estados="SELECT * FROM comparendos_estados where id= '".$row_comparendo['Tcomparendos_estado']."'";
 
-            $resultado_comparendos_estados=$mysqli->query($consulta_comparendos_estados);
+            $resultado_comparendos_estados=sqlsrv_query( $mysqli,$consulta_comparendos_estados, array(), array('Scrollable' => 'buffered'));
 
-            $row_comparendos_estados=$resultado_comparendos_estados->fetch_assoc();
+            $row_comparendos_estados=sqlsrv_fetch_array($resultado_comparendos_estados, SQLSRV_FETCH_ASSOC);
    
             
   echo "<div class='col-md-12'><font color='red'><h4><b>

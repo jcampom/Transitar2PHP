@@ -2,35 +2,35 @@
 include 'menu.php';
 if(!empty($_GET["activo"])){
     $editar="UPDATE usuarios SET estado = '".$_GET['cambio']."' where id = '".$_GET['activo']."' and empresa = '$empresa'";
-      $resultadoedit=$mysqli->query($editar);
+      $resultadoedit=sqlsrv_query( $mysqli,$editar, array(), array('Scrollable' => 'buffered'));
 
 }
 if(!empty($_GET["eliminar"])){
     $queryeliminar="DELETE FROM usuarios WHERE id='".$_GET["id"]."' and empresa = '$empresa'";
 
-    $resultadoeliminar=$mysqli->query($queryeliminar);
+    $resultadoeliminar=sqlsrv_query( $mysqli,$queryeliminar, array(), array('Scrollable' => 'buffered'));
 }
 if(empty($_POST)){
 
 }else{
    $query_consulta="SELECT * FROM usuarios where identificacion = '".$_POST['identificacion']."' and empresa = '$empresa'";
 
-      $resultado_consulta=$mysqli->query($query_consulta);
+      $resultado_consulta=sqlsrv_query( $mysqli,$query_consulta, array(), array('Scrollable' => 'buffered'));
 
-      $existe=$resultado_consulta->fetch_assoc();
+      $existe=sqlsrv_fetch_array($resultado_consulta, SQLSRV_FETCH_ASSOC);
 
 
 if($existe == 0){
      $query_consulta="SELECT * FROM usuarios where usuario = '".$_POST['usuario']."' and empresa = '$empresa'";
 
-      $resultado_consulta=$mysqli->query($query_consulta);
+      $resultado_consulta=sqlsrv_query( $mysqli,$query_consulta, array(), array('Scrollable' => 'buffered'));
 
-      $existe=$resultado_consulta->fetch_assoc();
+      $existe=sqlsrv_fetch_array($resultado_consulta, SQLSRV_FETCH_ASSOC);
       if($existe == 0){
           
   $query="INSERT INTO usuarios(nombre, direccion, celular, identificacion, usuario, password, tipo, fecha,empresa, estado,perfil) VALUES ('".$_POST['nombre']."','".$_POST['direccion']."','".$_POST['celular']."','".$_POST['identificacion']."','".$_POST['usuario']."','".$_POST['password']."','EMPRESA','$fecha','$empresa','1','".$_POST['perfil']."')";
 
-    $resultado=$mysqli->query($query);
+    $resultado=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
     
 if ($resultado) {
 
@@ -121,10 +121,10 @@ if ($resultado) {
                                     <?php
                                     // Obtener los menús existentes desde la base de datos
                                     $sql = "SELECT id, nombre FROM perfiles";
-                                    $result = $mysqli->query($sql);
+                                    $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
-                                    if ($result->num_rows > 0) {
-                                        while ($row = $result->fetch_assoc()) {
+                                    if (sqlsrv_num_rows($result) > 0) {
+                                        while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
                                             echo '<option style="margin-left: 15px;"" value="' . $row['id'] . '">' . $row['nombre'] . '</option>';
                                         }
                                     }
@@ -179,9 +179,9 @@ if ($resultado) {
               
                   $consulta="SELECT * FROM usuarios where empresa = '$empresa' ";
 
-                    $resultado=$mysqli->query($consulta);
+                    $resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 
-                   while($row=$resultado->fetch_assoc()){ ?>
+                   while($row=sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)){ ?>
                     <tr><th>
                     <?php if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?>    
                 <a onclick="return confirm('Estas seguro de eliminar este usuario?');" href="crear_usuarios.php?id=<?php echo $row['id'] ?>&eliminar=1"> <button type="button" class="btn btn-danger" style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" ><i class="fa fa-times" style="margin:3px"></i></button></a>

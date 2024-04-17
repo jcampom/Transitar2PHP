@@ -3,9 +3,9 @@ include 'menu.php';
 
  $consulta_array="SELECT * FROM pagos where empresa = '$empresa' and fecha ='$fecha' and tipo != 'INTERESES' and tipo != 'MORA' ";  
  
- $resultado_array=$mysqli->query($consulta_array);
+$resultado_array=sqlsrv_query( $mysqli,$consulta_array, array(), array('Scrollable' => 'buffered'));
  $arr = array();
-       while($row_array=$resultado_array->fetch_assoc()){ 
+       while($row_array=sqlsrv_fetch_array($resultado_array, SQLSRV_FETCH_ASSOC)){ 
             //Salvar datos a un arreglo de todos los elementosd de consulta
             $arr[] = $row_array['credito'];
             // Definir la array para evitar ese error
@@ -14,9 +14,9 @@ include 'menu.php';
  
   $consulta_array2="SELECT credito,SUM(valor) as suma FROM pagos where empresa = '$empresa' and tipo != 'INTERESES' and tipo != 'MORA' group by credito  ";  
  
- $resultado_array2=$mysqli->query($consulta_array2);
+$resultado_array2=sqlsrv_query( $mysqli,$consulta_array2, array(), array('Scrollable' => 'buffered'));
  $arr2 = array();
-       while($row_pagos=$resultado_array2->fetch_assoc()){ 
+       while($row_pagos=sqlsrv_fetch_array($resultado_array2, SQLSRV_FETCH_ASSOC)){ 
             //Salvar datos a un arreglo de todos los elementosd de consulta
           $id_cre =  $row_pagos['credito'];
             $arr2[$id_cre] = $row_pagos['suma'];
@@ -27,7 +27,7 @@ include 'menu.php';
 if(!empty($_GET['credito'])){
       $query="INSERT INTO pendientes(credito,fecha) VALUES ('".$_GET['credito']."','$fecha')";
 
-    $resultado=$mysqli->query($query);
+$resultado=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 }
 if(!empty($_GET['id'])){
     $cobrador = $_GET['id'];
@@ -41,11 +41,11 @@ if(!empty($_GET["eliminar"])){
 
 $queryeliminar="DELETE FROM creditos WHERE id='".$_GET["id_credito"]."' and empresa = '$empresa'";
 
-    $resultadoeliminar=$mysqli->query($queryeliminar);
+$resultadoeliminar=sqlsrv_query( $mysqli,$queryeliminar, array(), array('Scrollable' => 'buffered'));
     
     $queryeliminar2="DELETE FROM pagos WHERE credito='".$_GET["id_credito"]."' and empresa = '$empresa'";
 
-    $resultadoeliminar2=$mysqli->query($queryeliminar2);
+$resultadoeliminar2=sqlsrv_query( $mysqli,$queryeliminar2, array(), array('Scrollable' => 'buffered'));
 }
  ?>
  <script>    function cobrar(valor) {
@@ -158,8 +158,8 @@ var valor = valor;
  
                    
                   $consulta_rutas="SELECT * FROM rutas_supervisores where supervisor = '$idusuario'  ";   
-                   $resultado_rutas=$mysqli->query($consulta_rutas);
-     while($row_rutas=$resultado_rutas->fetch_assoc()){
+                   $resultado_rutas=sqlsrv_query( $mysqli,$consulta_rutas, array(), array('Scrollable' => 'buffered'));
+     while($row_rutas=sqlsrv_fetch_array($resultado_rutas, SQLSRV_FETCH_ASSOC)){
          
          $ruta_s = $row_rutas['ruta'];
       $consulta .= " OR c.empresa = '$empresa' and c.estado = 0 AND c.ruta = '$ruta_s'";
@@ -167,9 +167,9 @@ var valor = valor;
        $consulta .= " group by c.id order by enrutar";
                   }
 
-                    $resultado=$mysqli->query($consulta);
+                    $resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 
-                   while($row=$resultado->fetch_assoc()){ 
+                   while($row=sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)){ 
                        $desdiario = 0;
                        $descuento = 0;
                        $interes = $row['valor'] * $row['porcentaje']/100;
@@ -178,9 +178,9 @@ var valor = valor;
  //Sumamos pagos y abonos
     $casas="SELECT id FROM pendientes where credito = '".$row['id']."' and fecha = '$fecha'";
 
-    $resultado_casa=$mysqli->query($casas);
+$resultado_casa=sqlsrv_query( $mysqli,$casas, array(), array('Scrollable' => 'buffered'));
 
-    $casa=$resultado_casa->fetch_assoc();
+    $casa=sqlsrv_fetch_array($resultado_casa, SQLSRV_FETCH_ASSOC);
       $pagado = $arr2[$row['id']];
       $pendiente = $total - $arr2[$row['id']] ;
       
@@ -453,7 +453,7 @@ if (!in_array("$id_credito", $arr)) {
 
 }else{
       //     $editar="UPDATE creditos SET estado = '1' where id = '".$row['id']."'";
-        //      $resultadoedit=$mysqli->query($editar);
+        //$resultadoedit=sqlsrv_query( $mysqli,$editar, array(), array('Scrollable' => 'buffered'));
 }
                               }
                               ?>

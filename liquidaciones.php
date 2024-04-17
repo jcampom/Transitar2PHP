@@ -1,7 +1,4 @@
 <?php include 'menu.php'; 
-
-
-
 $tipo_tramite = $_POST['tipo_tramite'];
 ?>
 
@@ -69,10 +66,10 @@ ul#tramites-seleccionados {
                             <?php
                             
                             // Obtener los datos de la tabla tramites
-$sqlTramites = "SELECT id, nombre FROM tipo_tramite where id NOT IN(3,7,8)";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+                            $sqlTramites = "SELECT id, nombre FROM tipo_tramite where id NOT IN(3,7,8)";
+                            $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     if($tipo_tramite == $row['id']){
                                     echo "<option style='margin-left: 15px;' selected value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                     }else{
@@ -118,9 +115,9 @@ include 'funcion_ciudadanos.php';
                             <option style='margin-left: 15px;' value=''><?php
             $consulta_tramites2="SELECT * FROM tramites";
 
-            $resultado_tramites2=$mysqli->query($consulta_tramites2);
+            $resultado_tramites2=sqlsrv_query( $mysqli,$consulta_tramites2, array(), array('Scrollable' => 'buffered'));
 
-            $row_tramites2=$resultado_tramites2->fetch_assoc();
+            $row_tramites2=sqlsrv_fetch_array($resultado_tramites2, SQLSRV_FETCH_ASSOC);
                       echo ucwords($row_tramites2['nombre']); ?></option>
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tramite...</option>
@@ -130,9 +127,9 @@ include 'funcion_ciudadanos.php';
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM tramites where tipo_documento = '$tipo_tramite' order by nombre";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                 }
                             }
@@ -202,9 +199,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM tipo_servicio";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                 }
                             }
@@ -229,9 +226,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM clase_vehiculo";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                 }
                             }
@@ -254,9 +251,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM vehiculos_clasificacion";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                 }
                             }
@@ -286,9 +283,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM tipo_servicio ";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                 }
                             }
@@ -311,9 +308,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM clase_vehiculo ";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                 }
                             }

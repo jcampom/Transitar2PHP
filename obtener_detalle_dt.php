@@ -7,16 +7,16 @@ $numeroDocumento = $_POST['dt'];
 
 // Consulta a la tabla comparendos
 $sql = "SELECT * FROM derechos_transito WHERE TDT_ID = '$numeroDocumento'";
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
-$row = $result->fetch_assoc();
+$row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
 
 // Consultamos si es el primero que debe
 $sql_primer = "SELECT MIN(TDT_ano) as primer FROM derechos_transito WHERE TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 1 or TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 8 or TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 5";
-$result_primer = $mysqli->query($sql_primer);
+$result_primer=sqlsrv_query( $mysqli,$sql_primer, array(), array('Scrollable' => 'buffered'));
 
-$row_primer = $result_primer->fetch_assoc();
+$row_primer = sqlsrv_fetch_array($result_primer, SQLSRV_FETCH_ASSOC);
 
 $primero = $row_primer['primer'];
           
@@ -29,9 +29,9 @@ $ano_actual = substr($fecha, 0, 4);
 
 $consulta_vehiculo="SELECT * FROM vehiculos where numero_placa = '".$row['TDT_placa']."'";
 
-            $resultado_vehiculo=$mysqli->query($consulta_vehiculo);
+            $resultado_vehiculo=sqlsrv_query( $mysqli,$consulta_vehiculo, array(), array('Scrollable' => 'buffered'));
 
-            $row_vehiculo=$resultado_vehiculo->fetch_assoc();
+            $row_vehiculo=sqlsrv_fetch_array($resultado_vehiculo, SQLSRV_FETCH_ASSOC);
             
                   
                   $fechini = date("Y-m-d", strtotime($row['TDT_fecha']));
@@ -43,10 +43,10 @@ $consulta_vehiculo="SELECT * FROM vehiculos where numero_placa = '".$row['TDT_pl
          
          // Realizar la consulta para obtener los conceptos asociados al trámite
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '".$row['TDT_tramite']."'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 $total = 0;
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
             
@@ -61,12 +61,12 @@ if ($resultado_tramite->num_rows > 0) {
          
     
 
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+            $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
            
             
-         if ($resultado_concepto->num_rows > 0) {
-     $row_concepto=$resultado_concepto->fetch_assoc();
+         if (sqlsrv_num_rows($resultado_concepto) > 0) {
+     $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
      if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
           
                 $rango = $row_concepto['fecha_vigencia_final'];
@@ -83,9 +83,9 @@ if ($resultado_tramite->num_rows > 0) {
           $consulta_smlv="SELECT * FROM smlv where ano = '$ano_actual'";   
         }
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['valor_SMLV_UVT'] == 0){
              $valor_concepto = $row_concepto['valor_concepto'];  
@@ -142,10 +142,10 @@ echo "<b>Concepto : 	Interes mora  # Días Mora :".($dias_entre)."  <div style='
 
      // Realizar la consulta para obtener los conceptos asociados al honorarios
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '50'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 $total2 = 0;
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
             
@@ -153,9 +153,9 @@ if ($resultado_tramite->num_rows > 0) {
          
     
 
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
-            $row_concepto=$resultado_concepto->fetch_assoc();
+            $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
             
          
          
@@ -174,9 +174,9 @@ if ($resultado_tramite->num_rows > 0) {
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
            
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+$resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['porcentaje'] > 0){
                 

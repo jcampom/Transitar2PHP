@@ -3,13 +3,13 @@
 if(!empty($_POST)){
 $tipo = 2;
 $sql = "SELECT * FROM especies_venales_detalle where tipo = '$tipo'";
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
 $datos = array();
 
-if ($result->num_rows > 0) {
+if (sqlsrv_num_rows($result) > 0) {
   // Guardar los datos en un array
-  while($row = $result->fetch_assoc()) {
+  while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
     $datos[] = $row['id'];
   }
 }
@@ -17,7 +17,7 @@ if ($result->num_rows > 0) {
   $insertQuery = "INSERT INTO especies_venales (tipo, tipo_servicio, clase_vehiculo, docasignacion, entasignacion, asignacion, cantidad, proveedor, factura, fecha, usuario, fecha_factura, clasificacion,inicio,fin) VALUES (1, '".$_POST['tipo_servicio']."', '".$_POST['clase_vehiculo']."', '".$_POST['documento_asignacion']."', '".$_POST['entidad_asignacion']."', '".$_POST['documento_asignacion']."', '".$_POST['cantidad']."', '".$_POST['proveedor']."', '".$_POST['factura']."', '".$_POST['fecha']."', '$idusuario', '".$_POST['fecha_factura']."', '".$_POST['clasificacion']."', '".$_POST['inicio']."', '".$_POST['fin']."')";
 
     // Ejecutar la consulta de inserción
-    if ($mysqli->query($insertQuery)) {
+    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
   
 $ultimoIdInsertado = $mysqli->insert_id;
     // Ejecutar la consulta de inserción
@@ -27,20 +27,12 @@ $ultimoIdInsertado = $mysqli->insert_id;
 for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
 
  if(!in_array("$i", $datos)) {      
- $insert_detalle = "INSERT INTO especies_venales_detalle (id, tipo, estado, fecha_creacion, fecha_actualizacion, fecha, usuario, id_admin) VALUES ('$i','$tipo', '".$_POST['estado']."', '".$fechayhora."', '$fechayhora', '".$_POST['fecha']."','$idusuario', '$ultimoIdInsertado')";
- 
-    $mysqli->query($insert_detalle);
+    $insert_detalle = "INSERT INTO especies_venales_detalle (id, tipo, estado, fecha_creacion, fecha_actualizacion, fecha, usuario, id_admin) VALUES ('$i','$tipo', '".$_POST['estado']."', '".$fechayhora."', '$fechayhora', '".$_POST['fecha']."','$idusuario', '$ultimoIdInsertado')";
+    sqlsrv_query( $mysqli,$insert_detalle, array(), array('Scrollable' => 'buffered'));
  }
 }
 
-
-
-        
-        
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
-        
-
- 
  
     } else {
    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
@@ -67,9 +59,9 @@ Licencias de conducción</h2>
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM especies_venales_estados ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus = sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -123,9 +115,9 @@ Licencias de conducción</h2>
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros where Tterceros_tipo = 2 ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -154,9 +146,9 @@ Licencias de conducción</h2>
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros where Tterceros_tipo = 1 ";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>

@@ -20,9 +20,9 @@ if ($_POST['webservice']) {
                             RECNUM, NUMERO_CUTOAS, ID_TIPO_DOC, INTERESES, DESCUENTO, VADICIONAL, 
                             numero, resolucion_id, comparendo 
                         FROM VExportRecaudo WHERE doc = '$idcomp' AND RECNUM = '" . $_POST['idliq'][$idcomp] . "'";
-            $compexp = $mysqli->query($query_compexp);
-            $num = $compexp->num_rows;
-            $row_compexp = $compexp->fetch_assoc();
+            $compexp=sqlsrv_query( $mysqli,$query_compexp, array(), array('Scrollable' => 'buffered'));
+            $num = sqlsrv_num_rows($compexp);
+            $row_compexp = sqlsrv_fetch_array($compexp, SQLSRV_FETCH_ASSOC);
             if ($num > 0) {
                 if ($row_compexp['RECTIPOREC'] == 4) {
                     $tipo = "Acuerdo de Pago: " . $row_compexp['numero'] . ' - Cuota: ' . $row_compexp['NUMERO_CUTOAS'];
@@ -68,7 +68,7 @@ if ($_POST['webservice']) {
                             <td align='center' class='Recaudada'>&nbsp;</td>
                         </tr>";
                     $sqlExport = "INSERT INTO Texportplano (Texportplano_comp, Texportplano_tipo, Texportplano_idarch, Texportplano_user, Texportplano_fecha, Texportplano_cuota) VALUES ('".$row_compexp['comparendo']."', 2, 0, '" . $_SESSION['MM_Username'] . "', '$fechaini', $cuota)";
-                    $mysqli->query($sqlExport);
+                    sqlsrv_query( $mysqli,$sqlExport, array(), array('Scrollable' => 'buffered'));
                 }
                 registrarLogOperacion(3, $row_compexp['comparendo'], $row_compexp['RECNUM'], $res_id, $cuota, $recaudoXML, $responseXML, $respuesta, $correcto, $_SESSION['MM_Username']);
             }
@@ -91,7 +91,7 @@ if ($_POST['webservice']) {
 if ($_POST['generar']) {
     ini_set("memory_limit", "256M");
     set_time_limit(0);
-    $rs2 = $mysqli->query("SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch");
+    $rs2=sqlsrv_query( $mysqli,"SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch", array(), array('Scrollable' => 'buffered'));
     $row2 = $rs2->fetch_row();
     $id2 = trim($row2[0]) + 1;
     
@@ -121,9 +121,9 @@ if ($_POST['generar']) {
                             RECNUM, NUMERO_CUTOAS, ID_TIPO_DOC, INTERESES, DESCUENTO, VADICIONAL, comparendo, numero 
                         FROM VExportRecaudo WHERE doc = '$idcomp' AND RECNUM = '" . $_POST['idliq'][$idcomp] . "'";
                 
-                $compexp = $mysqli->query($query_compexp);
-                $num = $compexp->num_rows;
-                $row_compexp = $compexp->fetch_assoc();
+                $compexp=sqlsrv_query( $mysqli,$query_compexp, array(), array('Scrollable' => 'buffered'));
+                $num = sqlsrv_num_rows($compexp);
+                $row_compexp = sqlsrv_fetch_array($compexp, SQLSRV_FETCH_ASSOC);
                 
                 if ($num > 0) {
                     $numero = array_pop($row_compexp);
@@ -172,7 +172,7 @@ if ($_POST['generar']) {
 
         $totalsql .= "INSERT INTO Trecaudos_arch (Trecaudos_arch_archivo, Trecaudos_arch_nombre, Trecaudos_arch_tipo, Trecaudos_arch_tamano, Trecaudos_arch_descrip, Trecaudos_arch_md5, Trecaudos_arch_expimp, Trecaudos_arch_user, Trecaudos_arch_fecha) VALUES ('$path', '$nombre_archivo', '$tipo_archivo', '$tamano_archivo', '$mensp', '$md5', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
         
-        $result1 = $mysqli->query($totalsql);
+        $result1=sqlsrv_query( $mysqli,$totalsql, array(), array('Scrollable' => 'buffered'));
         $menspost2 .= "
             <tr>
                 <td align='center' class='Recaudada'><img src='../images/acciones/apply.png' width='14' height='14' onmouseover='Tip(\"Archivo Plano Link\")' onmouseout='UnTip()'/></td>
@@ -207,7 +207,7 @@ if ($_POST['generar']) {
                 <td align='center' class='Anulada'>&nbsp;</td>
             </tr>";
         $sql3 .= "INSERT INTO Trecaudos_error (Trecaudos_error_nlinea, Trecaudos_error_ncampo, Trecaudos_error_error, Trecaudos_error_idarch, Trecaudos_error_expimp, Trecaudos_error_user, Trecaudos_error_fecha) VALUES ('$row', '$c', '" . $mensn . "', '" . $id . "', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        $rsql3 = $mysqli->query($sql3);
+        $rsql3=sqlsrv_query( $mysqli,$sql3, array(), array('Scrollable' => 'buffered'));
     }
     // para escribir en el archivo,
     //strlen($texto) nos da la longitud de la cadena del archivo
@@ -229,7 +229,7 @@ if ($_POST['buscar']) {
 
     $query_comp = "SELECT * FROM VExportRecaudo V
                    WHERE V.frecaudo BETWEEN '$fecha_ini' AND '$fecha_fin' ORDER BY V.frecaudo ASC, V.RECNIP ASC";
-    $comp = $mysqli->query($query_comp) or die("error: " . serialize(sqlsrv_errors()));
+    $comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffered')) or die("error: " . serialize(sqlsrv_errors()));
 }
 
 ?>

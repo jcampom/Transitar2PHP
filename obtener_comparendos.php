@@ -11,7 +11,7 @@ $numeroDocumento = $_POST['numeroDocumento'];
 
 // Consulta a la tabla comparendos
 $sql = "SELECT * FROM comparendos WHERE Tcomparendos_idinfractor = '$numeroDocumento' and Tcomparendos_estado = 1 or Tcomparendos_idinfractor = '$numeroDocumento' and Tcomparendos_estado = 6 or Tcomparendos_idinfractor = '$numeroDocumento' and Tcomparendos_estado = 11";
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 $response = "<table class='table table-striped'>
 <tr>
 <th> No.</th>	
@@ -26,8 +26,8 @@ $response = "<table class='table table-striped'>
 ";
 // Generar los elementos de lista con los resultados de la consulta
 $total_comparendo = 0;
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if (sqlsrv_num_rows($result) > 0) {
+    while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
         // Formatear cada resultado como un elemento de lista <li>
         $nombreInfractor = $row['Tcomparendos_comparendo'];
         
@@ -54,9 +54,9 @@ if ($result->num_rows > 0) {
            // obtenemos el valor en smlv del comparendo
            $consulta_valor="SELECT * FROM comparendos_codigos where	TTcomparendoscodigos_codigo = '".$row['Tcomparendos_codinfraccion']."'";
 
-                  $resultado_valor=$mysqli->query($consulta_valor);
+                  $resultado_valor=sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
 
-                  $row_valor=$resultado_valor->fetch_assoc();
+                  $row_valor=sqlsrv_fetch_array($resultado_valor, SQLSRV_FETCH_ASSOC);
                   
                   // obtenemos el valor del smlv del año
 
@@ -64,9 +64,9 @@ $ano_comparendo = substr($fecha_notifica, 0, 4);
 
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano_comparendo'";
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
           if($ano_comparendo > 2019){      
             $smlv_diario = round(($row_smlv['smlv']) / 30);
@@ -136,10 +136,10 @@ $valor_cobranza = 0;
          
                   // Realizar la consulta para obtener los conceptos asociados al trámite
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '39'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 $total = 0;
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
             
@@ -147,9 +147,9 @@ if ($resultado_tramite->num_rows > 0) {
          
     
 
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+            $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
-            $row_concepto=$resultado_concepto->fetch_assoc();
+            $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
             
             
        if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
@@ -166,9 +166,9 @@ if ($resultado_tramite->num_rows > 0) {
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
            
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['valor_SMLV_UVT'] == 0){
              $valor_concepto = $row_concepto['valor_concepto'];  
@@ -205,10 +205,10 @@ if($row_concepto['operacion'] == 2){
 
          // Realizar la consulta para obtener los conceptos asociados al ammnistias
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 $total2 = 0;
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
             
@@ -216,9 +216,9 @@ if ($resultado_tramite->num_rows > 0) {
          
     
 
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
-            $row_concepto=$resultado_concepto->fetch_assoc();
+            $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
             
          
          
@@ -237,9 +237,9 @@ if ($resultado_tramite->num_rows > 0) {
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
            
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['porcentaje'] > 0){
                 
