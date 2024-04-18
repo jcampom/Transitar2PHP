@@ -38,7 +38,7 @@ $sql = "INSERT INTO comparendos (Tcomparendos_comparendo, Tcomparendos_fecha, Tc
 VALUES ('$comparendo', '$fecha_infraccion', '$lugar', Tcomparendos_placa, Tcomparendos_servicio, '$tipoInfractor', '".$_POST['origen_comparendo']."', '$infraccion', '$sancion','1', '$numeroDocumento', '$tipoInfractor', '$numeroDocumento','Tcomparendos_LT', '".$_POST['solidario_propietario']."', '".$_POST['solidario_empresa']."', '".$_POST['reporte_fuga']."', '0', '$fecha', '".$_POST['grua']."',  '".$_POST['uso_grua']."',  '".$_POST['patio']."', '0', '0',  '".$_POST['observaciones']."',  '".$_POST['testigo']."', '', '',  '".$_POST['origen_comparendo']."',  '".$_POST['ayudas_tecnologicas']."', '".$_POST['reporta_accidente']."', '".$_POST['mal_diligenciado']."', '".$_POST['archivo']."', '$idusuario', '".$_POST['municipio']."', '".$_POST['localidad']."', '".$_POST['grado_alcohol']."', '".$_POST['reincidencia']."', Tcomparendos_smlv, Tcomparendos_gruazona)";
 
 // Ejecuta la consulta
-if ($mysqli->query($sql) === TRUE) {
+if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))===TRUE){	
     echo "Registro insertado con éxito.";
 } else {
     echo "Error al insertar el registro: " . serialize(sqlsrv_errors());
@@ -102,11 +102,11 @@ if ($mysqli->query($sql) === TRUE) {
     
     <?php       $consulta_comparendo="SELECT * FROM comparendos where Tcomparendos_comparendo = '$comparendo'";
 
-            $resultado_comparendo=$mysqli->query($consulta_comparendo);
+            $resultado_comparendo=sqlsrv_query( $mysqli,$consulta_comparendo, array(), array('Scrollable' => 'buffered'));
 
 
             
-if (mysqli_num_rows($resultado_comparendo) == 0) {   
+if (sqlsrv_num_rows($resultado_comparendo) == 0) {   
      echo '<form method="POST" action="comparendos.php">';
     if(empty($_POST['nuevo'])){
     echo "<b><font color='red'>Comparendo no encontrado.</font></b>
@@ -245,9 +245,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM ciudades";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -264,9 +264,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM ciudades";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -283,9 +283,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM comparendos_codigos";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['TTcomparendoscodigos_codigo'] . '">' . $rowMenu['TTcomparendoscodigos_codigo'] . '</option>';
                 }
                 ?>
@@ -302,9 +302,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM comparendos_sanciones";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['nombre'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -374,9 +374,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_infractor";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -394,9 +394,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_identificacion";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -453,9 +453,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM ciudades";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -472,9 +472,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM categorias_instruccion";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -539,9 +539,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -575,9 +575,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -595,9 +595,9 @@ Ayudas Tecnológicas</label>
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_identificacion";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>

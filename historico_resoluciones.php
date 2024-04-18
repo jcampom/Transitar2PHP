@@ -68,11 +68,11 @@ if (($gestor = fopen($_FILES['lote_archivo']['tmp_name'], "r")) !== FALSE) {
                     $insert_sancion = " INSERT INTO resolucion_sancion (ressan_ano, ressan_numero, ressan_tipo, ressan_comparendo, ressan_archivo, ressan_observaciones, ressan_fecha, ressan_resant) 
                     VALUES ('$anioRes', '$numres', '$resolucion', '$comparendo', '../sanciones/$archive_pdf', '$nota', '$fechaRes', '$resant')";
                     // echo $insert_sancion . "<br>";
-                    $mysqli->query($insert_sancion);
+                    sqlsrv_query( $mysqli,$insert_sancion, array(), array('Scrollable' => 'buffered'));
                     $insert++;
                 } elseif (valUpdateAnt($numres, $resolucion, $comparendo, $anioRes, $resant)) {
                     $insert_sancion = " UPDATE resolucion_sancion SET ressan_resant = '$resant' WHERE ressan_numero = '$numres' AND ressan_tipo = '$resolucion' AND ressan_comparendo = '$comparendo'";
-                    $mysqli->query($insert_sancion);
+                    sqlsrv_query( $mysqli,$insert_sancion, array(), array('Scrollable' => 'buffered'));
                     $update_ant++;
                 } else {
                     $res_ok++;
@@ -80,7 +80,7 @@ if (($gestor = fopen($_FILES['lote_archivo']['tmp_name'], "r")) !== FALSE) {
 
                 if (valUpdateComp($estado, $restric[$resolucion])) {
                     $insert_sancion = " UPDATE comparendos SET Tcomparendos_estado='" . $resComp[$resolucion] . "' WHERE Tcomparendos_comparendo='$comparendo'";
-                    $mysqli->query($insert_sancion);
+                    sqlsrv_query( $mysqli,$insert_sancion, array(), array('Scrollable' => 'buffered'));
                     $update++;
                 } else {
                     $comp_ok++;
@@ -133,10 +133,10 @@ function obtenRefArchivo($comparendo, $tipo) {
 function valComparendo($comparendo) {
     global $mysqli;
     $sql = "SELECT Tcomparendos_estado FROM comparendos WHERE Tcomparendos_comparendo = '$comparendo'";
-    $result = $mysqli->query($sql);
+    $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     if ($result) {
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
+        if (sqlsrv_num_rows($result) > 0) {
+            $row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
             return $row['Tcomparendos_estado'];
         } else {
             return false;
@@ -190,9 +190,9 @@ function valResolucion($comparendo, $numero, $tipo) {
     
     global $mysqli;
     $sql = "SELECT ressan_numero FROM resolucion_sancion WHERE ressan_comparendo = '$comparendo' AND ressan_numero = '$numero' AND ressan_tipo = '$tipo'";
-    $result = $mysqli->query($sql);
+    $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     if ($result) {
-        if ($result->num_rows == 0) {
+        if (sqlsrv_num_rows($result) == 0) {
             return true;
         } else {
             return false;
@@ -209,9 +209,9 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
     $resp = false;
     if ($resant != null && $resant != "") {
         $sql = "SELECT ressan_numero FROM resolucion_sancion WHERE ressan_comparendo = '$comparendo' AND ressan_tipo = '$tipo' AND ressan_numero = '$numres' AND ressan_ano = '$anioRes'";
-        $result = $mysqli->query($sql);
+        $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
         if ($result) {
-            if ($result->num_rows == 1) {
+            if (sqlsrv_num_rows($result) == 1) {
                 $resp = true;
             }
         } else {
@@ -300,10 +300,10 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
 
     
     $query_resol = "SELECT id, nombre FROM resolucion_sancion_tipo where id in (2,28,16)";
-    $resol = $mysqli->query($query_resol);
+    $resol=sqlsrv_query( $mysqli,$query_resol, array(), array('Scrollable' => 'buffered'));
     
-    if ($resol->num_rows > 0) {
-        while ($row_resol = $resol->fetch_assoc()) {
+    if (sqlsrv_num_rows($resol) > 0) {
+        while ($row_resol = sqlsrv_fetch_array($resol, SQLSRV_FETCH_ASSOC)) {
             ?>
             <option value="<?php echo $row_resol['id']; ?>"><?php echo $row_resol['nombre']; ?> </option> 		
         <?php

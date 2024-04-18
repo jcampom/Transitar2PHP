@@ -60,8 +60,8 @@ if (isset($_GET['Comprobar'])) {
         $sql .= " AND ((CONVERT(resdt_fechares, DATETIME)) BETWEEN '" . $fechainicio . "' AND '" . $fechafinall . " 23:59:59')";
         $sql .= " ORDER BY resdt_fechares DESC";
 // echo $sql;
-        $Result = mysqli_query($mysqli, $sql);
-        if (mysqli_num_rows($Result) > 0) {
+        $Result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+        if (sqlsrv_num_rows($Result) > 0) {
             $mesliq = "<div class='highlight2'>Se encontraron resoluciones bajo los filtros seleccionados</div>";
             $OK = 'OK';
         } else {
@@ -107,7 +107,7 @@ if (isset($_GET['Comprobar'])) {
     <?php
     $Query = "SELECT id ,nombre FROM resolucion_sancion_tipo where origen = 2 order by nombre";
     $Combo = "";
-    $Result = mysqli_query($mysqli, $Query);
+    $Result=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
     $Combo = $Combo . "<select class='form-control' name='tipores' id='tipores'  style='width:150px' value=" . @$_GET['tipores'] . ">";
     $Combo = $Combo . "<option value='0'>Todos</option>";
     while ($columnas = mysqli_fetch_array($Result)) {
@@ -132,7 +132,7 @@ if (isset($_GET['Comprobar'])) {
         <?php
         $Query = "SELECT resdt_anioini FROM ressan_dt group by resdt_anioini order by resdt_anioini";
         $Combo = "";
-        $Result = mysqli_query($mysqli, $Query);
+        $Result=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
         $Combo = $Combo . "<select class='form-control' name='anio' id='anio'  style='width:150px' value=" . @$_GET['anio'] . ">";
         $Combo = $Combo . "<option value='0'>Todos</option>";
         while ($columnas = mysqli_fetch_array($Result)) {
@@ -204,7 +204,7 @@ if (isset($_GET['Comprobar'])) {
                                     $salida1 = $head;
                                     $count = 1;
                                     //echo $totalfilas=mssql_num_rows($Result);
-                         $Result1 = mysqli_query($mysqli, $sql);
+                         $Result1=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
 //////////////////////////////////////////////////////////
 while ($row = mysqli_fetch_array($Result1)) {
@@ -255,7 +255,7 @@ while ($row = mysqli_fetch_array($Result1)) {
                                        </tbody>
                                 </table>
                           
-                  <strong>Registros encontrados: </strong><?php echo @$Result1->num_rows; ?>
+                  <strong>Registros encontrados: </strong><?php echo @sqlsrv_num_rows($Result1); ?>
                         
                     </form>
                 

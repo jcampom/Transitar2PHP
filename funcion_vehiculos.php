@@ -13,9 +13,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_identificacion";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -81,9 +81,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM marca";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -113,9 +113,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM clase_vehiculo";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -146,9 +146,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_color";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -165,9 +165,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_servicio";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -184,9 +184,9 @@
          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_modalidad";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -221,9 +221,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_cilindraje";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '(' . $rowMenu['minimo']. '-' . $rowMenu['maximo'] . ')</option>';
                 }
                 ?>
@@ -284,9 +284,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_combustible";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -337,9 +337,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_clasificacion";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -364,9 +364,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_origen";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -407,9 +407,9 @@
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM paises";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>

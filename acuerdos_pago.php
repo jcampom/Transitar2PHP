@@ -21,9 +21,9 @@ $porcentaje = $_POST['porcentaje'];
 
 // Consulta a la tabla comparendos
 $sql_comparendo = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$comparendo'";
-$result_comparendo = $mysqli->query($sql_comparendo);
+$result_comparendo=sqlsrv_query( $mysqli,$sql_comparendo, array(), array('Scrollable' => 'buffered'));
 
-$row_comparendo = $result_comparendo->fetch_assoc();
+$row_comparendo = sqlsrv_fetch_array($result_comparendo, SQLSRV_FETCH_ASSOC);
 
 $identificacion = $row_comparendo['Tcomparendos_idinfractor'];
 
@@ -85,7 +85,7 @@ $honorario = 0;
   
       $insertQuery = "INSERT INTO acuerdos_pagos (TAcuerdop_numero, TAcuerdop_comparendo, TAcuerdop_valor, TAcuerdop_periodicidad, TAcuerdop_cuota, TAcuerdop_cuotas, TAcuerdop_identificacion, TAcuerdop_estado, TAcuerdop_fechapago, TAcuerdop_tipodoc, TAcuerdop_fecha, TAcuerdop_user, TAcuerdop_concepto, TAcuerdop_sistema, TAcuerdop_intmora, TAcuerdop_dintmora, TAcuerdop_honorario, TAcuerdop_cobranzas, TAcuerdop_solicitud) VALUES ('TAcuerdop_numero', '$comparendo', '$valor', '$periodicidad', '$i', '$cantidad_cuotas', '$identificacion', '4', '$fecha_pago', 'COM', '$fechayhora', '$idusuario', '0', '$sistema', '$mora', '$dias_mora', '$honorario', '0', '0')";
      // Ejecutar la consulta de inserción
-     if ($mysqli->query($insertQuery)) {
+     if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
 
  
  
@@ -103,7 +103,7 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos 
 $insert_resolucion = "INSERT INTO resolucion_sancion (ressan_ano, ressan_numero, ressan_tipo, ressan_comparendo, ressan_archivo, ressan_fecha, ressan_observaciones, ressan_exportado, ressan_resant, ressan_compid) VALUES ('$ano', '$numero_folio', '4', '$comparendo', '0', '$fecha', '', 'False', '".$row_comparendo['Tcomparendos_ID']."',  '".$row_comparendo['Tcomparendos_ID']."')";
 
  // Ejecutar la consulta de inserción
-     if ($mysqli->query($insert_resolucion)) {
+     if (sqlsrv_query( $mysqli,$insert_resolucion, array(), array('Scrollable' => 'buffered'))){
 
      } else {
    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar resolución. Error: ' . serialize(sqlsrv_errors()) . '</div>';
@@ -112,7 +112,7 @@ $insert_resolucion = "INSERT INTO resolucion_sancion (ressan_ano, ressan_numero,
  //	COMPARENDOS(CAMBIA DE ESTADO A ESTADO PRE ACUERDO)
   
  $actualizar_comparendo = "UPDATE comparendos SET Tcomparendos_estado = '4' WHERE Tcomparendos_comparendo = '$comparendo' ";
- $resultado_actualizar_comparendo = $mysqli->query($actualizar_comparendo);
+$resultado_actualizar_comparendo=sqlsrv_query( $mysqli,$actualizar_comparendo, array(), array('Scrollable' => 'buffered'));
  
  
  
@@ -163,8 +163,8 @@ if(!empty($_POST['garantia'])){
         FROM comparendos
         WHERE Tcomparendos_placa = '".$_POST['numero']."' and Tcomparendos_estado IN(6,8,11) or Tcomparendos_idinfractor = '".$_POST['numero']."' and Tcomparendos_estado IN(6,8,11) ";
 
-$result_comparendos = $mysqli->query($sql_comparendos);
-       if ($result_comparendos->num_rows > 0) {  
+$result_comparendos=sqlsrv_query( $mysqli,$sql_comparendos, array(), array('Scrollable' => 'buffered'));
+       if (sqlsrv_num_rows($result_comparendos) > 0) {  
   ?>  
   
   
@@ -183,7 +183,7 @@ $result_comparendos = $mysqli->query($sql_comparendos);
 <?php 
 
 
-while($row_comparendos = $result_comparendos->fetch_assoc()){ ?>
+while($row_comparendos = sqlsrv_fetch_array($result_comparendos, SQLSRV_FETCH_ASSOC)){ ?>
  </tr>
 <td> <?php echo $row_comparendos['Tcomparendos_comparendo']; ?> </td>	
 <td><?php echo $row_comparendos['Tcomparendos_fecha']; ?> </td>	
@@ -197,16 +197,16 @@ $fecha_notifica = getFnotifica($numeroDocumento);
 
 // Consulta a la tabla comparendos
 $sql = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$numeroDocumento'";
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
-$row = $result->fetch_assoc();
+$row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
            // obtenemos el valor en smlv del comparendo
            $consulta_valor="SELECT * FROM comparendos_codigos where	TTcomparendoscodigos_codigo = '".$row['Tcomparendos_codinfraccion']."'";
 
-                  $resultado_valor=$mysqli->query($consulta_valor);
+                  $resultado_valor=sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
 
-                  $row_valor=$resultado_valor->fetch_assoc();
+                  $row_valor=sqlsrv_fetch_array($resultado_valor, SQLSRV_FETCH_ASSOC);
                   
                   // obtenemos el valor del smlv del año
 
@@ -216,9 +216,9 @@ $ano_comparendo = substr($fecha_notifica, 0, 4);
 
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano_comparendo'";
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             if($ano_comparendo > 2019){      
             $smlv_diario = round(($row_smlv['smlv']) / 30);
             
@@ -438,8 +438,8 @@ echo round(($total_comparendo) / ($cuotas_restantes));
                 <option value="" disabled selected>Seleccione...</option>
                 <?php
                 $consulta_organismos = "SELECT id, nombre FROM terceros";
-                $resultado_organismos = $mysqli->query($consulta_organismos);
-                while ($row_organismo = $resultado_organismos->fetch_assoc()) {
+                $resultado_organismos=sqlsrv_query( $mysqli,$consulta_organismos, array(), array('Scrollable' => 'buffered'));
+                while ($row_organismo = sqlsrv_fetch_array($resultado_organismos, SQLSRV_FETCH_ASSOC)) {
                     echo '<option value="' . $row_organismo['id'] . '">' . $row_organismo['nombre'] . '</option>';
                 }
                 ?>
@@ -463,8 +463,8 @@ echo round(($total_comparendo) / ($cuotas_restantes));
                 <option value="" disabled selected>Seleccione...</option>
                 <?php
                 $consulta_marcas = "SELECT id, nombre FROM marca";
-                $resultado_marcas = $mysqli->query($consulta_marcas);
-                while ($row_marca = $resultado_marcas->fetch_assoc()) {
+                $resultado_marcas=sqlsrv_query( $mysqli,$consulta_marcas, array(), array('Scrollable' => 'buffered'));
+                while ($row_marca = sqlsrv_fetch_array($resultado_marcas, SQLSRV_FETCH_ASSOC)) {
                     echo '<option value="' . $row_marca['id'] . '">' . $row_marca['nombre'] . '</option>';
                 }
                 ?>
@@ -480,8 +480,8 @@ echo round(($total_comparendo) / ($cuotas_restantes));
                 <option value="" disabled selected>Seleccione...</option>
                 <?php
                 $consulta_servicios = "SELECT id, nombre FROM color";
-                $resultado_servicios = $mysqli->query($consulta_servicios);
-                while ($row_servicio = $resultado_servicios->fetch_assoc()) {
+                $resultado_servicios=sqlsrv_query( $mysqli,$consulta_servicios, array(), array('Scrollable' => 'buffered'));
+                while ($row_servicio = sqlsrv_fetch_array($resultado_servicios, SQLSRV_FETCH_ASSOC)) {
                     echo '<option value="' . $row_servicio['id'] . '">' . $row_servicio['nombre'] . '</option>';
                 }
                 ?>
@@ -505,8 +505,8 @@ echo round(($total_comparendo) / ($cuotas_restantes));
                 <option value="" disabled selected>Seleccione...</option>
                 <?php
                 $consulta_servicios = "SELECT id, nombre FROM tipo_servicio";
-                $resultado_servicios = $mysqli->query($consulta_servicios);
-                while ($row_servicio = $resultado_servicios->fetch_assoc()) {
+                $resultado_servicios=sqlsrv_query( $mysqli,$consulta_servicios, array(), array('Scrollable' => 'buffered'));
+                while ($row_servicio = sqlsrv_fetch_array($resultado_servicios, SQLSRV_FETCH_ASSOC)) {
                     echo '<option value="' . $row_servicio['id'] . '">' . $row_servicio['nombre'] . '</option>';
                 }
                 ?>
@@ -546,8 +546,8 @@ echo round(($total_comparendo) / ($cuotas_restantes));
                 <option value="" disabled selected>Seleccione...</option>
                 <?php
                 $consulta_coodeudores = "SELECT id, nombre FROM terceros";
-                $resultado_coodeudores = $mysqli->query($consulta_coodeudores);
-                while ($row_coodeudor = $resultado_coodeudores->fetch_assoc()) {
+                $resultado_coodeudores=sqlsrv_query( $mysqli,$consulta_coodeudores, array(), array('Scrollable' => 'buffered'));
+                while ($row_coodeudor = sqlsrv_fetch_array($resultado_coodeudores, SQLSRV_FETCH_ASSOC)) {
                     echo '<option value="' . $row_coodeudor['id'] . '">' . $row_coodeudor['nombre'] . '</option>';
                 }
                 ?>
@@ -563,8 +563,8 @@ echo round(($total_comparendo) / ($cuotas_restantes));
                 <option value="" disabled selected>Seleccione...</option>
                 <?php
                 $consulta_tipos_documento = "SELECT id, nombre FROM tipo_identificacion";
-                $resultado_tipos_documento = $mysqli->query($consulta_tipos_documento);
-                while ($row_tipo_documento = $resultado_tipos_documento->fetch_assoc()) {
+                $resultado_tipos_documento=sqlsrv_query( $mysqli,$consulta_tipos_documento, array(), array('Scrollable' => 'buffered'));
+                while ($row_tipo_documento = sqlsrv_fetch_array($resultado_tipos_documento, SQLSRV_FETCH_ASSOC)) {
                     echo '<option value="' . $row_tipo_documento['id'] . '">' . $row_tipo_documento['nombre'] . '</option>';
                 }
                 ?>

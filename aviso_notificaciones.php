@@ -11,26 +11,27 @@ if (!isset($_POST['generar'])) {
     $fini = date('Y-m-d', strtotime($fbase . '- 2 months'));
     $ffin = date('Y-m-d', strtotime($fbase . '- 1 months - 1 days'));
     
-$result = $mysqli->query("SELECT MAX(numero + 1) AS numero,
-            (SELECT Tnotifparams_autonotdias FROM Tnotifparams where Tnotifparams_ID = 1) AS dias FROM avisos WHERE tipo = 29");
+    $qry1 = "SELECT MAX(numero + 1) AS numero, (SELECT Tnotifparams_autonotdias FROM Tnotifparams where Tnotifparams_ID = 1) AS dias FROM avisos WHERE tipo = 29";
+    $result=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
 
-    $data = $result->fetch_assoc();
+    $data = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
     $numAviso = $data['numero'];
     $diasAviso = $data['dias'];
     
-    @$result1 = $mysqli->query("SELECT Tnotifica_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) AS fecha, Tcomparendos_origen AS origen,
+    $qry2="SELECT Tnotifica_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) AS fecha, Tcomparendos_origen AS origen,
             Tcomparendos_lugar AS lugar,  Tcomparendos_idinfractor AS ident,  Tcomparendos_ID AS compid,
             CONCAT(nombres, ' ', apellidos) AS nombre
         FROM Tnotifica 
             INNER JOIN comparendos ON Tcomparendos_ID = Tnotifica_compid AND Tcomparendos_estado IN (1,15) AND Tcomparendos_origen = 1
             INNER JOIN ciudadanos ON numero_documento = Tcomparendos_idinfractor
         WHERE Tnotifica_estado = 0 AND CAST(Tcomparendos_fecha AS DATE) <= '$ffin'
-        ORDER BY Tcomparendos_fecha ASC, Tcomparendos_comparendo ASC");
+        ORDER BY Tcomparendos_fecha ASC, Tcomparendos_comparendo ASC";
+    @$result1=sqlsrv_query( $mysqli,$qry2, array(), array('Scrollable' => 'buffered'));
     
-    $cantAviso = $result1->num_rows;
+    $cantAviso = sqlsrv_num_rows($result1);
     $avisos = array();
     
-    while ($rowdata = $result1->fetch_assoc()) {
+    while ($rowdata = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
         $group = substr($rowdata['fecha'], 0, 7);
         $avisos[$group][] = $rowdata;
     }
@@ -51,10 +52,10 @@ $result = $mysqli->query("SELECT MAX(numero + 1) AS numero,
 $sql = "SELECT IFNULL(MAX(numero), 0) + 1 AS nuevo_id FROM avisos WHERE tipo = 29";
 
 // Ejecutar la consulta
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     // Obtener el resultado como un arreglo asociativo
-    $row = $result->fetch_assoc();
+    $row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
     // Obtener el nuevo ID
     $num = $row['nuevo_id'];
@@ -74,17 +75,17 @@ $sql = "
         '{$_SESSION['MM_Username']}'
     )";
 
- $mysqli->query($sql);
+sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
  
  
  // Consulta SQL
 $sql = "SELECT id FROM avisos WHERE tipo = 29 AND numero = '$num'";
 
 // Ejecutar la consulta
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     // Obtener el resultado como un arreglo asociativo
-    $row = $result->fetch_assoc();
+    $row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
     // Obtener el nuevo ID
     $aviso = $row['id'];
@@ -99,7 +100,7 @@ $sqlInsertResolucion = "
     
 
     
-if ($mysqli->query($sqlInsertResolucion)) {
+if (sqlsrv_query( $mysqli,$sqlInsertResolucion, array(), array('Scrollable' => 'buffered'))){
 
     // Resto del código
 } else {
@@ -118,7 +119,7 @@ $sqlInsertAvisosResoluciones = "
 
 
 
-if ($mysqli->query($sqlInsertAvisosResoluciones)) {
+if (sqlsrv_query( $mysqli,$sqlInsertAvisosResoluciones, array(), array('Scrollable' => 'buffered'))){
 
     // Resto del código
 } else {
@@ -133,12 +134,12 @@ $sqlUpdateTnotifica = "
     WHERE Tnotifica_estado = 0 AND Tnotifica_compid IN ($compsid)";
 
         
-        $result = $mysqli->query($sqlUpdateTnotifica);
+        $result=sqlsrv_query( $mysqli,$sqlUpdateTnotifica, array(), array('Scrollable' => 'buffered'));
         
           echo "<br>Error en la consultas 3 : " . serialize(sqlsrv_errors());
  
  
-if ($mysqli->query($sql)) {
+if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))){
 
     // Resto del código
 } else {
@@ -150,20 +151,20 @@ if ($mysqli->query($sql)) {
         $result = serialize(sqlsrv_errors());
 
         if ($result == "") {
-            
-            $querya = $mysqli->query("SELECT COUNT(*) AS total, A.id
+        $qry3 = "SELECT COUNT(*) AS total, A.id
                     FROM avisos A
                         INNER JOIN avisos_resoluciones R ON A.id = R.aviso 
                     WHERE A.tipo = 29 AND A.numero = (SELECT MAX(numero) AS numero FROM avisos WHERE tipo = 29) 
-                    GROUP BY A.id");
+                    GROUP BY A.id";
+            $querya=sqlsrv_query( $mysqli,$qry3, array(), array('Scrollable' => 'buffered'));
                     
     if ($querya) {
-    $aviso = $querya->fetch_assoc();
+       $aviso = sqlsrv_fetch_array($querya, SQLSRV_FETCH_ASSOC);
     // Resto del código
-} else {
-    // Manejar el caso cuando la consulta no se ejecuta correctamente
-    echo "Error en la consulta: " . serialize(sqlsrv_errors());
-}
+     } else {
+      // Manejar el caso cuando la consulta no se ejecuta correctamente
+      echo "Error en la consulta: " . serialize(sqlsrv_errors());
+    }
           
             $menspost3 = "Se generaron documentos de aviso a  {$aviso['total']} comparendos, documento generado." .
                     ' <a href="../sanciones/gdp_avisonot_pdf.php?refId=' . $aviso['id'] . '" target="_blank">Ver Aviso</a>';

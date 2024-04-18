@@ -103,15 +103,15 @@ if ($paginar == 1) {
             (SELECT DISTINCT Texportplano_comp
              FROM Texportplano
              WHERE Texportplano_tipo='1')";
-    $comp1 = $mysqli->query($sql);
+    $comp1=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     echo $sql;
-    $total_registros = $comp1->num_rows;
+    $total_registros = sqlsrv_num_rows($comp1);
     $total_paginas = ceil($total_registros / $registros);
     $query_comp = "SELECT * FROM ($query_base) T WHERE T.fila BETWEEN $inicio AND $fin";
 } else {
     $query_comp = $query_base;
 }
-$comp = $mysqli->query($query_comp);
+$comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffered'));
 
 // echo $query_comp;
 
@@ -124,8 +124,8 @@ if ($_POST['webservice']) {
     $idcomp = $_POST['idcomp'];
     foreach ($idcomp as $id) {
         $query_compexp = "SELECT * FROM VExportComp WHERE idcomp = $id";
-        $compexp = $mysqli->query($query_compexp);
-        $data = $compexp->fetch_assoc();
+        $compexp=sqlsrv_query( $mysqli,$query_compexp, array(), array('Scrollable' => 'buffered'));
+        $data = sqlsrv_fetch_array($compexp, SQLSRV_FETCH_ASSOC);
         if (empty($data)) {
             continue;
         }
@@ -165,7 +165,7 @@ if ($_POST['webservice']) {
                         </tr>";
             $cuota = ($arrayComparendo['cuota']) ? $arrayComparendo['cuota'] : 0;
             $sqlExport = "INSERT INTO Texportplano (Texportplano_comp, Texportplano_tipo, Texportplano_idarch, Texportplano_user, Texportplano_fecha, Texportplano_cuota) VALUES ('" . $arrayComparendo['comp'] . "', 1, 0, '" . $_SESSION['MM_Username'] . "', '$fechaini', $cuota)";
-            $mysqli->query($sqlExport);
+            sqlsrv_query( $mysqli,$sqlExport, array(), array('Scrollable' => 'buffered'));
         }
         registrarLogOperacion(1, $arrayComparendo['comp'], 'NULL', 'NULL', 'NULL', $comparendoXML, $responseXML, $respuesta, $correcto, $_SESSION['MM_Username']);
     }
@@ -185,7 +185,7 @@ if ($_POST['generar']) {
     set_time_limit(0);
 
     // Obtener el último ID de Trecaudos_arch
-    $rs2 = $mysqli->query("SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch");
+    $rs2=sqlsrv_query( $mysqli,"SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch", array(), array('Scrollable' => 'buffered'));
     $row2 = $rs2->fetch_row();
     $id2 = trim($row2[0]);
     $nombre_archivo = ($id2 + 1) . "_" . trim($ndivipo) . "comp.txt";
@@ -212,8 +212,8 @@ if ($_POST['generar']) {
         foreach ($idcomp as $id) {
             
             $query_compexp = "SELECT * FROM VExportComp WHERE idcomp = $id";
-            $compexp = $mysqli->query($query_compexp);
-            $row_compexp = fixArray($compexp->fetch_assoc());
+            $compexp=sqlsrv_query( $mysqli,$query_compexp, array(), array('Scrollable' => 'buffered'));
+            $row_compexp = fixArray(sqlsrv_fetch_array($compexp, SQLSRV_FETCH_ASSOC));
             $nComp = $row_compexp['comp'];
             unset($row_compexp['idcomp']);
             unset($row_compexp['comp']);
@@ -259,7 +259,7 @@ if ($_POST['generar']) {
         $tamano_archivo = filesize($path);
 
         $totalsql .= "INSERT INTO Trecaudos_arch (Trecaudos_arch_archivo, Trecaudos_arch_nombre, Trecaudos_arch_tipo, Trecaudos_arch_tamano, Trecaudos_arch_descrip, Trecaudos_arch_md5, Trecaudos_arch_expimp, Trecaudos_arch_user, Trecaudos_arch_fecha) VALUES ('$path', '$nombre_archivo', '$tipo_archivo', '$tamano_archivo', '$mensp', '$md5', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        $result1 = $mysqli->query($totalsql);
+        $result1=sqlsrv_query( $mysqli,$totalsql, array(), array('Scrollable' => 'buffered'));
 
         $menspost3 .= "
             <tr>
@@ -280,17 +280,17 @@ if ($_POST['generar']) {
             </tr>";
 
         // Obtener el último ID de Trecaudos_arch
-        $rs = $mysqli->query("SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch");
+        $rs=sqlsrv_query( $mysqli,"SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch", array(), array('Scrollable' => 'buffered'));
         $row = $rs->fetch_row();
         $id = trim($row[0]);
 
         $sql2 = " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Texportplano', 'INSERT', '" . $id . "', '$mensp', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
         
-        $mysqli->query($sql2);
+        sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
         
         $sql2 = " INSERT INTO Trecaudos_ec (Trecaudos_ec_numcuenta, Trecaudos_ec_fechadesde, Trecaudos_ec_fechahasta, Trecaudos_ec_divipo, Trecaudos_ec_tiporecaudo, Trecaudos_ec_numrec, Trecaudos_ec_sumrec, Trecaudos_ec_oficio, Trecaudos_ec_codchequeo, Trecaudos_ec_idarch, Trecaudos_ec_pdf, Trecaudos_ec_expimp, Trecaudos_ec_user, Trecaudos_ec_fecha) VALUES ('', '', '', '', '', '" . ($consec - 1) . "', '$valortotal', " . $_POST['oficio'] . ", '" . $rsumaascii . "', '" . $id . "', '$mensp', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
         
-        $mysqli->query($sql2);
+        sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
 
         fclose($fp);
     } else {
@@ -307,7 +307,7 @@ if ($_POST['generar']) {
         $sql3 = "INSERT INTO Trecaudos_error (Trecaudos_error_nlinea, Trecaudos_error_ncampo, Trecaudos_error_error, Trecaudos_error_idarch, Trecaudos_error_expimp, Trecaudos_error_user, Trecaudos_error_fecha) VALUES ('$row', '$c', '" . $mensn . "', '" . $id . "', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
      
         
-        if ($mysqli->query($sql3)) {
+        if (sqlsrv_query( $mysqli,$sql3, array(), array('Scrollable' => 'buffered'))){
     // Insert successful
     
       echo '<div class="alert alert-warning"><strong>¡No se pudo generar el archivo!</strong> Se dejo un registro del error.</div>';
@@ -364,8 +364,8 @@ if ($_POST['generar']) {
                                       <select class="form-control" name='origen' id='origen' style='width:150px' value="<?php echo @$_GET['origen']; ?>">
     <option value='0'>Todos</option>
     <?php
-    $result1 = $mysqli->query("SELECT id ,nombre FROM comparendos_origen");
-    while ($columnas = $result1->fetch_assoc()) {
+    $result1=sqlsrv_query( $mysqli,"SELECT id ,nombre FROM comparendos_origen", array(), array('Scrollable' => 'buffered'));
+    while ($columnas = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
         $seleccion = ($columnas['id'] == $_GET['origen']) ? " selected " : '';
         echo "<option value='" . $columnas['id'] . "' " . $seleccion . ">" . toUTF8(trim($columnas['nombre'])) . "</option>";
     }
@@ -380,8 +380,8 @@ if ($_POST['generar']) {
                                           <select class="form-control" name='estado' id='estado' style='width:150px' value="<?php echo @$_GET['estado']; ?>">
     <option value='0'>Todos</option>
     <?php
-    $result2 = $mysqli->query("SELECT id, nombre FROM comparendos_estados ORDER BY nombre");
-    while ($columnas = $result2->fetch_assoc()) {
+    $result2=sqlsrv_query( $mysqli,"SELECT id, nombre FROM comparendos_estados ORDER BY nombre", array(), array('Scrollable' => 'buffered'));
+    while ($columnas = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC)) {
         $seleccion = ($columnas['id'] == $_GET['estado']) ? " selected " : '';
         echo "<option value='" . $columnas['id'] . "' " . $seleccion . ">" . toUTF8(trim($columnas['nombre'])) . "</option>";
     }
@@ -397,8 +397,8 @@ if ($_POST['generar']) {
                                          <select class="form-control" name='codigo' id='codigo' style='width:150px' value="<?php echo @$_GET['codigo']; ?>">
     <option value='0'>Todos</option>
     <?php
-    $result3 = $mysqli->query("SELECT TTcomparendoscodigos_codigo as codigo FROM comparendos_codigos");
-    while ($columnas = $result3->fetch_assoc()) {
+    $result3=sqlsrv_query( $mysqli,"SELECT TTcomparendoscodigos_codigo as codigo FROM comparendos_codigos", array(), array('Scrollable' => 'buffered'));
+    while ($columnas = sqlsrv_fetch_array($result3, SQLSRV_FETCH_ASSOC)) {
         $seleccion = ($columnas['codigo'] == $_GET['codigo']) ? " selected " : '';
         echo "<option value='" . $columnas['codigo'] . "' " . $seleccion . ">" . $columnas['codigo'] . "</option>";
     }
@@ -569,7 +569,7 @@ if ($_POST['generar']) {
                         <tr>
                             <td colspan="10">&nbsp;</td>
                         </tr>
-                    <?php elseif ($comp->num_rows > 0) : ?>
+                    <?php elseif (sqlsrv_num_rows($comp) > 0) : ?>
                         <form name="form" id="form" action="expplanocomp.php" method="POST" onSubmit="return ValidaExporComp()">
                                   <table class="table">
                             <tr class="contenido2">

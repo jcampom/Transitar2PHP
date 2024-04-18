@@ -14,20 +14,20 @@ if (isset($_POST['generar'])) {
                 // echo "$cobroId<br>";
                 $gen = "UPDATE comparendos SET Tcomparendos_honorarios='$cobroSet' WHERE Tcomparendos_ID='$cobroId'";
                 
-                $mysqli->query($gen);
+                sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
                 
                 $mensp .= generateTR($_POST['numero' . $k], 'Honorarios', $cobroSet);
             } elseif ($_POST['tipodeuda'] == 6) {
                 $gen = "UPDATE acuerdos_pagos  SET TAcuerdop_honorarios='$cobroSet' WHERE TAcuerdop_ID='$cobroId'";
-                 $mysqli->query($gen);
+                 sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
                 $mensp .= generateTR($_POST['numero' . $k] . " cuota: " . $_POST['otro' . $k], 'Honorarios', $cobroSet);
             } else {
                 $gen = "UPDATE derechos_transito  SET TDT_honorarios='$cobroSet' WHERE TDT_ID='$cobroId'";
-                 $mysqli->query($gen);
+                 sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
                 $mensp .= generateTR($_POST['fecha' . $k] . " placa: " . $_POST['numero' . $k], 'Honorarios', $cobroSet);
             }
              $gen = "INSERT INTO THonoCobra (THonoCobra_deudaID, THonoCobra_deudaTipo, THonoCobra_cobroTipo, THonoCobra_tercero, THonoCobra_fecha, THonoCobra_user) VALUES('$cobroId', '" . $_POST['tipodeuda'] . "', '$cobroTipo', '" . $_POST['tercero'] . "', '$fechaini', '" . $_SESSION['MM_Username'] . "');";
-              $mysqli->query($gen);
+              sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
              
         }
         if ($_POST['cobra' . $k] || $_POST['cobrad' . $k]) {
@@ -36,19 +36,19 @@ if (isset($_POST['generar'])) {
             $cobroSet = $_POST['cobrad' . $k] ? 2 : 1;
             if ($_POST['tipodeuda'] == 4) {
                 $gen = "UPDATE comparendos SET Tcomparendos_cobranza='$cobroSet' WHERE Tcomparendos_ID='$cobroId';";
-                 $mysqli->query($gen);
+                 sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
                 $mensp .= generateTR($_POST['numero' . $k], 'Cobranza', $cobroSet);
             } elseif ($_POST['tipodeuda'] == 6) {
                 $gen = "UPDATE acuerdos_pagos  SET TAcuerdop_cobranza='$cobroSet' WHERE TAcuerdop_ID='$cobroId';";
-                 $mysqli->query($gen);
+                 sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
                 $mensp .= generateTR($_POST['numero' . $k] . " cuota: " . $_POST['otro' . $k], 'Cobranza', $cobroSet);
             } else {
                 $gen = "UPDATE derechos_transito  SET TDT_cobranza='$cobroSet' WHERE TDT_ID='$cobroId';";
-                 $mysqli->query($gen);
+                 sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
                 $mensp .= generateTR($_POST['fecha' . $k] . " placa: " . $_POST['numero' . $k], 'Cobranza', $cobroSet);
             }
             $gen = "INSERT INTO THonoCobra (THonoCobra_deudaID, THonoCobra_deudaTipo, THonoCobra_cobroTipo, THonoCobra_tercero, THonoCobra_fecha, THonoCobra_user) VALUES('$cobroId', '" . $_POST['tipodeuda'] . "', '$cobroTipo', '" . $_POST['tercero'] . "', '$fechaini', '" . $_SESSION['MM_Username'] . "');";
-             $mysqli->query($gen);
+             sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
         }
     }
     if ($gen == '') {

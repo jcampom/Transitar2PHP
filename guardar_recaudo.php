@@ -26,18 +26,18 @@ $titulos = $_POST['titulos'];
 // obtenemos datos de la liquidacion
 $consulta_liquidacion = "SELECT * FROM detalle_liquidaciones where liquidacion = '$liquidacion' ";
 
-$resultado_liquidacion = $mysqli->query($consulta_liquidacion);
+$resultado_liquidacion=sqlsrv_query( $mysqli,$consulta_liquidacion, array(), array('Scrollable' => 'buffered'));
 
-$resultado_liquidacion2 = $mysqli->query($consulta_liquidacion);
+$resultado_liquidacion2=sqlsrv_query( $mysqli,$consulta_liquidacion, array(), array('Scrollable' => 'buffered'));
 
-$row_liquidacion = $resultado_liquidacion->fetch_assoc();
+$row_liquidacion = sqlsrv_fetch_array($resultado_liquidacion, SQLSRV_FETCH_ASSOC);
 
 
 
 
  $sql = "INSERT INTO recaudos (liquidacion, comparendo, valor, tipo_recaudo, forma_pago, fecha, nombre_pagador, telefono_pagador, identificacion_pagador, banco, numero_consignacion, referencia, observacion, fechayhora, usuario) VALUES ('$liquidacion', '".$row_liquidacion['comparendo']."', '$valor', '$tipo_recaudo', '$forma_pago', '$fecha', '$nombre_pagador', '$telefono_pagador', '$identificacion_pagador', '$banco', '$numero_consignacion', '$referencia', '$observacion', '$fechayhora', '$idusuario')";
 
-        if ($mysqli->query($sql) !== TRUE) {
+        if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))!==TRUE){
 
             
     
@@ -45,28 +45,28 @@ $row_liquidacion = $resultado_liquidacion->fetch_assoc();
                 
         }else{
             $sql_actualizar = "UPDATE liquidaciones SET estado='3' where id = '$liquidacion'";
-                $resultado = $mysqli->query($sql_actualizar);
+                $resultado=sqlsrv_query( $mysqli,$sql_actualizar, array(), array('Scrollable' => 'buffered'));
                 
                 
-while($row_liquidacion2 = $resultado_liquidacion2->fetch_assoc()){
+while($row_liquidacion2 = sqlsrv_fetch_array($resultado_liquidacion2, SQLSRV_FETCH_ASSOC)){
     
     if(!empty($row_liquidacion2['comparendo'])){
                 // se cambia el estado del comparendo a recaudado
  $actualizar_comparendo = "UPDATE comparendos SET Tcomparendos_estado = '2' WHERE Tcomparendos_comparendo = '".$row_liquidacion2['comparendo']."' ";
- $resultado_actualizar_comparendo = $mysqli->query($actualizar_comparendo);
+$resultado_actualizar_comparendo=sqlsrv_query( $mysqli,$actualizar_comparendo, array(), array('Scrollable' => 'buffered'));
     }
     
      if(!empty($row_liquidacion2['acuerdo'])){
                  // se cambia el estado del cuaota de acuerdo de pago recaudado
  $actualizar_ap = "UPDATE acuerdos_pagos SET TAcuerdop_estado = '2' WHERE TAcuerdop_numero = '".$row_liquidacion2['acuerdo']."' and TAcuerdop_cuota = '".$row_liquidacion2['cuota']."' ";
- $resultado_ap = $mysqli->query($actualizar_ap);
+$resultado_ap=sqlsrv_query( $mysqli,$actualizar_ap, array(), array('Scrollable' => 'buffered'));
  
      }
      
           if(!empty($row_liquidacion2['acuerdo'])){
                  // se cambia el estado del cuaota de acuerdo de pago recaudado
  $actualizar_dt = "UPDATE derechos_transito SET TAcuerdop_estado = '2' WHERE TDT_ID = '".$row_liquidacion2['dt']."' ";
- $resultado_dt = $mysqli->query($actualizar_dt);
+$resultado_dt=sqlsrv_query( $mysqli,$actualizar_dt, array(), array('Scrollable' => 'buffered'));
  
      }
 }
@@ -80,7 +80,7 @@ while($row_liquidacion2 = $resultado_liquidacion2->fetch_assoc()){
 
         $sql = "INSERT INTO titulos (numero, fecha, valor) VALUES ('$numero', '$fecha', '$valor')";
 
-        if ($mysqli->query($sql) !== TRUE) {
+        if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))!==TRUE){		
             echo "Error al insertar el título: " . serialize(sqlsrv_errors());
         }
     }
@@ -95,7 +95,7 @@ while($row_liquidacion2 = $resultado_liquidacion2->fetch_assoc()){
             // La imagen se ha subido exitosamente
             
  $actualizar_imagen = "UPDATE recaudos SET imagen = '$rutaImagen' WHERE liquidacion = '$liquidacion' ";
- $resultado_imagen = $mysqli->query($actualizar_imagen);
+$resultado_imagen=sqlsrv_query( $mysqli,$actualizar_imagen, array(), array('Scrollable' => 'buffered'));
         } else {
             // Error al subir la imagen
         }
