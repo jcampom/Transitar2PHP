@@ -11,15 +11,15 @@ if (isset($_POST['buscar'])) {
     } else {
         if ($_POST['tiporecaudo'] == 1) {
             $query_ap = "SELECT TAcuerdop_comparendo, TAcuerdop_numero FROM acuerdos_pagos WHERE TAcuerdop_numero='" . trim($_POST['documento_tipo']) . "' OR TAcuerdop_identificacion= '" . trim($_POST['documento_tipo']) . "' GROUP BY TAcuerdop_comparendo, TAcuerdop_numero ORDER BY TAcuerdop_numero";
-            $result_ap = $mysqli->query($query_ap) or die(guardar_error(__LINE__));
+            $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
             
-            $result_ap= $result_ap->num_rows;
+            $result_ap= sqlsrv_num_rows($result_ap);
             if ($result_ap==0){echo "<script>alert(\"El Acuerdo de Pago no existe o la identificacion no tiene AP's.\");</script>";}
         } elseif ($_POST['tiporecaudo'] == 2) {
             $query_comp = "SELECT Tcomparendos_comparendo FROM comparendos WHERE (Tcomparendos_comparendo='".$_POST['documento_tipo']."' or Tcomparendos_idinfractor=".$_POST['documento_tipo'].") AND Tcomparendos_estado NOT IN (2, 3, 4)";
-            $result_comp = $mysqli->query($query_comp);
+            $result_comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffered'));
             $row_comp = $result_comp->fetch_array(MYSQLI_ASSOC);
-            $result_comp= $result_comp->num_rows;
+            $result_comp= sqlsrv_num_rows($result_comp);
             if ($result_comp==0){echo "<script>alert(\"                  NO HUBO RESULTADOS \\n\\nPosibles razones: \\n1. El Comparendo no existe. \\n2. o esta en estado Recaudado. \\n3. o esta en acuerdo de pago. \\n4. o esta en preacuerdo \\n5. o el ciudadano no tiene comparendos.\");</script>";}
         }
     }
@@ -31,12 +31,12 @@ if (isset($_POST['buscar'])) {
 						
 		    if ($_POST['tiporecaudo'] == 1) {
     $query_ap = "SELECT TAcuerdop_comparendo, TAcuerdop_periodicidad, TAcuerdop_identificacion, TAcuerdop_cuota, TAcuerdop_valor, TAcuerdop_fechapago, TAcuerdop_estado FROM acuerdos_pagos WHERE TAcuerdop_numero='" . $_POST['documento_tipo'] . "'";
-    $result_ap = $mysqli->query($query_ap) or die(guardar_error(__LINE__));
+    $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
     $query_rec = "START TRANSACTION;";
     $inserciones = 0;
     $subtotal = 0;
 
-    while ($row_linea = $result_ap->fetch_assoc()) {
+    while ($row_linea = sqlsrv_fetch_array($result_ap, SQLSRV_FETCH_ASSOC)) {
         if ($_POST['recaudar_cuota_' . $row_linea['TAcuerdop_cuota']] == 1) {
             if ($_POST['liq_no_' . $row_linea['TAcuerdop_cuota']] == "" || $_POST['fecha_recaudo_' . $row_linea['TAcuerdop_cuota']] == "") {
                 echo "<script>alert(\"El valor de la cuota, Fecha recaudo o Liquidacion no pueden estar vacios.\");</script>";
@@ -67,7 +67,7 @@ if (isset($_POST['buscar'])) {
     }
     $query_rec = $query_rec . "COMMIT;";
     if ($inserciones != 0) {
-        $result_ap1 = $mysqli->query($query_rec);
+        $result_ap1=sqlsrv_query( $mysqli,$query_rec, array(), array('Scrollable' => 'buffered'));
         //echo $query_rec;
     }
     if (!$result_ap1) {
@@ -151,13 +151,13 @@ if (isset($_POST['buscar'])) {
     }
     $subtotal = 0;
     $query_rna = "SELECT Ttramites_ID, Ttramites_nombre FROM tramites WHERE Ttramites_tipodoc=" . $tipodoc . " ORDER BY Ttramites_nombre";
-    $result_rna = mysqli_query($mysqli, $query_rna) or die(guardar_error(__LINE__));
+    $result_rna=sqlsrv_query( $mysqli,$query_rna, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
     $query_insert_rna = "BEGIN TRANSACTION InsertRNA;";
     while ($row_rna = mysqli_fetch_array($result_rna)) {
         $tramite = 0;
         $valor_rnc = 0;
         $query_rnc = "SELECT Tconceptos_ID, Tconceptos_nombre, Tconceptos_tipodoc FROM Tconceptos WHERE Tconceptos_ID IN (SELECT Ttramites_conceptos_C FROM Ttramites_conceptos WHERE Ttramites_conceptos_T=" . $row_rna[0] . ")";
-        $result_rnc = mysqli_query($mysqli, $query_rnc) or die(guardar_error(__LINE__));
+        $result_rnc=sqlsrv_query( $mysqli,$query_rnc, array(), array('Scrollable' => 'buffered'))  or die(guardar_error(__LINE__));
         while ($row_rnc = mysqli_fetch_array($result_rnc)) {
             if ($_POST[$row_rna[0] . "_" . $row_rnc[0]] > 0) {
                 if ($tramite == 0) {
@@ -183,7 +183,7 @@ if (isset($_POST['buscar'])) {
     $query_insert_rna .= "INSERT INTO Tliquidacionmain (Tliquidacionmain_ID, Tliquidacionmain_fecha, Tliquidacionmain_idciudadano, Tliquidacionmain_idtramitador, Tliquidacionmain_placa, Tliquidacionmain_estado, Tliquidacionmain_nc, Tliquidacionmain_caduca, Tliquidacionmain_subtotal, Tliquidacionmain_iva, Tliquidacionmain_user, Tliquidacionmain_tipodoc, Tliquidacionmain_fecharecaudo) VALUES (" . $_POST['liquidacion'] . ", '" . $hoy . "', '" . $_POST['documento'] . "', '" . $_POST['documento'] . "', '', 3, '', '" . $_POST['fecha'] . "', " . $subtotal . ", 0, '" . $_SESSION['MM_Username'] . "', " . $tipodoc . ", '" . $_POST['fecha'] . "');\n";
     $query_insert_rna .= "INSERT INTO Trecaudos (Trecaudos_liquidacion, Trecaudos_fecharecaudo, Trecaudos_valor, Trecaudos_documento, Trecaudos_fecha, Trecaudos_user) VALUES (" . $_POST['liquidacion'] . ", '" . $_POST['fecha'] . "', " . $subtotal . ", '" . $_POST['documento'] . "', '" . $hoy . "', '" . $_SESSION['MM_Username'] . "');\n";
     $query_insert_rna .= "COMMIT TRANSACTION InsertRNA;\r";
-    $result_insert_rna = mysqli_query($mysqli, $query_insert_rna);
+$result_insert_rna=sqlsrv_query( $mysqli,$query_insert_rna, array(), array('Scrollable' => 'buffered'));
 
     if (!$result_insert_rna) {
         echo "<script>alert(\"La actualizacion no se pudo realizar, revise los valores!!!\");</script>";
@@ -317,7 +317,7 @@ body {
 		
 							if (@$result_ap >= 1 && @$_POST['tiporecaudo'] == 1) {
     $query_linea = "SELECT TAcuerdop_comparendo, TAcuerdop_periodicidad, TAcuerdop_identificacion, TAcuerdop_cuota, TAcuerdop_valor, TAcuerdop_fechapago, TAcuerdop_estado FROM acuerdos_pagos WHERE TAcuerdop_numero='" . $_POST['documento_tipo'] . "'";
-    $result_linea = mysqli_query($mysqli, $query_linea) or die(guardar_error(__LINE__));
+    $result_linea=sqlsrv_query( $mysqli,$query_linea, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
     $unavez = 1;
     while ($row_linea = mysqli_fetch_array($result_linea)) {
         if ($unavez == 1) {
@@ -373,7 +373,7 @@ body {
     echo "</tr>";
 } elseif (@$result_ap >= 2 && @$_POST['tiporecaudo'] == 1) {
     $query_ap = "SELECT TAcuerdop_numero FROM acuerdos_pagos WHERE TAcuerdop_numero='" . trim($_POST['documento_tipo']) . "' OR TAcuerdop_identificacion= '" . trim($_POST['documento_tipo']) . "' GROUP BY TAcuerdop_comparendo, TAcuerdop_numero ORDER BY TAcuerdop_numero";
-    $result_ap = mysqli_query($mysqli, $query_ap) or die(guardar_error(__LINE__));
+    $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
     echo "<tr><td align='center' colspan=7></p><strong>Se encontraron varios AP's, seleccione uno para realizar el recaudo:</strong></p>";
     while ($row_ap = mysqli_fetch_array($result_ap)) {
         ?>
@@ -385,7 +385,7 @@ body {
 
 if ($result_comp == 1 && $_POST['tiporecaudo'] == 2) {
     $query_linea = "SELECT Tcomparendos_comparendo, Tcomparendos_fecha,  Tcomparendos_placa, Tcomparendos_codinfraccion, Tcomparendos_estado, Tcomparendos_idinfractor, Tcomparendos_origen FROM comparendos WHERE Tcomparendos_comparendo='" . $_POST['documento_tipo'] . "' or Tcomparendos_idinfractor=" . $_POST['documento_tipo'] . " AND Tcomparendos_estado NOT IN (2, 3, 4)";
-    $result_linea = mysqli_query($mysqli, $query_linea);
+    $result_linea=sqlsrv_query( $mysqli,$query_linea, array(), array('Scrollable' => 'buffered'));
     echo "<table class='table'><tr><td colspan=7></br><strong>1. Los campos: Valor recaudo y Fecha Recaudo, son obligatorios.</br>2. El comparendo quedara en estado recaudado.</br></strong></p></td></tr>";
     echo "<tr><td align='center'><strong>Comparendo</strong></td>";
     echo "<td align='center'><strong>Fecha</strong></td>";
@@ -456,7 +456,7 @@ if ($result_comp == 1 && $_POST['tiporecaudo'] == 2) {
         FROM Tconceptos INNER JOIN Tterceros ON Tconceptos_terceros = Tterceros_ID
         WHERE (Tconceptos_tipodoc = 4 OR Tconceptos_tipodoc = 3) AND (Tconceptos_ID IN (1000000016, 1000000020, 1000000021, 93, 94, 134, 1000000050, 1000000051, 54/*, 38, 51, 52, 53*/))
         ORDER BY Tconceptos_nombre";
-    $result_conceptos = mysqli_query($mysqli, $query_conceptos);
+    $result_conceptos=sqlsrv_query( $mysqli,$query_conceptos, array(), array('Scrollable' => 'buffered'));
     while ($row_conceptos = mysqli_fetch_array($result_conceptos)) {
         echo "<tr><td colspan=2><strong>" . $row_conceptos[1] . "</strong></td>";
         echo "<td colspan=2 align='center'><input class='form-control' name='" . $row_conceptos['Tconceptos_ID'] . "' id='" . $row_conceptos['Tconceptos_ID'] . "' type='text' size='10' maxlength='10' value=0   Onchange='sumar()' Onkeyup='sumar()' Onblur='sumar()' onkeypress=\"return IsNumber(event);\"/>";
@@ -470,7 +470,7 @@ if ($result_comp == 1 && $_POST['tiporecaudo'] == 2) {
     <?php
 } elseif ($result_comp >= 2 && $_POST['tiporecaudo'] == 2) { // si tiene algun resultado 
     $query_comp = "SELECT Tcomparendos_comparendo FROM comparendos WHERE Tcomparendos_comparendo='" . $_POST['documento_tipo'] . "' or Tcomparendos_idinfractor=" . $_POST['documento_tipo'] . " AND Tcomparendos_estado NOT IN (2, 3, 4) GROUP BY Tcomparendos_comparendo ORDER BY Tcomparendos_comparendo";
-    $result_comp = mysqli_query($mysqli, $query_comp) or die(guardar_error(__LINE__));
+    $result_comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
     echo "<tr><td align='center' colspan=7></p><strong>Se encontraron varios comparendos para el ciudadano,</br>seleccione uno para realizar el recaudo:</strong></p>"; //Imprime AP
     while ($row_comp = mysqli_fetch_array($result_comp)) {
         ?>
@@ -503,7 +503,7 @@ if ($_POST['tiporecaudo'] == 3 || $_POST['tiporecaudo'] == 4) {
 if ($_POST['tiporecaudo'] == 3) {
     echo "<tr><td colspan=5 align='right'> <strong>Doble click para Contraer/Expandir</strong>";
     $query_rna = "SELECT id, nombre FROM tramites WHERE tipo_documento =1 order by nombre";
-    $result_rna = mysqli_query($mysqli, $query_rna);
+    $result_rna=sqlsrv_query( $mysqli,$query_rna, array(), array('Scrollable' => 'buffered'));
     $posicion = 0;
     $array = array();
     while ($row_rna = mysqli_fetch_array($result_rna)) {
@@ -518,7 +518,7 @@ if ($_POST['tiporecaudo'] == 3) {
             $array[$posicion] = $row_rna['Ttramites_ID'];
             $posicion++;
             $query_rnc = "SELECT id, nombre FROM conceptos WHERE id IN (SELECT concepto_id FROM detalle_tramites WHERE tramite_id=" . $row_rna['id'] . ")";
-            $result_rnc = mysqli_query($mysqli, $query_rnc);
+            $result_rnc=sqlsrv_query( $mysqli,$query_rnc, array(), array('Scrollable' => 'buffered'));
 
             while ($row_rnc = mysqli_fetch_array($result_rnc)) {
                 echo "<tr class='gradient'><td colspan=2>&nbsp;&nbsp;&nbsp;&nbsp;" . $row_rnc['nombre'] . "</td><td><input class='form-control' name='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' id='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' type='text' size=5></td></tr>";
@@ -540,7 +540,7 @@ if ($_POST['tiporecaudo'] == 3) {
 if ($_POST['tiporecaudo'] == 4) {
     echo "<tr><td colspan=5 align='right'> <strong>Doble click para Contraer/Expandir</strong>";
     $query_rna = "SELECT id, nombre FROM tramites WHERE tipo_documento=2 order by nombre";
-    $result_rna = mysqli_query($mysqli, $query_rna);
+    $result_rna=sqlsrv_query( $mysqli,$query_rna, array(), array('Scrollable' => 'buffered'));
     $posicion = 0;
     $array = array();
     while ($row_rna = mysqli_fetch_array($result_rna)) {
@@ -554,7 +554,7 @@ if ($_POST['tiporecaudo'] == 4) {
             $array[$posicion] = $row_rna['id'];
             $posicion++;
             $query_rnc = "SELECT id, nombre FROM conceptos WHERE id IN (SELECT concepto_id FROM detalle_tramites WHERE tramite_id=" . $row_rna['id'] . ")";
-            $result_rnc = mysqli_query($mysqli, $query_rnc);
+            $result_rnc=sqlsrv_query( $mysqli,$query_rnc, array(), array('Scrollable' => 'buffered'));
             while ($row_rnc = mysqli_fetch_array($result_rnc)) {
                 echo "<tr class='gradient'><td colspan=2>&nbsp;&nbsp;&nbsp;&nbsp;" . $row_rnc['nombre'] . "</td><td><input class='form-control' name='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' id='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' type='text' size=5></td></tr>";
             }

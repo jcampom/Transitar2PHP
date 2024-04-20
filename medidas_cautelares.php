@@ -12,8 +12,8 @@ if (isset($_POST['valnoficio']) && isset($_POST['numero'])) {
     $valido = false;
     if ($numero > 0) {
 $query = "SELECT id FROM medcautcomp WHERE mcnumero = $numero AND YEAR(fecha) = $year";
-$execute = $mysqli->query($query);
-if ($execute->num_rows == 0) {
+$execute=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
+if (sqlsrv_num_rows($execute) == 0) {
     $valido = true;
 }
     }
@@ -33,10 +33,10 @@ if (isset($_POST['update'])) {
             
             $bancos = array();
 $queryb = "SELECT id FROM bancos WHERE Tbancos_activo = 1 ORDER BY nombre";
-$resultb = $mysqli->query($queryb);
+$resultb=sqlsrv_query( $mysqli,$queryb, array(), array('Scrollable' => 'buffered'));
 $bancos = array();
-if ($resultb->num_rows > 0) {
-    while ($columna = $resultb->fetch_assoc()) {
+if (sqlsrv_num_rows($resultb) > 0) {
+    while ($columna = sqlsrv_fetch_array($resultb, SQLSRV_FETCH_ASSOC)) {
         $bancos[] = $columna["id"];
     }
 }
@@ -44,12 +44,12 @@ if ($resultb->num_rows > 0) {
         $freenum = false;
         $numinsc = array();
 $querynum = "SELECT mcnumero FROM medcautcomp WHERE mcnumero >= $numero AND YEAR(fecha) = $year GROUP BY mcnumero";
-$querynum_result = $mysqli->query($querynum);
+$querynum_result=sqlsrv_query( $mysqli,$querynum, array(), array('Scrollable' => 'buffered'));
 $numinsc = array();
-if ($querynum_result->num_rows == 0) {
+if (sqlsrv_num_rows($querynum_result) == 0) {
     $freenum = true;
 } else {
-    while ($row1 = $querynum_result->fetch_assoc()) {
+    while ($row1 = sqlsrv_fetch_array($querynum_result, SQLSRV_FETCH_ASSOC)) {
         $numinsc[] = $row1["mcnumero"];
     }
 }
@@ -65,10 +65,10 @@ foreach ($bancos as $banco) {
         continue;
     }
     $querychk = "SELECT compid FROM medcautcomp WHERE banco = $banco AND compid IN ($compids)";
-    $querychk_result = $mysqli->query($querychk);
-    if ($querychk_result->num_rows > 0) {
+$querychk_result=sqlsrv_query( $mysqli,$querychk, array(), array('Scrollable' => 'buffered'));
+    if (sqlsrv_num_rows($querychk_result) > 0) {
         $nchecks = array();
-        while ($row1 = $querychk_result->fetch_assoc()) {
+        while ($row1 = sqlsrv_fetch_array($querychk_result, SQLSRV_FETCH_ASSOC)) {
             $nchecks[] = $row1['compid'];
         }
         $pchecks = array_diff($checks, $nchecks);
@@ -92,7 +92,7 @@ foreach ($bancos as $banco) {
                         . " VALUES ('$compid', '$medidas', '$numero', 1, '$banco', '$valor', '$archivo','$usuario'); ";
                         
            
-                //     if ($mysqli->query($sqltrans)) {
+                //if (sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'))){
                         
                 //     }else{
                 // echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
@@ -112,7 +112,7 @@ foreach ($bancos as $banco) {
 
 if ($ninscri > 0) {
     // $sqltrans .= " COMMIT";
-    // $resultt = $mysqli->query($sqltrans) or die('Error');
+    //$resultt = sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered')) or die('Error');
      $result = "";
 } else {
     $result = "No se encontraron comparendendos validos para medidas cautelares.";
@@ -146,7 +146,7 @@ INNER JOIN resolucion_sancion ON ressan_compid = Tcomparendos_ID AND ressan_tipo
 INNER JOIN resolucion_sancion_tipo ON ressan_tipo = id 
 INNER JOIN ciudadanos ON CAST(Tcomparendos_idinfractor AS VARCHAR(30)) = numero_documento 
 WHERE 1 = 1 $where  ORDER BY fechacomp DESC, fechares, ressan_numero DESC";
-$registros = $mysqli->query($query);
+$registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
 
 
@@ -269,16 +269,16 @@ $registros = $mysqli->query($query);
                 <?php elseif ($_GET['generar']) : ?>
                     <form name="form1" id="form" method="POST" >
                       
-                            <?php $cantidad = mysqli_num_rows($registros); ?>
+                            <?php $cantidad = sqlsrv_num_rows($registros); ?>
                             <?php if ($cantidad > 0) : ?>
 <div align='center' colspan='8'><span class="Recaudada">El numero de oficio aumentara en uno a partir del numero enviado por cada banco selecionado,
                                             evite el uso de numero anteriores en generacion de multiples bancos, el numero de generado en el documento seria CE (numero)-(YY).</span></div>
                                
                                     <?php
                                  
-                                    
-                                   $resultnum = $mysqli->query("SELECT IFNULL(MAX(mcnumero), 0) + 1 AS numero FROM medcautcomp WHERE YEAR(fecha) = $year");
-                                   $numrow = $resultnum->fetch_assoc();
+                                   $qry1="SELECT IFNULL(MAX(mcnumero), 0) + 1 AS numero FROM medcautcomp WHERE YEAR(fecha) = $year" 
+                                   $resultnum=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
+                                   $numrow = sqlsrv_fetch_array($resultnum, SQLSRV_FETCH_ASSOC);
                                     ?>
                                      <div class="col-md-4">  
                              <div class="form-group form-float">        
@@ -297,7 +297,7 @@ $registros = $mysqli->query($query);
                                  
                                    <?php
     $Query = "SELECT id, nombre FROM mmctipos ORDER BY nombre";
-    $Resultb = $mysqli->query($Query);
+    $Resultb=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
 
     $Combo = "<select name='medidas' id='medidas'  style='width: 80%;' required>";
     $Combo .= "<option value='0'>Todos</option>";
@@ -318,7 +318,7 @@ $registros = $mysqli->query($query);
                               <br>
                                    <?php
     $Query = "SELECT id, nombre FROM bancos WHERE Tbancos_activo = 1 ORDER BY nombre";
-    $Resultb = $mysqli->query($Query);
+    $Resultb=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
 
     $Combo = "<select name='bancos[]' id='bancos'  style='width: 80%;' multiple required>";
     $Combo .= "<option value='0'>Todos</option>";
@@ -344,7 +344,7 @@ $registros = $mysqli->query($query);
                                     <th width="5%">Selec.</th>
                                 </tr>
                                 <?php $count = 0; ?>
-                                <?php while ($row = mysqli_fetch_assoc($registros)) { 
+                                <?php while ($row = sqlsrv_fetch_array($registros, SQLSRV_FETCH_ASSOC)){
                              
                                 ?>
                                     <?php

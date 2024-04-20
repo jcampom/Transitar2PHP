@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Consultar la tabla "formularios" para obtener los detalles del formulario
 $consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
-$resultado = $mysqli->query($consulta);
-$existe = $resultado->fetch_assoc();
+$resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
+$existe = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC);
 
 $campos = $existe['campos'];
 $tabla = $existe['tabla'];
@@ -57,7 +57,7 @@ if (is_array($valorCampo)) {
     // Ejecutar la consulta de inserción
     
     // echo $insertQuery;
-    if ($mysqli->query($insertQuery)) {
+    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
     } else {
    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
@@ -70,13 +70,13 @@ if (isset($_GET['eliminar'])) {
 
     // Verificar si el registro existe antes de eliminarlo
     $consultaEliminar = "SELECT * FROM $tabla WHERE id = $eliminarId";
-    $resultadoEliminar = $mysqli->query($consultaEliminar);
+    $resultadoEliminar=sqlsrv_query( $mysqli,$consultaEliminar, array(), array('Scrollable' => 'buffered'));
 
-    if ($resultadoEliminar && mysqli_num_rows($resultadoEliminar) > 0) {
+    if ($resultadoEliminar && sqlsrv_num_rows($resultadoEliminar) > 0) {
         $eliminarQuery = "DELETE FROM $tabla WHERE id = $eliminarId";
 
         // Ejecutar la consulta de eliminación
-        if ($mysqli->query($eliminarQuery)) {
+        if (sqlsrv_query( $mysqli,$eliminarQuery, array(), array('Scrollable' => 'buffered'))){
             echo '<div class="alert alert-success"><strong>¡Registro eliminado!</strong> El registro ha sido eliminado correctamente.</div>';
         } else {
             echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al eliminar el registro: ' . serialize(sqlsrv_errors()) . '</div>';
@@ -117,7 +117,7 @@ if (isset($_GET['editar'])) {
     $updateQuery = "UPDATE $tabla SET $camposUpdate WHERE id = $editarId";
 // echo $updateQuery;
     // Ejecutar la consulta de actualización
-    if ($mysqli->query($updateQuery)) {
+    if (sqlsrv_query( $mysqli,$updateQuery, array(), array('Scrollable' => 'buffered'))){
 		$todoBien= true;
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han actualizado correctamente.</div>';
 		 // Mostrar script para abrir automáticamente el modal de edición
@@ -142,7 +142,7 @@ if (isset($_GET['editar'])) {
             // La imagen se ha subido exitosamente
             
  $actualizar_imagen = "UPDATE $tabla SET $imagen_subida = '$rutaImagen' WHERE id = $editarId ";
- $resultado_imagen = $mysqli->query($actualizar_imagen);
+$resultado_imagen=sqlsrv_query( $mysqli,$actualizar_imagen, array(), array('Scrollable' => 'buffered'));
         } else {
             // Error al subir la imagen
         }
@@ -154,10 +154,10 @@ if (isset($_GET['editar'])) {
 
     // Consultar el registro a editar
     $consultaEditar = "SELECT * FROM $tabla WHERE id = $editarId";
-    $resultadoEditar = $mysqli->query($consultaEditar);
+    $resultadoEditar=sqlsrv_query( $mysqli,$consultaEditar, array(), array('Scrollable' => 'buffered'));
 
-    if ($resultadoEditar && mysqli_num_rows($resultadoEditar) > 0) {
-        $registroEditar = $resultadoEditar->fetch_assoc();
+    if ($resultadoEditar && sqlsrv_num_rows($resultadoEditar) > 0) {
+        $registroEditar = sqlsrv_fetch_array($resultadoEditar, SQLSRV_FETCH_ASSOC);
         $camposEditar = explode(',', $campos);
 
         // Mostrar modal de edición con los campos del registro seleccionado
@@ -175,10 +175,10 @@ if (isset($_GET['editar'])) {
 
 	
 		$consultaCampos2 = "SELECT * FROM `detalle_formularios` WHERE formulario = $formularioId ";
-        $resultadoCampos2 = $mysqli->query($consultaCampos2);
+        $resultadoCampos2=sqlsrv_query( $mysqli,$consultaCampos2, array(), array('Scrollable' => 'buffered'));
 
         
-            while ($campo2 = $resultadoCampos2->fetch_assoc()) {
+            while ($campo2 = sqlsrv_fetch_array($resultadoCampos2, SQLSRV_FETCH_ASSOC)) {
  
             $campoLimpio = trim($campo2['campo']);
             $valorCampo = $registroEditar[$campoLimpio];
@@ -210,9 +210,9 @@ if (isset($_GET['editar'])) {
                 echo '>';
    $consultaRegistros2 = "SELECT id, nombre FROM $dinamico";
 
-   $resultadoRegistros2 = $mysqli->query($consultaRegistros2);
+   $resultadoRegistros2=sqlsrv_query( $mysqli,$consultaRegistros2, array(), array('Scrollable' => 'buffered'));
 $valorCampo = explode(",", $valorCampo);
-   while ($registro2 = $resultadoRegistros2->fetch_assoc()) { 
+   while ($registro2 = sqlsrv_fetch_array($resultadoRegistros2, SQLSRV_FETCH_ASSOC)) { 
         $opcionID =  $registro2['id'];
       
          
@@ -272,14 +272,14 @@ $valorCampo = explode(",", $valorCampo);
         <?php
         // Consultar los campos de la tabla "detalle_formularios" para el formulario actual
         $consultaCampos = "SELECT campo, tipo, requerido, dinamico, label, multiple, file FROM `detalle_formularios` WHERE formulario = $formularioId";
-        $resultadoCampos = $mysqli->query($consultaCampos);
+        $resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
 $cantidad_campos = 0;
-        if ($resultadoCampos && mysqli_num_rows($resultadoCampos) > 0) {
+        if ($resultadoCampos && sqlsrv_num_rows($resultadoCampos) > 0) {
           
             // Crear el formulario dinámicamente
             echo '<form action="formulario_dinamico_datos.php" method="POST" enctype="multipart/form-data">';
 
-            while ($campo = $resultadoCampos->fetch_assoc()) {
+            while ($campo = sqlsrv_fetch_array($resultadoCampos, SQLSRV_FETCH_ASSOC)) {
                   $cantidad_campos += 1;
                 $campoLimpio = trim($campo['campo']);
                 $tipoCampo = $campo['tipo'];
@@ -313,9 +313,9 @@ $cantidad_campos = 0;
                 echo '>';
    $consultaRegistros2 = "SELECT id, nombre FROM $dinamico";
 
-   $resultadoRegistros2 = $mysqli->query($consultaRegistros2);
+   $resultadoRegistros2=sqlsrv_query( $mysqli,$consultaRegistros2, array(), array('Scrollable' => 'buffered'));
 
-   while ($registro2 = $resultadoRegistros2->fetch_assoc()) {     
+   while ($registro2 = sqlsrv_fetch_array($resultadoRegistros2, SQLSRV_FETCH_ASSOC)) {     
        echo '<option style="margin-left: 15px;" value="'.$registro2['id'].'">'.$registro2['nombre'].'</option>';
    }
                      
@@ -379,10 +379,10 @@ $cantidad_campos = 0;
         }
         
          $consultaCampos = "SELECT COUNT(*) as cantidad FROM `detalle_formularios` WHERE formulario = $formularioId";
-        $resultadoCampos = $mysqli->query($consultaCampos);
+        $resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
 
 
-           $campo = $resultadoCampos->fetch_assoc();
+           $campo = sqlsrv_fetch_array($resultadoCampos, SQLSRV_FETCH_ASSOC);
            
            $cantidad_campos = $campo['cantidad'];
              ?>
@@ -404,10 +404,10 @@ $cantidad_campos = 0;
         
       
         $consultaCampos = "SELECT campo, tipo, label, dinamico FROM `detalle_formularios` WHERE formulario = $formularioId limit $cantidad_filtros";
-        $resultadoCampos = $mysqli->query($consultaCampos);
+$resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
 
-        if ($resultadoCampos && mysqli_num_rows($resultadoCampos) > 0) {
-            while ($campo = $resultadoCampos->fetch_assoc()) {
+        if ($resultadoCampos && sqlsrv_num_rows($resultadoCampos) > 0) {
+            while ($campo = sqlsrv_fetch_array($resultadoCampos, SQLSRV_FETCH_ASSOC)) {
                 $campoLimpio = trim($campo['campo']);
                 $tipoCampo = $campo['tipo'];
              
@@ -476,11 +476,11 @@ if ($tipoCampo == 'date') {
 					} else {
         
 						$consultaCampos2 = "SELECT id, nombre FROM ".$campo['dinamico'];
-						$resultadoCampos2 = $mysqli->query($consultaCampos2);
+						$resultadoCampos2=sqlsrv_query( $mysqli,$consultaCampos2, array(), array('Scrollable' => 'buffered'));
 						echo '<select name="' . $campoLimpio . '_filtro" id="' . $campoLimpio . '_filtro" class="form-control">';
 						echo '<option value= >Seleccione</option>';
-						if ($resultadoCampos2 && mysqli_num_rows($resultadoCampos2) > 0) {
-							while ($campo2 = $resultadoCampos2->fetch_assoc()) {
+						if ($resultadoCampos2 && sqlsrv_num_rows($resultadoCampos2) > 0) {
+							while ($campo2 = sqlsrv_fetch_array($resultadoCampos2, SQLSRV_FETCH_ASSOC)) {
 								$idCampo2 = trim($campo2['id']);
 								$nombreCampo2 = trim($campo2['nombre']);
 								echo '<option value= "'.$idCampo2.'">'.$nombreCampo2.'</option>';
@@ -537,9 +537,9 @@ if ($tipoCampo == 'date') {
                             
             $consulta_label="SELECT * FROM detalle_formularios where campo = '$campo' and formulario = '$formularioId'";
 
-            $resultado_label=$mysqli->query($consulta_label);
+            $resultado_label=sqlsrv_query( $mysqli,$consulta_label, array(), array('Scrollable' => 'buffered'));
 
-            $row_label=$resultado_label->fetch_assoc();
+            $row_label=sqlsrv_fetch_array($resultado_label, SQLSRV_FETCH_ASSOC);
             
             if(!empty($row_label['label'])){
               $label = $row_label['label'];
@@ -592,12 +592,12 @@ if (!empty($filtros)) {
 
 $consultaRegistros .=" limit 10";
 
-                    $resultadoRegistros = $mysqli->query($consultaRegistros);
+                    $resultadoRegistros=sqlsrv_query( $mysqli,$consultaRegistros, array(), array('Scrollable' => 'buffered'));
                     
 	////	echo $consultaRegistros;
 
-                    if ($resultadoRegistros && mysqli_num_rows($resultadoRegistros) > 0) {
-                        while ($registro = $resultadoRegistros->fetch_assoc()) {
+                    if ($resultadoRegistros && sqlsrv_num_rows($resultadoRegistros) > 0) {
+                        while ($registro = sqlsrv_fetch_array($resultadoRegistros, SQLSRV_FETCH_ASSOC)) {
                             echo '<tr>';
                                  echo '<td>';
 if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { 
@@ -615,9 +615,9 @@ if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
                                     
             $consulta_dinamico="SELECT * FROM detalle_formularios where campo = '$campoLimpio' and formulario = '$formularioId'";
 
-            $resultado_dinamico=$mysqli->query($consulta_dinamico);
+            $resultado_dinamico=sqlsrv_query( $mysqli,$consulta_dinamico, array(), array('Scrollable' => 'buffered'));
 
-            $row_dinamico=$resultado_dinamico->fetch_assoc();
+            $row_dinamico=sqlsrv_fetch_array($resultado_dinamico, SQLSRV_FETCH_ASSOC);
             
             $dinamico = $row_dinamico['dinamico'];
         ///  REVISAR CONDICION DE NOMBRE EN LAS BUSQUEDAS DE CAMPO DINAMICO   ////    
@@ -647,9 +647,9 @@ if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
 				}
 				$consulta_dinamico2="SELECT * FROM $tablaDinamica where $idDinamica = '".$registro[$campoLimpio]."'";
 
-				$resultado_dinamico2=$mysqli->query($consulta_dinamico2);
+				$resultado_dinamico2=sqlsrv_query( $mysqli,$consulta_dinamico2, array(), array('Scrollable' => 'buffered'));
 
-				$row_dinamico2=$resultado_dinamico2->fetch_assoc();
+				$row_dinamico2=sqlsrv_fetch_array($resultado_dinamico2, SQLSRV_FETCH_ASSOC);
 				   echo '<td>' . $row_dinamico2['$nombreDinamica'] . '</td>';
                
                

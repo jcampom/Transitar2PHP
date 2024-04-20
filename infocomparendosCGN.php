@@ -11,10 +11,11 @@ if (isset($_POST['Generar'])) {
         $mesliq = "<div class='campoRequerido'>No ha seleccionado o digitado ningun filtro</div>";
         $OK = "";
     } else {
-        $sqldiffecha = $mysqli->query("SELECT MAX(creado) AS creado, DATEDIFF(CAST('".$_POST['fechainicial']."' AS DATE), MAX(creado)) AS diffecha FROM morososCGN_semestral WHERE borrado IS NULL");
+    	$qry1="SELECT MAX(creado) AS creado, DATEDIFF(CAST('".$_POST['fechainicial']."' AS DATE), MAX(creado)) AS diffecha FROM morososCGN_semestral WHERE borrado IS NULL";
+        $sqldiffecha=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
 
-        if ($sqldiffecha->num_rows > 0) {
-            $filam = $sqldiffecha->fetch_assoc();
+        if (sqlsrv_num_rows($sqldiffecha) > 0) {
+            $filam = sqlsrv_fetch_array($sqldiffecha, SQLSRV_FETCH_ASSOC);
 
             if (intval($filam['diffecha']) >= 6) {
                 $OK = "OK";
@@ -31,7 +32,8 @@ if (isset($_POST['Generar'])) {
 if (isset($_POST['registrosguardar']) && $_POST['registrosguardar'] != null) {
     if ($_POST['registrosguardar'] != '') {
         $arreglo2 = unserialize(base64_decode($_POST['registrosguardar']));
-        $exito = $mysqli->query("UPDATE morososCGN_semestral SET borrado = '".date("Y-m-d H:i:s")."', borrado_por = '".$_SESSION['MM_Username']."' WHERE borrado IS NULL");
+	$qry2="UPDATE morososCGN_semestral SET borrado = '".date("Y-m-d H:i:s")."', borrado_por = '".$_SESSION['MM_Username']."' WHERE borrado IS NULL";
+        $exito=sqlsrv_query( $mysqli,$qry2, array(), array('Scrollable' => 'buffered'));
 
         if ($exito) {
             for ($i = 0; $i < count($arreglo2); $i++) {
@@ -39,7 +41,7 @@ if (isset($_POST['registrosguardar']) && $_POST['registrosguardar'] != null) {
                 $arreglo2[$i]['tipo']."','".$arreglo2[$i]['num_obligacion']."','".$arreglo2[$i]['tcomparendos_idinfractor'].
                 "','".$arreglo2[$i]['nombre']."','".$arreglo2[$i]['razon_social']."',".$arreglo2[$i]['sumavalores'].",'".$_POST['fechainicial']."','".$_SESSION['MM_Username']."','".date("Y-m-d H:i:s")."',".$arreglo2[$i]['cantidadobligaciones'].",'".$arreglo2[$i]['detalleobligaciones']."')";
                 
-                $exito = $mysqli->query($insert);
+                $exito=sqlsrv_query( $mysqli,$insert, array(), array('Scrollable' => 'buffered'));
             }
         }
     }
@@ -80,11 +82,12 @@ if (isset($_POST['registrosguardar']) && $_POST['registrosguardar'] != null) {
             </form>
 		<?php
 $html = "";
-$sqldatos = $mysqli->query("SELECT * FROM morososCGN_semestral WHERE borrado IS NULL AND creado = (SELECT MAX(creado) FROM morososCGN_semestral WHERE borrado IS NULL)");
+$qry3="SELECT * FROM morososCGN_semestral WHERE borrado IS NULL AND creado = (SELECT MAX(creado) FROM morososCGN_semestral WHERE borrado IS NULL)";
+$sqldatos=sqlsrv_query( $mysqli,$qry3, array(), array('Scrollable' => 'buffered'));
 
-if ($sqldatos->num_rows > 0) {
+if (sqlsrv_num_rows($sqldatos) > 0) {
     $salida00 = "";
-    while ($filam = $sqldatos->fetch_assoc()) {
+    while ($filam = sqlsrv_fetch_array($sqldatos, SQLSRV_FETCH_ASSOC)) {
         $salida00 .= "<tr>";
         $salida00 .= "<td>DEUDOR PRINCIPAL</td>";
         $salida00 .= "<td>" . toUTF8($filam['tipo_deudor']) . "</td>";
@@ -188,15 +191,17 @@ $sql_totconc2 = "IF Object_ID('infoCGN2') IS NOT NULL BEGIN DROP TABLE infoCGN2 
     HAVING ROUND(SUM(dbo.CalValSMLV(tc.Tconceptos_valor, tc.tconceptos_smlv, td.TDT_ano) ),0) > 
     (SELECT (CASE Ts2.smlvorginal WHEN NULL THEN Ts2.smlv ELSE Ts2.smlvorginal END) * 5 FROM [smlv] Ts2 WHERE Ts2.ano=YEAR(CAST('" . $_POST['fechainicial'] . "' AS DATE)))
     ORDER BY RTRIM(LTRIM(c.numero_documento))";
+	
+$sql_totconc3 = "SELECT * FROM infoCGN UNION SELECT * FROM infoCGN2";
 
 ini_set('memory_limit', '1024M');
 
 
-$query_totconc1 = mysqli_query($mysqli, $sql_totconc1);
-$query_totconc2 = mysqli_query($mysqli, $sql_totconc2);
-$query_totconc = mysqli_query($mysqli, "SELECT * FROM infoCGN UNION SELECT * FROM infoCGN2");
+$query_totconc1=sqlsrv_query( $mysqli,$sql_totconc1, array(), array('Scrollable' => 'buffered'));
+$query_totconc2=sqlsrv_query( $mysqli,$sql_totconc2, array(), array('Scrollable' => 'buffered'));
+$query_totconc=sqlsrv_query( $mysqli,$sql_totconc3, array(), array('Scrollable' => 'buffered'));
 
-if (mysqli_num_rows($query_totconc) > 0) {
+if (sqlsrv_num_rows($query_totconc) > 0) {
     $salida .= "<table width='100%' bgcolor='#FFFFFF' border='0.5' bordercolor='#0000CC'>";
     $salida .= "<tr class='header'>
                 <td align='center' width='25%'>CONCEPTO</td>
@@ -244,10 +249,10 @@ if (mysqli_num_rows($query_totconc) > 0) {
             OR tc.Tcomparendos_estado NOT IN ( 2,3,7,9,12,13,14))  
         AND tc.Tcomparendos_idinfractor=" . $row_totconc['tcomparendos_idinfractor'] . "
         GROUP BY tcomparendos_idinfractor, tcomparendos_comparendo";
-$query2 = mysqli_query($mysqli, $sql2);
-$arreglo[$i]['cantidadobligaciones'] = mysqli_num_rows($query2);
+$query2=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
+$arreglo[$i]['cantidadobligaciones'] = sqlsrv_num_rows($query2);
 $detalles = "";
-if (mysqli_num_rows($query2) > 0) {
+if (sqlsrv_num_rows($query2) > 0) {
     while ($row2 = mysqli_fetch_array($query2)) {
         $detalles .= $row2['tcomparendos_comparendo'] . ",";
     }
@@ -278,7 +283,7 @@ $i++;
                                             </td>
                                         </tr>';
                                 }
-							mysqli_free_result($query_totconc);
+							sqlsrv_free_stmt($query_totconc);
 
 						/* */		
                             } elseif(isset($_POST['registrosguardar']) && $_POST['registrosguardar']!=null) {

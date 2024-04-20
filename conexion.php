@@ -252,8 +252,8 @@ function ValDiaHabil($fecha, $tipo = 0) {
 
     $where = ($tipo) ? " IN (1,$tipo)" : " = 1";
     $sql = "SELECT * FROM festivos WHERE Tfestivos_fecha = '$fecha' AND Tfestivos_tipo $where";
-    $diasf = mysqli_query($mysqli, $sql);
-    $numRows_diasf = mysqli_num_rows($diasf);
+    $diasf=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+    $numRows_diasf = sqlsrv_num_rows($diasf);
 
     if ($numRows_diasf > 0) {
         return false;
@@ -335,9 +335,9 @@ function ValDiaFecha($fecha, $suma = true, $tipo = 0) {
     $oper = $suma ? '+' : '-';
     $where = ($tipo) ? " IN (1,$tipo)" : " = 1";
     $sql = "SELECT * FROM festivos WHERE Tfestivos_fecha = '$fecha' AND Tfestivos_tipo $where";
-    $diasf = mysqli_query($mysqli, $sql);
-    $row_diasf = mysqli_fetch_assoc($diasf);
-    $numRows_diasf = mysqli_num_rows($diasf);
+    $diasf=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+    $row_diasf=sqlsrv_fetch_array($diasf, SQLSRV_FETCH_ASSOC);
+    $numRows_diasf = sqlsrv_num_rows($diasf);
 
     if ($numRows_diasf > 0) {
         $nuevafecha = strtotime($oper . '1 day', strtotime($fecha));
@@ -376,15 +376,15 @@ function BuscarSMLV($anio, $original = false) {
     $original = $original ? 1 : 0;
     
     $sqll = "SELECT * FROM smlv WHERE smlv ='$anio'";
-    $queryl = mysqli_query($mysqli, $sqll);
-    $totalRows_servl = mysqli_num_rows($queryl);
+    $queryl=sqlsrv_query( $mysqli,$sqll, array(), array('Scrollable' => 'buffered'));
+    $totalRows_servl = sqlsrv_num_rows($queryl);
 
     if ($totalRows_servl == 0) {
         $sql2 = "SELECT * FROM smlv ORDER BY smlv DESC LIMIT 1";
-        $queryl = mysqli_query($mysqli, $sql2);
+        $queryl=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
     }
 
-    $row_queryl = mysqli_fetch_assoc($queryl);
+    $row_queryl=sqlsrv_fetch_array($queryl, SQLSRV_FETCH_ASSOC);
     $smlv = ($anio >= '2021' && $original) ? $row_queryl['smlv_orginal'] : $row_queryl['smlv'];
 
     return $smlv;
@@ -396,15 +396,15 @@ function BuscarUVT($anio) {
     $anio = mysqli_real_escape_string($mysqli, $anio);
 
     $sqll = "SELECT uvt_original FROM smlv WHERE smlv='$anio'";
-    $queryl = mysqli_query($mysqli, $sqll);
-    $totalRows_servl = mysqli_num_rows($queryl);
+    $queryl=sqlsrv_query( $mysqli,$sqll, array(), array('Scrollable' => 'buffered'));
+    $totalRows_servl = sqlsrv_num_rows($queryl);
 
     if ($totalRows_servl == 0) {
         $sql2 = "SELECT uvt_original FROM smlv ORDER BY smlv DESC LIMIT 1";
-        $queryl = mysqli_query($mysqli, $sql2);
+        $queryl=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
     }
 
-    $row_queryl = mysqli_fetch_assoc($queryl);
+    $row_queryl=sqlsrv_fetch_array($queryl, SQLSRV_FETCH_ASSOC);
     $uvt = $row_queryl['uvt_original'];
 
     return $uvt;
@@ -480,14 +480,14 @@ function DiasDomingos($startDate, $endDate, $oper = true){
 // global $mysqli; 
     
 //     // if (!$mysqli) {
-//     //     die("Error de conexión: " . mysqli_connect_error());
+//     //     die("Error de conexión: " . serialize(sqlsrv_errors()));
 //     // }
     
 //     $query_tasa = "SELECT * FROM Tinteresesm WHERE '$fechaini' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal OR "
 //                 . " '$fechafin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal OR "
 //                 . " Tinteresesm_finicial BETWEEN '$fechaini' AND '$fechafin' OR "
 //                 . " Tinteresesm_ffinal BETWEEN '$fechaini' AND '$fechafin' ORDER BY Tinteresesm_ffinal ASC";
-//     $result = mysqli_query($mysqli, $query_tasa);
+//     $result=sqlsrv_query( $mysqli,$query_tasa, array(), array('Scrollable' => 'buffered'));
     
 
     
@@ -499,25 +499,25 @@ function DiasDomingos($startDate, $endDate, $oper = true){
 // global $mysqli;
     
 //     // if (!$mysqli) {
-//     //     die("Error de conexión: " . mysqli_connect_error());
+//     //     die("Error de conexión: " . serialize(sqlsrv_errors()));
 //     // }
     
 //     // $sql = "SELECT Tinteresesm_ID FROM Tinteresesm WHERE '$fechfin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal";
-//     // $queryval = mysqli_query($mysqli, $sql);
-//     // $rows_toval = mysqli_num_rows($queryval);
+//     //$queryval=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+//     // $rows_toval = sqlsrv_num_rows($queryval);
 
 //   $query_tasa = "SELECT * FROM tinteresesm WHERE '$fechini' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal OR "
 //                 . " '$fechfin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal OR "
 //                 . " Tinteresesm_finicial BETWEEN '$fechini' AND '$fechfin' OR "
 //                 . " Tinteresesm_ffinal BETWEEN '$fechini' AND '$fechfin' ORDER BY Tinteresesm_ffinal ASC";
-//     $resultado_tasa = mysqli_query($mysqli, $query_tasa);
+//     $resultado_tasa=sqlsrv_query( $mysqli,$query_tasa, array(), array('Scrollable' => 'buffered'));
 
-// //$rowconsulta = $resultadoconsulta->fetch_assoc();
-//     // $totalRows_result = mysqli_num_rows($result);
+// //$rowconsulta = sqlsrv_fetch_array($resultadoconsulta, SQLSRV_FETCH_ASSOC);
+//     // $totalRows_result = sqlsrv_num_rows($result);
 //     $ttotal = 0;
     
 //     if (1==1) {
-//         while ($row_tasa = $resultado_tasa->fetch_assoc()) {
+//         while ($row_tasa = sqlsrv_fetch_array($resultado_tasa, SQLSRV_FETCH_ASSOC)) {
 //          $ftini = ($row_tasa['Tinteresesm_finicial'] < $fechini) ? $fechini : $row_tasa['Tinteresesm_finicial'];
 //         $ftfin = ($row_tasa['Tinteresesm_ffinal'] > $fechfin) ? $fechfin : $row_tasa['Tinteresesm_ffinal'];
 //         $vtead = $row_tasa['Tinteresesm_TEAD'];
@@ -549,7 +549,7 @@ global $mysqli;
         . " Tinteresesm_finicial BETWEEN '$fechaini' AND '$fechafin' OR "
         . " Tinteresesm_ffinal BETWEEN '$fechaini' AND '$fechafin' ORDER BY Tinteresesm_ffinal ASC";
 
-    $result = mysqli_query($mysqli, $query_tasa);
+    $result=sqlsrv_query( $mysqli,$query_tasa, array(), array('Scrollable' => 'buffered'));
 
     // Check for errors
     if (!$result) {
@@ -563,19 +563,20 @@ global $mysqli;
 #### Buscar los acuerdos de pago pendientes por el ID enviado ####
 function ValorInteresMora($fechini, $fechfin, $valor) {
 global $mysqli;
- $queryval = mysqli_query($mysqli, "SELECT id FROM tinteresesm WHERE '$fechfin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal");
+ $qry1 = "SELECT id FROM tinteresesm WHERE '$fechfin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal";
+ $queryval=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
 
     // Verifica si hay errores
     if (!$queryval) {
         die("Consulta fallida: " . mysqli_error($mysqli));
     }
-$rows_toval = mysqli_num_rows($queryval);
+$rows_toval = sqlsrv_num_rows($queryval);
     $result = BuscarTasaEA($fechini, $fechfin);
-    $totalRows_result = mysqli_num_rows($result);
+    $totalRows_result = sqlsrv_num_rows($result);
     $ttotal = 0;
 
     if ($totalRows_result > 0 && $rows_toval > 0) {
-        while ($row_tasa = mysqli_fetch_assoc($result)) {
+        while ($row_tasa=sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)){
             $ftini = ($row_tasa['Tinteresesm_finicial'] < $fechini) ? $fechini : $row_tasa['Tinteresesm_finicial'];
             $ftfin = ($row_tasa['Tinteresesm_ffinal'] > $fechfin) ? $fechfin : $row_tasa['Tinteresesm_ffinal'];
       
@@ -1012,7 +1013,7 @@ $nombre_tabla = $existe['nombre'];
     $resultadoCampos = sqlsrv_query( $mysqli,$consultaCampos);
     $cantidad_campos = 0;
 
-    if ($resultadoCampos && mysqli_num_rows($resultadoCampos) > 0) {
+    if ($resultadoCampos && sqlsrv_num_rows($resultadoCampos) > 0) {
 
 
         while ($campo = sqlsrv_fetch_array( $resultadoCampos, SQLSRV_FETCH_ASSOC)) {
@@ -1544,7 +1545,7 @@ function generar_resolucion($comparendo, $plantilla,$tipo = 9999999999999999) {
      //obtenemos informacion de la resolucion
     //  $sql_resolucion = "SELECT * FROM resolucion_sancion where ressan_comparendo = '$comparendo'";
     //  $resultado_resolucion = sqlsrv_query( $mysqli,$sql_resolucion);
-    //  $resolucion = $resultado_resolucion->fetch_assoc();
+    //  $resolucion = sqlsrv_fetch_array($resultado_resolucion, SQLSRV_FETCH_ASSOC);
 
 //obtenemos informacion de ciudades
     $sql_ciudades= "SELECT * FROM ciudades where id = '".$ciudadano['ciudad_residencia']."'";
@@ -1817,7 +1818,7 @@ function getNumResolucion($tipo, &$numero, &$desc, $anio = null, $dt = false) {
 
     $stmt = $mysqli->prepare("CALL num_resolucion(?, ?, ?, ?, ?, @num, @dsc)");
     $stmt->bind_param("iisii", $tipo, $numero, $desc, $year, $tabla);
-    $stmt->execute();
+    sqlsrv_execute( $stmt ));
     @$stmt->bind_result($numero, $desc);
     $stmt->fetch();
    
@@ -1851,7 +1852,7 @@ global $mysqli;
         }
         $Combo = $Combo . "<select name='" . $nombre . "' id='" . $nombre . "'" . $desabilitado . " style='width:120px'>";
 
-        while ($columnas = $Result->fetch_array(MYSQLI_NUM)) {
+        while ($columnas = sqlsrv_fetch_array( $Result, SQLSRV_FETCH_NUMERIC)) {
             if ($columnas[0] == $selected) {
                 $seleccionar = " selected='selected' ";
             } else {
@@ -1922,9 +1923,9 @@ function NombreCampo($tabla, $campo, $nombre = '_nombre', $id = '_ID'){
 
     $query = "SELECT $nombre FROM $tabla WHERE $id='$campo'";
     // echo $query;
-    $parame = mysqli_query($mysqli, $query);
+    $parame=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
     $row_parame = mysqli_fetch_array($parame);
-    // mysqli_close($conexion);
+    // sqlsrv_close($conexion);
     return $row_parame[0];
 }
 

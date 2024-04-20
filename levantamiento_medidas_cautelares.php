@@ -13,20 +13,20 @@ function desembargacomparendosihay($ncompder, $idecomp, $nliq) {
     $pasar2 = "hey:";
     if ($ncompder != null || $idecomp != null || $nliq != null) {
         $querycomp = "select * from comparendos where " . ($ncompder != null ? "Tcomparendos_comparendo= " . $ncompder : ($idecomp != null ? "Tcomparendos_ID= " . $idecomp . " " : "Tcomparendos_ID in (select comparendo from detalle_conceptos_liquidaciones  where concepto='1000004526' AND liquidacion ='" . $nliq . "') "));
-        $executecomp = mysqli_query($mysqli, $querycomp);
+        $executecomp=sqlsrv_query( $mysqli,$querycomp, array(), array('Scrollable' => 'buffered'));
         $querymed = "select * from medcautcomp where compid = '" . $idecomp . "' order by levfecha desc";
-        $executemed = mysqli_query($mysqli, $querymed);
-        $flev = mysqli_fetch_assoc($executemed);
+        $executemed=sqlsrv_query( $mysqli,$querymed, array(), array('Scrollable' => 'buffered'));
+        $flev=sqlsrv_fetch_array($executemed, SQLSRV_FETCH_ASSOC);
 
         $fecha_levantamiento = $flev['levfecha'];
-        if (mysqli_num_rows($executecomp) > 0) {
-            $rcomp = mysqli_fetch_assoc($executecomp);
+        if (sqlsrv_num_rows($executecomp) > 0) {
+            $rcomp=sqlsrv_fetch_array($executecomp, SQLSRV_FETCH_ASSOC);
             $ncompder = $rcomp['Tcomparendos_comparendo'];
             $idecomp = $rcomp['Tcomparendos_ID'];
             if (true) {
                 $queryres2 = "select * from resolucion_sancion where ressan_comparendo= " . $ncompder . " AND ressan_tipo=35 ";
-                $executeres2 = mysqli_query($mysqli, $queryres2);
-                if (mysqli_num_rows($executeres2) > 0) {
+                $executeres2=sqlsrv_query( $mysqli,$queryres2, array(), array('Scrollable' => 'buffered'));
+                if (sqlsrv_num_rows($executeres2) > 0) {
                     $sigue = false;
                 } else {
                     $sigue = true;
@@ -39,9 +39,9 @@ function desembargacomparendosihay($ncompder, $idecomp, $nliq) {
         }
         if ($sigue) {
             $querymax = "select max(ressan_numero) as maximo from resolucion_sancion where ressan_tipo=35 ";
-            $executemax = mysqli_query($mysqli, $querymax);
-            if (mysqli_num_rows($executemax) > 0) {
-                $rmax = mysqli_fetch_assoc($executemax);
+            $executemax=sqlsrv_query( $mysqli,$querymax, array(), array('Scrollable' => 'buffered'));
+            if (sqlsrv_num_rows($executemax) > 0) {
+                $rmax=sqlsrv_fetch_array($executemax, SQLSRV_FETCH_ASSOC);
                 $numero = $rmax['maximo'] + 1;
             } else {
                 $numero = 1;
@@ -56,12 +56,12 @@ function desembargacomparendosihay($ncompder, $idecomp, $nliq) {
 
             $sqltrans .= " COMMIT END TRY BEGIN CATCH ROLLBACK TRAN PRINT ltrim(str(error_number())) END CATCH";
 
-            $resultt = mysqli_query($mysqli, $sqltrans) or die('Error');
+            $resultt=sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered')) or die('Error');
             $result = mysqli_error($mysqli);
             if ($result == "" || true) {
-                $query = mysqli_query($mysqli, "SELECT ressan_id AS id, ressan_archivo AS ruta FROM resolucion_sancion WHERE ressan_numero = $numero "
-                        . "AND ressan_ano = $anio AND ressan_comparendo = '$ncompder' AND ressan_tipo = 35");
-                $fetch = mysqli_fetch_assoc($query);
+                $qry1 = "SELECT ressan_id AS id, ressan_archivo AS ruta FROM resolucion_sancion WHERE ressan_numero = $numero " . "AND ressan_ano = $anio AND ressan_comparendo = '$ncompder' AND ressan_tipo = 35";
+		$query=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
+                $fetch=sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                 // header('Location: ./' . $fetch['ruta'] . '?ref_com=' . $fetch['id']);
                 $pasar = $fetch['ruta'] . '?ref_com=' . $fetch['id'];
             } else {
@@ -81,8 +81,8 @@ if (isset($_POST['valnoficio']) && isset($_POST['numero'])) {
     $valido = false;
     if ($numero > 0) {
         $query = "SELECT id FROM medcautcomp WHERE levnumero = $numero";
-        $execute = mysqli_query($mysqli, $query);
-        if (mysqli_num_rows($execute) == 0) {
+        $execute=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
+        if (sqlsrv_num_rows($execute) == 0) {
             $valido = true;
         }
     }
@@ -110,26 +110,26 @@ if (isset($_POST['update'])) {
 
                 $sqltrans = "UPDATE medcautcomp SET 
                     levarchivo = '$archivo',  levnumero = (select max(levnumero)+1 from medcautcomp), mcestado = 2,levfecha = NOW(), levusuario = '$usuario'  WHERE id = $mcid ";
-                $resultt = mysqli_query($mysqli, $sqltrans) or die('Error');
+                $resultt=sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered')) or die('Error');
                 $result = mysqli_error($mysqli);
             }
             //		
             $sqq = "select levnumero,compid from medcautcomp WHERE id = $mcid ";
-            $executeqq = mysqli_query($mysqli, $sqq);
-            $rqq = mysqli_fetch_assoc($executeqq);
+            $executeqq=sqlsrv_query( $mysqli,$sqq, array(), array('Scrollable' => 'buffered'));
+            $rqq=sqlsrv_fetch_array($executeqq, SQLSRV_FETCH_ASSOC);
             $numero = $rqq['levnumero'];
             $compid = $rqq['compid'];
             //   buscar si tiene desembargo  ///
             $query35 = "select * from resolucion_sancion where ressan_tipo=35 AND ressan_comparendo in (select Tcomparendos_comparendo from comparendos where Tcomparendos_ID in (select compid from medcautcomp where id=" . $mcid . ")) ";
-            $execute35 = mysqli_query($mysqli, $query35);
-            if (mysqli_num_rows($execute35) > 0) {
-                $r35 = mysqli_fetch_assoc($execute35);
+            $execute35=sqlsrv_query( $mysqli,$query35, array(), array('Scrollable' => 'buffered'));
+            if (sqlsrv_num_rows($execute35) > 0) {
+                $r35=sqlsrv_fetch_array($execute35, SQLSRV_FETCH_ASSOC);
                 $genarchiv[$mcid] = array('ruta' => $archivo, 'numero' => $numero, 'rutaODD' => $r35["ressan_archivo"], 'numeroODD' => $r35["ressan_ano"] . "-" . $r35["ressan_numero"] . "-DE", 'ressan_id' => $r35["ressan_id"]);
             } else {
                 $pasar = desembargacomparendosihay(null, $compid, null);
                 $query35 = "select * from resolucion_sancion where ressan_tipo=35 AND ressan_comparendo in (select Tcomparendos_comparendo from comparendos where Tcomparendos_ID in (select compid from medcautcomp where id=" . $mcid . ")) ";
-                $execute35 = mysqli_query($mysqli, $query35);
-                $r35 = mysqli_fetch_assoc($execute35);
+                $execute35=sqlsrv_query( $mysqli,$query35, array(), array('Scrollable' => 'buffered'));
+                $r35=sqlsrv_fetch_array($execute35, SQLSRV_FETCH_ASSOC);
                 $genarchiv[$mcid] = array('ruta' => $archivo, 'numero' => $numero, 'rutaODD' => $r35["ressan_archivo"], 'numeroODD' => $r35["ressan_ano"] . "-" . $r35["ressan_numero"] . "-DE", 'ressan_id' => $r35["ressan_id"]);
                 //$genarchiv[$mcid] = array('ruta' => $archivo, 'numero' => $numero,'rutaODD' => null, 'numeroODD' => null,'ressan_id' => null);
             }
@@ -211,7 +211,7 @@ if (isset($_POST['update'])) {
 			WHERE C.Tcomparendos_estado=13 AND M.levnumero IS NULL  AND IFNULL(ressan35.ressan_comparendo,'')='' $where 
 		ORDER BY fechains	";	
 		
-		$registros = $mysqli->query($query);
+		$registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 		
 // 		echo $query;
 	}
@@ -338,7 +338,7 @@ $numlev = 0;
 <?php } elseif (isset($_GET['generar']) && $error == 0) { ?>
     <form name="form1" id="form" method="POST" >
         <table id="table" align="center" bgcolor="#FFFFFF" width="70%" style="border-collapse: collapse;">
-            <?php $cantidad = mysqli_num_rows($registros); ?>
+            <?php $cantidad = sqlsrv_num_rows($registros); ?>
             <?php if ($cantidad > 0) { ?>
                 <tr>
                     <th width="10%">Comparendo</th>
@@ -352,11 +352,12 @@ $numlev = 0;
                 </tr>
                 <?php
                 $count = 0;
-                $resultnum = $mysqli->query("SELECT COALESCE(MAX(levnumero), 0) AS numero FROM medcautcomp");
-                $numrow = $resultnum->fetch_assoc();
+		$qry2="SELECT COALESCE(MAX(levnumero), 0) AS numero FROM medcautcomp";
+                $resultnum=sqlsrv_query( $mysqli,$qry2, array(), array('Scrollable' => 'buffered'));
+                $numrow = sqlsrv_fetch_array($resultnum, SQLSRV_FETCH_ASSOC);
                 $numlev = $numrow['numero'];
                 ?>
-                <?php while ($row = $registros->fetch_assoc()) {
+                <?php while ($row = sqlsrv_fetch_array($registros, SQLSRV_FETCH_ASSOC)) {
                     $count++;
                     $color = "#BCB9FF";
                     if ($count % 2 == 0) {

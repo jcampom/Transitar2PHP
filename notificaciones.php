@@ -134,8 +134,7 @@ sqlsrv_begin_transaction( $mysqli );
 
 try {
     $sqltrans = "";
-    
-    
+   
     if ($tipo == 1) {
 $plantilla = 13;
         

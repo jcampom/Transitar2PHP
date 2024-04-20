@@ -8,14 +8,14 @@ if(!empty($_POST['nueva'])){
     $insertQuery = "INSERT INTO plantillas_resoluciones (nombre,plantilla,tipo_resolucion,estado_cambio,resoluciones_creadas,cargo_firma, firma_ciudadano) VALUES ('".$_POST['nombre']."','$plantilla','".$_POST['tipo_resolucion']."','".$_POST['estado_cambio']."','".$_POST['resoluciones_creadas']."','".trim($_POST['cargo_firma'])."','".$_POST['firma_ciudadano']."')";
     
        // Ejecutar la consulta de inserción
-    if ($mysqli->query($insertQuery)) {
+    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
                     $id_plantilla = mysqli_insert_id($mysqli); // Obtener el ID de la plantilla creada
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
         
              $query_plantilla = "INSERT INTO menu_items (nombre, padre_id,enlace,empresa, fecha,fechayhora, usuario, icono) VALUES ('".$_POST['nombre']."', '84','resoluciones.php?id=$id_plantilla','$empresa','$fecha','$fechayhora','$idusuario','gavel')";
         
             
-               if ($mysqli->query($query_plantilla)) {
+               if (sqlsrv_query( $mysqli,$query_plantilla, array(), array('Scrollable' => 'buffered'))){
    echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Ha sido agregada la nueva resolucion al menu.</div>';
                }else{
    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';  
@@ -34,7 +34,7 @@ if(!empty($_POST['actualizar'])){
 
 
 // Ejecutar la consulta
-if ($mysqli->query($queryUpdate)) {
+if (sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'))){
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
     }else{
    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';  
@@ -49,9 +49,9 @@ if(!empty($_POST['id'])){
     
  $consulta_plantillas="SELECT * FROM plantillas_resoluciones where id = '".$_POST['id']."'";
 
-            $resultado_plantillas=$mysqli->query($consulta_plantillas);
+            $resultado_plantillas=sqlsrv_query( $mysqli,$consulta_plantillas, array(), array('Scrollable' => 'buffered'));
 
-            $row_plantillas=$resultado_plantillas->fetch_assoc();
+            $row_plantillas=sqlsrv_fetch_array($resultado_plantillas, SQLSRV_FETCH_ASSOC);
             
             $contenido = $row_plantillas['plantilla'];
             
@@ -81,8 +81,8 @@ if(!empty($_POST['id'])){
                 <option value=""   style="margin-left: 15px;"  selected>Seleccione ...</option>
                 <?php
                 $consulta_plantillas2 = "SELECT * FROM plantillas_resoluciones";
-                $resultado_plantillas2 = $mysqli->query($consulta_plantillas2);
-                while ($row_plantillas2 = $resultado_plantillas2->fetch_assoc()) {
+                $resultado_plantillas2=sqlsrv_query( $mysqli,$consulta_plantillas2, array(), array('Scrollable' => 'buffered'));
+                while ($row_plantillas2 = sqlsrv_fetch_array($resultado_plantillas2, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $row_plantillas2['id'] . '">' . $row_plantillas2['nombre'] . '</option>';
                 }
                 ?>
@@ -94,10 +94,7 @@ if(!empty($_POST['id'])){
     <div class="col-md-6">
         
     <div class="form-group form-float">
-     
 
-           
-   
              </div>
               </div>
 
@@ -131,8 +128,8 @@ if(!empty($_POST['id'])){
               <select class="form-control" required name="tipo_resolucion" = data-live-search="true">
                 <option value=" <?php
                 $consulta_tipos2 = "SELECT * FROM resolucion_sancion_tipo where id = '".$row_plantillas['tipo_resolucion']."'";
-                $resultado_tipos2  = $mysqli->query($consulta_tipos2 );
-                $row_tipos2  = $resultado_tipos2 ->fetch_assoc();
+                $resultado_tipos2=sqlsrv_query( $mysqli,$consulta_tipos2, array(), array('Scrollable' => 'buffered'));
+                $row_tipos2  = sqlsrv_fetch_array($resultado_tipos2 , SQLSRV_FETCH_ASSOC);
                 
                 echo $row_tipos2['id'];
                 ?>"   style="margin-left: 15px;"  selected>
@@ -143,8 +140,8 @@ if(!empty($_POST['id'])){
                 ?></option>
                 <?php
                 $consulta_tipos = "SELECT * FROM resolucion_sancion_tipo";
-                $resultado_tipos  = $mysqli->query($consulta_tipos );
-                while ($row_tipos  = $resultado_tipos ->fetch_assoc()) {
+                $resultado_tipos=sqlsrv_query( $mysqli,$consulta_tipos, array(), array('Scrollable' => 'buffered'));
+                while ($row_tipos  = sqlsrv_fetch_array($resultado_tipos , SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $row_tipos['id'] . '">' . $row_tipos['id'] . ' | ' . $row_tipos['nombre'] . '</option>';
                 }
                 ?>
@@ -162,10 +159,10 @@ if(!empty($_POST['id'])){
 
                 <?php
                 $consulta_estados = "SELECT * FROM comparendos_estados";
-                $resultado_estados  = $mysqli->query($consulta_estados);
+                $resultado_estados=sqlsrv_query( $mysqli,$consulta_estados, array(), array('Scrollable' => 'buffered'));
                 
                 
-                while ($row_estados  = $resultado_estados ->fetch_assoc()) {
+                while ($row_estados  = sqlsrv_fetch_array($resultado_estados , SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $row_estados['id'] . '" ' . (in_array($row_estados['id'], $estados_permitidos) ? ' selected' : '') . '>' . $row_estados['id'] . ' | ' . $row_estados['nombre'] . '</option>';
                 }
                 ?>   
@@ -182,8 +179,8 @@ if(!empty($_POST['id'])){
                          
   <option value=" <?php
                 $consulta_estados2 = "SELECT * FROM comparendos_estados where id = '".$row_plantillas['estado_cambio']."'";
-                $resultado_estados2  = $mysqli->query($consulta_estados2);
-                $row_estados2  = $resultado_estados2 ->fetch_assoc();
+                $resultado_estados2=sqlsrv_query( $mysqli,$consulta_estados2, array(), array('Scrollable' => 'buffered'));
+                $row_estados2  = sqlsrv_fetch_array($resultado_estados2 , SQLSRV_FETCH_ASSOC);
                 
                 echo $row_plantillas['estado_cambio'];
                 ?>"   style="margin-left: 15px;"  selected>
@@ -194,10 +191,10 @@ if(!empty($_POST['id'])){
                 ?></option>
                 <?php
                 $consulta_estados = "SELECT * FROM comparendos_estados";
-                $resultado_estados  = $mysqli->query($consulta_estados);
+                $resultado_estados=sqlsrv_query( $mysqli,$consulta_estados, array(), array('Scrollable' => 'buffered'));
                 
                 
-                while ($row_estados  = $resultado_estados ->fetch_assoc()) {
+                while ($row_estados  = sqlsrv_fetch_array($resultado_estados , SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $row_estados['id'] . '" >' . $row_estados['id'] . ' | ' . $row_estados['nombre'] . '</option>';
                 }
                 ?>   
@@ -220,10 +217,10 @@ if(!empty($_POST['id'])){
                 ?></option>
                 <?php
                 $consulta_estados = "SELECT * FROM empleados where firma != ''";
-                $resultado_estados  = $mysqli->query($consulta_estados);
+                $resultado_estados=sqlsrv_query( $mysqli,$consulta_estados, array(), array('Scrollable' => 'buffered'));
                 
                 
-                while ($row_estados  = $resultado_estados ->fetch_assoc()) {
+                while ($row_estados  = sqlsrv_fetch_array($resultado_estados , SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $row_estados['cargo'] . '" > ' . $row_estados['cargo'] . '</option>';
                 }
                 ?>   
@@ -241,8 +238,8 @@ if(!empty($_POST['id'])){
               <select class="form-control" required name="resoluciones_creadas" = data-live-search="true">
                 <option value=" <?php
                 $consulta_tipos2 = "SELECT * FROM resolucion_sancion_tipo where id = '".$row_plantillas['resoluciones_creadas']."'";
-                $resultado_tipos2  = $mysqli->query($consulta_tipos2 );
-                $row_tipos2  = $resultado_tipos2 ->fetch_assoc();
+                $resultado_tipos2=sqlsrv_query( $mysqli,$consulta_tipos2, array(), array('Scrollable' => 'buffered'));
+                $row_tipos2  = sqlsrv_fetch_array($resultado_tipos2 , SQLSRV_FETCH_ASSOC);
                 
                 echo $row_tipos2['id'];
                 ?>"   style="margin-left: 15px;"  selected>
@@ -253,8 +250,8 @@ if(!empty($_POST['id'])){
                 ?></option>
                 <?php
                 $consulta_tipos = "SELECT * FROM resolucion_sancion_tipo";
-                $resultado_tipos  = $mysqli->query($consulta_tipos );
-                while ($row_tipos  = $resultado_tipos ->fetch_assoc()) {
+                $resultado_tipos=sqlsrv_query( $mysqli,$consulta_tipos, array(), array('Scrollable' => 'buffered'));
+                while ($row_tipos  = sqlsrv_fetch_array($resultado_tipos , SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $row_tipos['id'] . '">' . $row_tipos['id'] . ' | ' . $row_tipos['nombre'] . '</option>';
                 }
                 ?>
@@ -262,8 +259,7 @@ if(!empty($_POST['id'])){
     </div>
       </div> 
         </div>
-        
-        
+
                      <div class="col-md-12">
             <div class="form-group form-float">
                            <br>  <br>

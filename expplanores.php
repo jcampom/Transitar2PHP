@@ -41,8 +41,8 @@ function valorAP($comp, $cuotas) {
     $query = "SELECT SUM(TAcuerdop_valor) AS valor
         FROM acuerdos_pagos WHERE TAcuerdop_comparendo = '$comp' AND TAcuerdop_cuotas = $cuotas AND TAcuerdop_estado <> 5";
 
-    $result = $mysqli->query($query) or die("Error en el plan de pago");
-    $acuerdo = $result->fetch_assoc();
+    $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered')) or die("Error en el plan de pago");
+    $acuerdo = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
     
     return $acuerdo['valor'];
 }
@@ -99,7 +99,7 @@ function planDePagoAP($comp, $cuotas) {
             DATE_FORMAT(TAcuerdop_fechapago, '%d/%m/%Y') AS fecha
         FROM acuerdos_pagos WHERE TAcuerdop_comparendo = '$comp' AND TAcuerdop_cuotas = $cuotas";
 
-    $result = $mysqli->query($query);
+    $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
     
     if (!$result) {
         die("Error en la consulta del plan de pago: " . serialize(sqlsrv_errors()));
@@ -163,15 +163,15 @@ if ($_POST['Comprobar'] || $_GET["pagina"]) {
 
     if ($paginar == 1) {
         $sql = "SELECT COUNT(idres) AS total FROM VExportResol $where";
-        $res1 = $mysqli->query($sql) or die("error: " . serialize(sqlsrv_errors()));
-        $row_res1 = $res1->fetch_assoc();
+        $res1=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered')) or die("error: " . serialize(sqlsrv_errors()));
+        $row_res1 = sqlsrv_fetch_array($res1, SQLSRV_FETCH_ASSOC);
         $total_registros = $row_res1['total'];
         $total_paginas = ceil($total_registros / $registros);
         $query_res = "SELECT * FROM ($query_base) T WHERE T.fila BETWEEN $inicio AND $fin";
     } else {
         $query_res = $query_base;
     }
-    $resol = $mysqli->query($query_res) or die("error: " . serialize(sqlsrv_errors()));
+    $resol=sqlsrv_query( $mysqli,$query_res, array(), array('Scrollable' => 'buffered')) or die("error: " . serialize(sqlsrv_errors()));
 }
 
 
@@ -185,8 +185,8 @@ if ($_POST['webservice']) {
 	$credenciales = array('SECRETARIA' => $row_paramWS['TParametrosWS_secretaria'], 'USUARIO' => $row_paramWS['TParametrosWS_usuario'], 'CLAVE' => $row_paramWS['TParametrosWS_contrasena']);
     foreach ($idres as $id) {
         $query_resexp = "SELECT * FROM VExportResol WHERE idres = $id";
-        $resexp = $mysqli->query($query_resexp);
-        $arrayResolucion = fixArray($resexp->fetch_assoc(), true);
+        $resexp=sqlsrv_query( $mysqli,$query_resexp, array(), array('Scrollable' => 'buffered'));
+        $arrayResolucion = fixArray(sqlsrv_fetch_array($resexp, SQLSRV_FETCH_ASSOC), true);
 		if (!is_array($arrayResolucion)) {
 			continue;
 		}
@@ -215,7 +215,7 @@ if ($_POST['webservice']) {
             analizarRespuesta($resolucionXML, $responseXML, $arrayResolucion, $registrosCorrectos, $registrosConError, false, "Resumen de acuerdo"); //Resumen de acuerdo de pago (resolucion 8)
             $planPagoAP = planDePagoAP($arrayResolucion['comp'], $arrayResolucion['cuotas']);
             $arrayResolucion['RESVALINF'] = $valInfra;
-            while ($cuotaAP = $planPagoAP->fetch_assoc()) {
+            while ($cuotaAP = sqlsrv_fetch_array($planPagoAP, SQLSRV_FETCH_ASSOC)) {
                 $arrayResolucion['RESTIPORES'] = 38;
                 $arrayResolucion['RESINFRACCION'] = $cuotaAP['cuota'];
                 $arrayResolucion['RESVALOR'] = $arrayResolucion['RESVALPAG'] = $cuotaAP['valor'];
@@ -240,7 +240,7 @@ if ($_POST['webservice']) {
 if ($_POST['generar']) {
     ini_set("memory_limit", "256M");
     set_time_limit(0);
-    $rs2 = $mysqli->query("SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch");
+    $rs2=sqlsrv_query( $mysqli,"SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch", array(), array('Scrollable' => 'buffered'));
     $row2 = $rs2->fetch_row();
     $idArch = trim($row2[0]) + 1;
 
@@ -255,8 +255,8 @@ if ($_POST['generar']) {
         $idres = $_POST['idres'];
         foreach ($idres as $id) {
             $query_resexp = "SELECT * FROM VExportResol WHERE idres = $id";
-            $resexp = $mysqli->query($query_resexp);
-            $res = fixArray($resexp->fetch_assoc());
+            $resexp=sqlsrv_query( $mysqli,$query_resexp, array(), array('Scrollable' => 'buffered'));
+            $res = fixArray(sqlsrv_fetch_array($resexp, SQLSRV_FETCH_ASSOC));
             if (!is_array($res)) {
                 continue;
             }
@@ -303,7 +303,7 @@ if ($_POST['generar']) {
                     <td align='center' class='Recaudada'>&nbsp;</td>
                 </tr>";
                 $planPagoAP = planDePagoAP($res['comp'], $res['cuotas']);
-                while ($cuotaAP = $planPagoAP->fetch_assoc()) {
+                while ($cuotaAP = sqlsrv_fetch_array($planPagoAP, SQLSRV_FETCH_ASSOC)) {
                     $linea .= "$consec,{$res['RESNUMERO']},,{$res['RESFECHA']},38,{$res['RESFHASTA']},{$res['RESCOMP']}"
                             . ",{$res['RESCOMPF']},{$res['RESNIPINFRAC']},{$res['RESTIPODOC']},{$res['RESNOMBRE']},{$res['RESAPELLIDO']},{$res['RESDIRINFRACTOR']}"
                             . ",{$res['RESTELINFRACTOR']},{$res['RESIDCIUDAD']},{$cuotaAP['valor']},{$res['RESVALAD']},{$res['FOTOMULTA']},{$res['RESORGANISMO']}"
@@ -363,12 +363,12 @@ if ($_POST['generar']) {
         /* -- Afectación de BD -- */
   if ($valortotal) {
     $totalsql .= "INSERT INTO Trecaudos_arch (Trecaudos_arch_archivo, Trecaudos_arch_nombre, Trecaudos_arch_tipo, Trecaudos_arch_tamano, Trecaudos_arch_descrip, Trecaudos_arch_md5, Trecaudos_arch_expimp, Trecaudos_arch_user, Trecaudos_arch_fecha) VALUES ('$path', '$nombre_archivo', '$tipo_archivo', '$tamano_archivo', '$mensp', '$md5', '3', '{$_SESSION['MM_Username']}', '$fechaini')";
-    $resultTotal = $mysqli->query($totalsql);
+    $resultTotal=sqlsrv_query( $mysqli,$totalsql, array(), array('Scrollable' => 'buffered'));
 
     $sqlExport .= " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('" . ($consec - 1) . "', 'Texportplano', 'INSERT', '$idArch', '$mensp', '3', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
     $sqlExport .= " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('" . ($consec - 1) . "', 'Trecaudos_arch', 'INSERT', '$idArch', '$mensp', '3', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
     $sqlExport .= " INSERT INTO Trecaudos_ec (Trecaudos_ec_numcuenta, Trecaudos_ec_fechadesde, Trecaudos_ec_fechahasta, Trecaudos_ec_divipo, Trecaudos_ec_tiporecaudo, Trecaudos_ec_numrec, Trecaudos_ec_sumrec, Trecaudos_ec_oficio, Trecaudos_ec_codchequeo, Trecaudos_ec_idarch, Trecaudos_ec_pdf, Trecaudos_ec_expimp, Trecaudos_ec_user, Trecaudos_ec_fecha) VALUES ('', '', '', '', '', '" . ($consec - 1) . "', '$valortotal', '" . $_POST['oficio'] . "', '$rsumaascii', '$idArch', '$mensp', '3', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-    $rsqlExport = $mysqli->query($sqlExport);
+    $rsqlExport=sqlsrv_query( $mysqli,$sqlExport, array(), array('Scrollable' => 'buffered'));
 }
 
     } else {
@@ -383,7 +383,7 @@ $menspost .= "
     </tr>";
 
 $sqlError .= "INSERT INTO Trecaudos_error (Trecaudos_error_nlinea, Trecaudos_error_ncampo, Trecaudos_error_error, Trecaudos_error_idarch, Trecaudos_error_expimp, Trecaudos_error_user, Trecaudos_error_fecha) VALUES ('$row', '$c', '$mensn', '$idArch', '3', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-$rsqlError = $mysqli->query($sqlError);
+$rsqlError=sqlsrv_query( $mysqli,$sqlError, array(), array('Scrollable' => 'buffered'));
 
     }
 }//Generar
@@ -429,9 +429,9 @@ $rsqlError = $mysqli->query($sqlError);
     <option value="">Seleccione...</option>
     <?php
     $query_resol = "SELECT id, nombre, sigla FROM resolucion_sancion_tipo WHERE simit != 0 ORDER BY nombre ASC";
-    $resolt = $mysqli->query($query_resol) or die("error");
+    $resolt=sqlsrv_query( $mysqli,$query_resol, array(), array('Scrollable' => 'buffered')) or die("error: " . serialize(sqlsrv_errors()));
     ?>
-    <?php while ($row_resol = $resolt->fetch_assoc()) : ?>
+    <?php while ($row_resol = sqlsrv_fetch_array($resolt, SQLSRV_FETCH_ASSOC)) : ?>
         <?php $selected = ($sespos['resolucion'] == $row_resol['id']) ? 'selected' : ''; ?>
         <option value="<?php echo $row_resol['id']; ?>" <?php echo $selected; ?>><?php echo $row_resol['nombre']; ?> </option>
     <?php endwhile; ?>
@@ -617,7 +617,7 @@ $rsqlError = $mysqli->query($sqlError);
                             <td colspan="10">                               
                                 <form name="form" id="form" action="expplanores.php" method="POST" onSubmit="return ValidaExporRes()">
                                     <table width="100%">
-                                        <?php if ($resol->num_rows > 0) : ?>
+                                        <?php if (sqlsrv_num_rows($resol) > 0) : ?>
                                             <tr class="contenido2">
                                                 <th align="center">Fila</th>
                                                 <th align="center">Fecha Res.</th>
@@ -632,7 +632,7 @@ $rsqlError = $mysqli->query($sqlError);
                                                     <input class="form-control"  name="todos" type="checkbox" id="todos" onmouseover="Tip('Marca o desmarca todos los registros del listado')" onmouseout="UnTip()" checked="" onclick="CheckOnCheck()" />
                                                 </th>
                                             </tr>
-                                            <?php while ($row_res = $resol->fetch_assoc()) : ?>
+                                            <?php while ($row_res = sqlsrv_fetch_array($resol, SQLSRV_FETCH_ASSOC)) : ?>
                                                 <tr> 
                                                     <td align="center"><?php echo $row_res['fila']; ?></td>
                                                     <td align="center"><?php echo $row_res['fecha']; ?></td>

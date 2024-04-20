@@ -16,9 +16,9 @@ $tramitesSeleccionados = $_POST['tramitesSeleccionados'];
 if(empty($claseVehiculo)){
             $consulta_vehiculo="SELECT * FROM vehiculos where numero_placa = '$placa'";
 
-            $resultado_vehiculo=$mysqli->query($consulta_vehiculo);
+            $resultado_vehiculo=sqlsrv_query( $mysqli,$consulta_vehiculo, array(), array('Scrollable' => 'buffered'));
 
-            $row_vehiculo=$resultado_vehiculo->fetch_assoc();
+            $row_vehiculo=sqlsrv_fetch_array($resultado_vehiculo, SQLSRV_FETCH_ASSOC);
             
             $claseVehiculo = $row_vehiculo['clase'];
             
@@ -33,7 +33,7 @@ if($tipoTramite == 4){
                VALUES ('$tipoTramite', '$ciudadano', '$placa', '$tipoServicio', '$claseVehiculo', '$clasificacionVehiculo', '$idusuario', '$fecha', '$fechayhora', '$empresa', '$nota_credito')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'))===TRUE){
     // Inserción exitosa
        $liquidacionId = mysqli_insert_id($mysqli);
 
@@ -53,7 +53,7 @@ $sistematizacion = 0;
                         VALUES ('$liquidacionId', '39','$comparendos')";
 
     // Ejecutar la consulta
-    if ($mysqli->query($consultaDetalle) !== TRUE) {
+    if (sqlsrv_query( $mysqli,$consultaDetalle, array(), array('Scrollable' => 'buffered'))!==TRUE){
 
     } 
     
@@ -63,16 +63,16 @@ $sistematizacion = 0;
 
 // Consulta a la tabla comparendos
 $sql = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$comparendos'";
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
-$row = $result->fetch_assoc();
+$row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
            // obtenemos el valor en smlv del comparendo
            $consulta_valor="SELECT * FROM comparendos_codigos where	TTcomparendoscodigos_codigo = '".$row['Tcomparendos_codinfraccion']."'";
 
-                  $resultado_valor=$mysqli->query($consulta_valor);
+                  $resultado_valor=sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
 
-                  $row_valor=$resultado_valor->fetch_assoc();
+                  $row_valor=sqlsrv_fetch_array($resultado_valor, SQLSRV_FETCH_ASSOC);
                   
                   // obtenemos el valor del smlv del año
 
@@ -80,9 +80,9 @@ $ano_comparendo = substr($row['Tcomparendos_fecha'], 0, 4);
 
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano_comparendo'";
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
                   
           if($ano_comparendo > 2019){      
             $smlv_diario = round(($row_smlv['smlv']) / 30);
@@ -149,10 +149,10 @@ $datos = calcularInteresCompa($valor, $fechini, $fecha, $diasint, $parametros_ec
          
          // Realizar la consulta para obtener los conceptos asociados al trámite
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '39'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
             
@@ -163,9 +163,9 @@ if ($resultado_tramite->num_rows > 0) {
    
     }
 
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+            $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
-            $row_concepto=$resultado_concepto->fetch_assoc();
+            $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
             
             
   if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
@@ -183,9 +183,9 @@ if ($resultado_tramite->num_rows > 0) {
             
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['valor_SMLV_UVT'] == 0){
              $valor_concepto = $row_concepto['valor_concepto'];  
@@ -209,10 +209,10 @@ if ($resultado_tramite->num_rows > 0) {
 
           
 $sqlCM = "SELECT * FROM medcautcomp WHERE mcestado = 1 and compid ='".$row['Tcomparendos_ID']."'";
-$queryConcep = $mysqli->query($sqlCM);
+$queryConcep=sqlsrv_query( $mysqli,$sqlCM, array(), array('Scrollable' => 'buffered'));
 
 
-if ($queryConcep->num_rows > 0) {
+if (sqlsrv_num_rows($queryConcep) > 0) {
 
 
         $valor_concepto = $valor_concepto;
@@ -226,7 +226,7 @@ if ($queryConcep->num_rows > 0) {
                VALUES ('$liquidacionId', '39', '".$row_concepto['id']."','$valor_concepto','$valor_mora','$comparendos','$valor_honorario','$valor_cobranza','".$row_concepto['terceros']."')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta_conceptos) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta_conceptos, array(), array('Scrollable' => 'buffered'))===TRUE){
 
 
   } 
@@ -239,10 +239,10 @@ if ($queryConcep->num_rows > 0) {
 
          // Realizar la consulta para obtener los conceptos asociados al ammnistias
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 $total2 = 0;
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
             
@@ -250,9 +250,9 @@ if ($resultado_tramite->num_rows > 0) {
          
     
 
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+            $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
-            $row_concepto=$resultado_concepto->fetch_assoc();
+            $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
             
          
          
@@ -271,9 +271,9 @@ if ($resultado_tramite->num_rows > 0) {
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
            
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['porcentaje'] > 0){
                 
@@ -318,7 +318,7 @@ if($row_concepto['operacion'] == 2){
                VALUES ('$liquidacionId', '59', '".$row_concepto['id']."','$valor_concepto','$valor_mora','$comparendos','".$row_concepto['terceros']."')";
                
                  // Ejecutar la consulta
-  if($mysqli->query($consulta_conceptos) === TRUE) {
+  if(sqlsrv_query( $mysqli,$consulta_conceptos, array(), array('Scrollable' => 'buffered'))===TRUE){
 
 
   } 
@@ -340,7 +340,7 @@ if($row_concepto['operacion'] == 2){
                VALUES ('$tipoTramite', '$ciudadano', '$placa', '$tipoServicio', '$claseVehiculo', '$clasificacionVehiculo', '$idusuario', '$fecha', '$fechayhora', '$empresa','$nota_credito')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'))===TRUE){
     // Inserción exitosa
        $liquidacionId = mysqli_insert_id($mysqli);
 
@@ -361,24 +361,24 @@ if($row_concepto['operacion'] == 2){
       
       $consulta_dt="SELECT * FROM derechos_transito where TDT_ID = '$dt'";
 
-            $resultado_dt=$mysqli->query($consulta_dt);
+            $resultado_dt=sqlsrv_query( $mysqli,$consulta_dt, array(), array('Scrollable' => 'buffered'));
 
-            $row_dt=$resultado_dt->fetch_assoc();
+            $row_dt=sqlsrv_fetch_array($resultado_dt, SQLSRV_FETCH_ASSOC);
     // Realizar la inserción en la tabla detalle_liquidaciones
     $consultaDetalle = "INSERT INTO detalle_liquidaciones (liquidacion, tramite,dt)
                         VALUES ('$liquidacionId','".$row_dt['TDT_tramite']."', '$dt')";
 
     // Ejecutar la consulta
-    if ($mysqli->query($consultaDetalle) !== TRUE) {
+    if (sqlsrv_query( $mysqli,$consultaDetalle, array(), array('Scrollable' => 'buffered'))!==TRUE){
 
     } 
     
     
     // Consultamos si es el primero que debe
 $sql_primer = "SELECT MIN(TDT_ano) as primer FROM derechos_transito WHERE TDT_placa = '".$row_dt['TDT_placa']."' and TDT_estado = 1 or TDT_placa = '".$row_dt['TDT_placa']."' and TDT_estado = 8 or TDT_placa = '".$row_dt['TDT_placa']."' and TDT_estado = 5";
-$result_primer = $mysqli->query($sql_primer);
+$result_primer=sqlsrv_query( $mysqli,$sql_primer, array(), array('Scrollable' => 'buffered'));
 
-$row_primer = $result_primer->fetch_assoc();
+$row_primer = sqlsrv_fetch_array($result_primer, SQLSRV_FETCH_ASSOC);
 
 $primero = $row_primer['primer'];
     
@@ -388,9 +388,9 @@ $primero = $row_primer['primer'];
 // Consulta a la tabla comparendos
 
 $sql = "SELECT * FROM derechos_transito WHERE TDT_ID = '$dt'";
-$result = $mysqli->query($sql);
+$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
-$row = $result->fetch_assoc();
+$row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
 $ano_dt = $row['TDT_ano'];
 
@@ -400,9 +400,9 @@ $ano_siguiente = $row['TDT_ano'] + 1;
 
 $consulta_vehiculo="SELECT * FROM vehiculos where numero_placa = '".$row['TDT_placa']."'";
 
-            $resultado_vehiculo=$mysqli->query($consulta_vehiculo);
+            $resultado_vehiculo=sqlsrv_query( $mysqli,$consulta_vehiculo, array(), array('Scrollable' => 'buffered'));
 
-            $row_vehiculo=$resultado_vehiculo->fetch_assoc();
+            $row_vehiculo=sqlsrv_fetch_array($resultado_vehiculo, SQLSRV_FETCH_ASSOC);
             
                   
                   $fechini = "$ano_siguiente-01-01";
@@ -416,10 +416,10 @@ $consulta_vehiculo="SELECT * FROM vehiculos where numero_placa = '".$row['TDT_pl
          
          // Realizar la consulta para obtener los conceptos asociados al trámite
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '".$row['TDT_tramite']."'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
              
@@ -431,12 +431,12 @@ if ($resultado_tramite->num_rows > 0) {
                  $consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."' and clase_vehiculo = '".$row_vehiculo['clase']."' and servicio_vehiculo = '".$row_vehiculo['tipo_servicio']."'";    
             }
          
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+            $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             
             
 
-       if ($resultado_concepto->num_rows > 0) {
-     $row_concepto=$resultado_concepto->fetch_assoc();
+       if (sqlsrv_num_rows($resultado_concepto) > 0) {
+     $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
      if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
           
                 $rango = $row_concepto['fecha_vigencia_final'];
@@ -455,9 +455,9 @@ if ($resultado_tramite->num_rows > 0) {
         }
            
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['valor_SMLV_UVT'] == 0){
              $valor_concepto = $row_concepto['valor_concepto'];  
@@ -507,7 +507,7 @@ $dias_entre = $dias_entre + 1;
                VALUES ('$liquidacionId', '".$row['TDT_tramite']."', '".$row_concepto['id']."','$valor_concepto','$valor_mora','$dt','".$row_concepto['terceros']."')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta_conceptos) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta_conceptos, array(), array('Scrollable' => 'buffered'))===TRUE){
 
 
   } 
@@ -532,7 +532,7 @@ $dias_entre = $dias_entre + 1;
                VALUES ('$tipoTramite', '$ciudadano', '$placa', '$tipoServicio', '$claseVehiculo', '$clasificacionVehiculo', '$idusuario', '$fecha', '$fechayhora', '$empresa','$nota_credito')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'))===TRUE){
     // Inserción exitosa
        $liquidacionId = mysqli_insert_id($mysqli);
 
@@ -558,24 +558,24 @@ $dias_entre = $dias_entre + 1;
       
       $consulta_ap="SELECT * FROM acuerdos_pagos where TAcuerdop_numero = '".$ap['ap']."' and TAcuerdop_cuota = '".$ap['cuota']."'";
 
-            $resultado_ap=$mysqli->query($consulta_ap);
+            $resultado_ap=sqlsrv_query( $mysqli,$consulta_ap, array(), array('Scrollable' => 'buffered'));
 
-            $row_ap=$resultado_ap->fetch_assoc();
+            $row_ap=sqlsrv_fetch_array($resultado_ap, SQLSRV_FETCH_ASSOC);
     // Realizar la inserción en la tabla detalle_liquidaciones
     $consultaDetalle = "INSERT INTO detalle_liquidaciones (liquidacion, tramite,acuerdo,cuota)
                         VALUES ('$liquidacionId','40','".$ap['ap']."','".$ap['cuota']."')";
 
     // Ejecutar la consulta
-    if ($mysqli->query($consultaDetalle) !== TRUE) {
+    if (sqlsrv_query( $mysqli,$consultaDetalle, array(), array('Scrollable' => 'buffered'))!==TRUE){
 
     } 
     
     
     // Consultamos si es el primero que debe
 $sql_primer = "SELECT MIN(TAcuerdop_cuota) as primer FROM acuerdos_pagos WHERE TAcuerdop_numero = '".$ap['ap']."' and TAcuerdop_estado = '1' or TAcuerdop_numero = '".$ap['ap']."' and TAcuerdop_estado = '3'";
-$result_primer = $mysqli->query($sql_primer);
+$result_primer=sqlsrv_query( $mysqli,$sql_primer, array(), array('Scrollable' => 'buffered'));
 
-$row_primer = $result_primer->fetch_assoc();
+$row_primer = sqlsrv_fetch_array($result_primer, SQLSRV_FETCH_ASSOC);
 
 $primero = $row_primer['primer'];
     
@@ -590,10 +590,10 @@ $ano_actual = substr($fecha, 0, 4);
 
          // Realizar la consulta para obtener los conceptos asociados al trámite
 $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '40'";
-$resultado_tramite = $mysqli->query($sql_tramite);
+$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 
-if ($resultado_tramite->num_rows > 0) {
-    while ($row_tramite = $resultado_tramite->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado_tramite) > 0) {
+    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
         
     
              
@@ -605,12 +605,12 @@ if ($resultado_tramite->num_rows > 0) {
                  $consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."' and id != '1000000167' ";    
             }
          
-            $resultado_concepto=$mysqli->query($consulta_concepto);
+            $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             
             
 
-       if ($resultado_concepto->num_rows > 0) {
-     $row_concepto=$resultado_concepto->fetch_assoc();
+       if (sqlsrv_num_rows($resultado_concepto) > 0) {
+     $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
      if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
           
                 $rango = $row_concepto['fecha_vigencia_final'];
@@ -629,9 +629,9 @@ if ($resultado_tramite->num_rows > 0) {
         }
            
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             if($row_concepto['valor_SMLV_UVT'] == 0){
              $valor_concepto = $row_concepto['valor_concepto'];  
@@ -668,7 +668,7 @@ $valor_concepto = $row_ap['TAcuerdop_valor'];
                VALUES ('$liquidacionId', '40', '".$row_concepto['id']."','$valor_concepto','".$ap['cuota']."','".$row_concepto['terceros']."')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta_conceptos) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta_conceptos, array(), array('Scrollable' => 'buffered'))===TRUE){
 
 
   } 
@@ -694,7 +694,7 @@ $valor_concepto = $row_ap['TAcuerdop_valor'];
                VALUES ('$tipoTramite', '$ciudadano', '$placa', '$tipoServicio', '$claseVehiculo', '$clasificacionVehiculo', '$idusuario', '$fecha', '$fechayhora', '$empresa','$nota_credito')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'))===TRUE){
     // Inserción exitosa
        $liquidacionId = mysqli_insert_id($mysqli);
 
@@ -716,16 +716,16 @@ $repetidos = array();
                         VALUES ('$liquidacionId', '$tramiteId')";
 
     // Ejecutar la consulta
-    if ($mysqli->query($consultaDetalle) !== TRUE) {
+    if (sqlsrv_query( $mysqli,$consultaDetalle, array(), array('Scrollable' => 'buffered'))!==TRUE){
 
     }
     
  
 $sql_detalle_tramite = "SELECT * FROM detalle_tramites where tramite_id = '$tramiteId'";
-$resultado_detalle_tramite = $mysqli->query($sql_detalle_tramite);
+$resultado_detalle_tramite=sqlsrv_query( $mysqli,$sql_detalle_tramite, array(), array('Scrollable' => 'buffered'));
 
 $valor_total = 0;
-while($row_detalle_tramite = $resultado_detalle_tramite->fetch_assoc()){ 
+while($row_detalle_tramite = sqlsrv_fetch_array($resultado_detalle_tramite, SQLSRV_FETCH_ASSOC)){ 
 
 //Obtenemos valor del concepto
 
@@ -741,8 +741,8 @@ while($row_detalle_tramite = $resultado_detalle_tramite->fetch_assoc()){
 }
 
         
-$resultado_concepto = $mysqli->query($sql_concepto);
-$row_concepto = $resultado_concepto->fetch_assoc();
+$resultado_concepto=sqlsrv_query( $mysqli,$sql_concepto, array(), array('Scrollable' => 'buffered'));
+$row_concepto = sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
 
 
            
@@ -762,9 +762,9 @@ $row_concepto = $resultado_concepto->fetch_assoc();
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
       
 
-            $resultado_smlv=$mysqli->query($consulta_smlv);
+            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
-            $row_smlv=$resultado_smlv->fetch_assoc();
+            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
             
       if ($row_concepto['valor_modificacble'] == "True") {
@@ -796,7 +796,7 @@ $row_concepto = $resultado_concepto->fetch_assoc();
                VALUES ('$liquidacionId', '$tramiteId', '".$row_detalle_tramite['concepto_id']."','$valor','".$row_concepto['terceros']."')";
 
   // Ejecutar la consulta
-  if ($mysqli->query($consulta_conceptos) === TRUE) {
+  if (sqlsrv_query( $mysqli,$consulta_conceptos, array(), array('Scrollable' => 'buffered'))===TRUE){
 
 
   } else {
@@ -807,7 +807,7 @@ $row_concepto = $resultado_concepto->fetch_assoc();
   if($tramiteId == 1){
       // Consulta de actualización
     $queryUpdate = "UPDATE placas SET Tplacas_estado = '2' WHERE Tplacas_placa = '$placa'";
-    $resultadoUpdate = $mysqli->query($queryUpdate);
+$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
     
   }
   
@@ -841,22 +841,22 @@ if($nota_credito > 0){ // Si se uso nota credito se guarda en notas_credito_usad
 // buscamos el numero de nota credito disponible
   $consulta_nc="SELECT * FROM notas_credito where identificacion = '$ciudadano' order by saldo desc";
 
-            $resultado_nc=$mysqli->query($consulta_nc);
+            $resultado_nc=sqlsrv_query( $mysqli,$consulta_nc, array(), array('Scrollable' => 'buffered'));
 
 
-         $row_nc=$resultado_nc->fetch_assoc();
+         $row_nc=sqlsrv_fetch_array($resultado_nc, SQLSRV_FETCH_ASSOC);
                 
       if($row_nc['saldo'] > $nota_credito){
           
             // Consulta de actualización
     $queryUpdate = "UPDATE notas_credito SET saldo = saldo - $nota_credito, estado = 3 WHERE id = '".$row_nc['id']."'";
-    $resultadoUpdate = $mysqli->query($queryUpdate);    
+    $resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
       
           
       }else{
         // Consulta de actualización
     $queryUpdate = "UPDATE notas_credito SET saldo = saldo - $nota_credito, estado = 2 WHERE id = '".$row_nc['id']."'";
-    $resultadoUpdate = $mysqli->query($queryUpdate);   
+    $resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
           
       }    
  
@@ -865,7 +865,7 @@ if($nota_credito > 0){ // Si se uso nota credito se guarda en notas_credito_usad
                VALUES ('".$row_nc['id']."', '$liquidacionId', '$nota_credito', '$fecha')";
 
 
-$mysqli->query($consulta);
+sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 
 
 

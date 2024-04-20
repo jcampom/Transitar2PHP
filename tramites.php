@@ -61,131 +61,131 @@ $query = "INSERT INTO tramites_realizados (certificado_ensenanza, fecha_certific
 VALUES ('$certificado_ensenanza', '$fecha_certificado_ensenanza', '$organismo_expide_ensenanza', '$fecha_certificado_medico', '$no_certificado_medico', '$organismo_expide_medico', '$categoria_licencia', '$licencia_conduccion', '$fecha_expide_licencia', '$organismo_expide_licencia', '$fecha_vence_licencia', '$sustrato', '$debe_conducir_con_lentes', '$menor_de_18_anos_no_puede_conducir_por_carretera', '$debe_conducir_con_aparato_ortopedico', '$no_puede_conducir_ningun_otro_tipo_de_vehiculo', '$otras_no_especificadas', '$no_puede_conducir_de_noche', '$diseno_especial_del_vehiculo', '$no_puede_conducir_conjunto_vehiculos', '$ninguna','$tipo_tramite2', '$liquidacion2', '$idusuario', '$fecha','$fechayhora','$categoria_licencia_actual', '$licencia_conduccion_actual', '$fecha_expide_licencia_actual','$identificacion_antigua','$identificacion_nueva','$tramite')";
 
 // Ejecutar la consulta
-if ($mysqli->query($query)) {
+if (sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'))){
      echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> El Tramite ha sido realizado con éxito </div>';
      
      
 // Se actualiza el tramite
  $queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '2' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
- $resultadoUpdate = $mysqli->query($queryUpdate);
+$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
      
 if($tramite == 24){ //EXPEDICION LICENCIA DE CONDUCCION
 
 
 // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
   // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_auto = '$identificacion_nueva', categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', expedicion_licencia_auto = '$fecha_expide_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
- $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
 
 }elseif($tramite == 25){ //REFRENDACION LICENCIA DE CONDUCCION
 	
 	// se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
   // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET   vigencia_licencia_auto = '$fecha_vence_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
 
- $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
  
  
 }elseif($tramite == 26 ){ //RECATEGORIZACION LICENCIA DE CONDUCCION
 	
 // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
  
   // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
 
- $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
  
 }elseif($tramite == 28){ //DUPLICADO DE LICENCIA DE CONDUCCION
 	
 // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
   // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
  
-  $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
   
 }elseif($tramite == 29){ //EXPEDICION LC POR CAMBIO DE DOCUMENTO VEHICULO
 	
 	// se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
   // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_auto = '$identificacion_nueva', categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', expedicion_licencia_auto = '$fecha_expide_licencia',  organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato', numero_documento = '$identificacion_nueva' WHERE numero_documento = '$identificacion_antigua' ";
  
  
-  $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
  
 }elseif($tramite == 66){ //EXPEDICION INICIAL LICENCIA DE CONDUCCION MOTO
 	
 // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
   // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_moto = '$fecha_vence_licencia', categoria_licencia_moto = '$categoria_licencia', vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
  
-  $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
   
 }elseif($tramite == 67){ //REFRENDACION LICENCIA DE CONDUCCION MOTO
 	
 	// se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
   // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET  vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
  
-  $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
 
 }elseif($tramite == 68){ //CAMBIO DE DOCUMENTO LICENCIA DE CONDUCCION
 	
 
 // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
   
     // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET  sustrato_licencia_auto = '$sustrato' and numero_documento = '$identificacion_nueva' WHERE numero_documento = '$identificacion_antigua' ";
 
- $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
   
   
 }elseif($tramite == 69){ //EXPEDICION LC POR CAMBIO DE DOCUMENTO MOTO
 
 // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
     // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_moto = '$fecha_vence_licencia', categoria_licencia_moto = '$categoria_licencia', vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato', numero_documento = '$identificacion_nueva'  WHERE numero_documento = '$identificacion_antigua' ";
  
-  $resultado_actualizar_ciudadano = $mysqli->query($actualizar_ciudadano);
+$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
   
 }
 
 
  $consulta_detalle_tramites="SELECT * FROM detalle_conceptos_liquidaciones where estado = 0 and liquidacion = '$liquidacion2'";
 
-            $resultado_detalle_tramites=$mysqli->query($consulta_detalle_tramites);
+            $resultado_detalle_tramites=sqlsrv_query( $mysqli,$consulta_detalle_tramites, array(), array('Scrollable' => 'buffered'));
 
-            if (mysqli_num_rows($resultado_detalle_tramites) > 0) {   
+            if (sqlsrv_num_rows($resultado_detalle_tramites) > 0) {   
      
             }else{
          // Se actualiza la liquidacion
     $queryUpdate2 = "UPDATE liquidaciones SET estado = '2' WHERE id = '$liquidacion2'";
-    $resultadoUpdate2 = $mysqli->query($queryUpdate2);
+    $resultadoUpdate2=sqlsrv_query( $mysqli,$queryUpdate2, array(), array('Scrollable' => 'buffered'));
     
 
     
@@ -207,8 +207,8 @@ $formularioId = $_POST['formulario_id'];
 if($tramite != 1 && $tramite != 8){
 // Consultar la tabla "formularios" para obtener los detalles del formulario
 $consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
-$resultado = $mysqli->query($consulta);
-$existe = $resultado->fetch_assoc();
+$resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
+$existe = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC);
 
 $campos = $existe['campos'];
 $tabla = $existe['tabla'];
@@ -245,7 +245,7 @@ $nombre_tabla = $existe['nombre'];
     $insertQuery = "INSERT INTO $tabla ($camposInsert,fecha,usuario,liquidacion,tramite) VALUES ($valoresInsert,'$fecha','$idusuario','$liquidacion2','$tramite')";
 
     // Ejecutar la consulta de inserción
-    if ($mysqli->query($insertQuery)) {
+    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
   
   if(empty($campo_utiliza)){
@@ -255,19 +255,19 @@ $nombre_tabla = $existe['nombre'];
   if(!empty($campo_actualiza)){
                 // Se actualiza el vehiculo
  $actualizar_vehiculo = "UPDATE vehiculos SET $campo_actualiza = '$campo_utiliza' WHERE numero_placa = '$placa'";
- $resultado_vehiculo = $mysqli->query($actualizar_vehiculo);
+$resultado_vehiculo=sqlsrv_query( $mysqli,$actualizar_vehiculo, array(), array('Scrollable' => 'buffered'));
  
   }
  
  
                 // Se actualiza el tramite
  $queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '1' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
- $resultadoUpdate = $mysqli->query($queryUpdate);
+$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
  
  
  // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
  
     } else {
@@ -283,17 +283,17 @@ $nombre_tabla = $existe['nombre'];
     $insertQuery = "INSERT INTO tramites_vehiculos (liquidacion,tramite,placa,fecha_tramite, fecha,usuario) VALUES ('$liquidacion2','$tramite','$numeroPlaca','$fecha','$fecha','$idusuario')";
     
        // Ejecutar la consulta de inserción
-    if ($mysqli->query($insertQuery)) {
+    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
         
         // Se actualiza el tramite
  $queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '1' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
- $resultadoUpdate = $mysqli->query($queryUpdate);
+$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
  
  
  // se cambia el estado del sustrato de licencia de conduccion a usado
  $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
- $resultado_actualizar_sustrato = $mysqli->query($actualizar_sustrato);
+$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
  
  
     } else {
@@ -383,9 +383,9 @@ ul#tramites-seleccionados {
                             <option style='margin-left: 15px;' value=''><?php
             $consulta_tramites2="SELECT * FROM tipo_tramite where id = '$tipo_tramite'";
 
-            $resultado_tramites2=$mysqli->query($consulta_tramites2);
+            $resultado_tramites2=sqlsrv_query( $mysqli,$consulta_tramites2, array(), array('Scrollable' => 'buffered'));
 
-            $row_tramites2=$resultado_tramites2->fetch_assoc();
+            $row_tramites2=sqlsrv_fetch_array($resultado_tramites2, SQLSRV_FETCH_ASSOC);
                       echo ucwords($row_tramites2['nombre']); ?></option>
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tipo de Tramite...</option>
@@ -394,9 +394,9 @@ ul#tramites-seleccionados {
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM tipo_tramite where id  IN(1,2)";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     if($tipo_tramite != $row["id"]){
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                     }
@@ -425,9 +425,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                             <option style='margin-left: 15px;' value=''><?php
             $consulta_tramites2="SELECT * FROM tramites where id = '".$tramite."'";
 
-            $resultado_tramites2=$mysqli->query($consulta_tramites2);
+            $resultado_tramites2=sqlsrv_query( $mysqli,$consulta_tramites2, array(), array('Scrollable' => 'buffered'));
 
-            $row_tramites2=$resultado_tramites2->fetch_assoc();
+            $row_tramites2=sqlsrv_fetch_array($resultado_tramites2, SQLSRV_FETCH_ASSOC);
                       echo ucwords($row_tramites2['nombre']); ?></option>
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tramite...</option>
@@ -437,9 +437,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                             
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT * FROM tramites where tipo_documento = '$tipo_tramite'";
-$resultTramites = $mysqli->query($sqlTramites);
-                            if ($resultTramites->num_rows > 0) {
-                                while ($row = $resultTramites->fetch_assoc()) {
+$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            if (sqlsrv_num_rows($resultTramites) > 0) {
+                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row['id'] . "'>" . $row['nombre'] . "</option>";
                                 }
                             }
@@ -478,9 +478,9 @@ $resultTramites = $mysqli->query($sqlTramites);
         
           $consulta_liquidaciones="SELECT * FROM liquidaciones where id = '$liquidacion'";
 
-            $resultado_liquidaciones=$mysqli->query($consulta_liquidaciones);
+            $resultado_liquidaciones=sqlsrv_query( $mysqli,$consulta_liquidaciones, array(), array('Scrollable' => 'buffered'));
 
-            $row_liquidaciones=$resultado_liquidaciones->fetch_assoc();
+            $row_liquidaciones=sqlsrv_fetch_array($resultado_liquidaciones, SQLSRV_FETCH_ASSOC);
             
             $estado = $row_liquidaciones['estado'];
             
@@ -498,13 +498,13 @@ $resultTramites = $mysqli->query($sqlTramites);
     
             $consulta_detalle_liquidaciones="SELECT * FROM detalle_conceptos_liquidaciones where liquidacion = '$liquidacion' and tramite = '$tramite'";
 
-            $resultado_detalle_liquidaciones=$mysqli->query($consulta_detalle_liquidaciones);
+            $resultado_detalle_liquidaciones=sqlsrv_query( $mysqli,$consulta_detalle_liquidaciones, array(), array('Scrollable' => 'buffered'));
 
 
             
-   if ($resultado_detalle_liquidaciones->num_rows > 0) {
+   if (sqlsrv_num_rows($resultado_detalle_liquidaciones) > 0) {
        
-       $activo = $resultado_detalle_liquidaciones->fetch_assoc();
+       $activo = sqlsrv_fetch_array($resultado_detalle_liquidaciones, SQLSRV_FETCH_ASSOC);
             
          if($activo['estado'] == 0){ 
              
@@ -550,9 +550,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros where Tterceros_tipo = '5'";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -586,9 +586,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros where Tterceros_tipo= '6'";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -641,9 +641,9 @@ $resultTramites = $mysqli->query($sqlTramites);
                      <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM terceros where Tterceros_tipo = '4'";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -795,9 +795,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM marca";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -827,9 +827,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM clase_vehiculo";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -860,9 +860,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_color";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -879,9 +879,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_servicio";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -898,9 +898,9 @@ include 'funcion_ciudadanos.php';
          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_modalidad";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -934,9 +934,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_cilindraje";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -996,9 +996,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_combustible";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1049,9 +1049,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_clasificacion";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1076,9 +1076,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_origen";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1119,9 +1119,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM paises";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1324,9 +1324,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM marca";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1356,9 +1356,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM clase_vehiculo";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1389,9 +1389,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_color";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1408,9 +1408,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM tipo_servicio";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1427,9 +1427,9 @@ include 'funcion_ciudadanos.php';
          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_modalidad";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1463,9 +1463,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_cilindraje";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1525,9 +1525,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_combustible";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1578,9 +1578,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_clasificacion";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1605,9 +1605,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM vehiculos_origen";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1648,9 +1648,9 @@ include 'funcion_ciudadanos.php';
                          <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM paises";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -1872,9 +1872,9 @@ echo "<b><font color='red'>El tramite ya fue ejecutado</font></b>";
                   
             $consulta_estado="SELECT * FROM liquidacion_estados where id = '$estado'";
 
-            $resultado_estado=$mysqli->query($consulta_estado);
+            $resultado_estado=sqlsrv_query( $mysqli,$consulta_estado, array(), array('Scrollable' => 'buffered'));
 
-            $row_estado=$resultado_estado->fetch_assoc();
+            $row_estado=sqlsrv_fetch_array($resultado_estado, SQLSRV_FETCH_ASSOC);
             
            
               

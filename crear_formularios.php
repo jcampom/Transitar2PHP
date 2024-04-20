@@ -6,7 +6,7 @@ if(!empty($_GET["eliminar"])){
 // Eliminar de la tabla detalle_formularios
 $queryeliminarDetalle = "DELETE FROM detalle_formularios WHERE formulario = '" . $_GET["id"] . "' ";
 
-$resultadoEliminarDetalle = $mysqli->query($queryeliminarDetalle);
+$resultadoEliminarDetalle=sqlsrv_query( $mysqli,$queryeliminarDetalle, array(), array('Scrollable' => 'buffered'));
 
 // Verificar si hubo un error
 if (!$resultadoEliminarDetalle) {
@@ -16,7 +16,7 @@ if (!$resultadoEliminarDetalle) {
 // Eliminar de la tabla formularios
 $queryEliminar = "DELETE FROM formularios WHERE id = '" . $_GET["id"] . "' ";
 
-$resultadoEliminar = $mysqli->query($queryEliminar);
+$resultadoEliminar=sqlsrv_query( $mysqli,$queryEliminar, array(), array('Scrollable' => 'buffered'));
 
 // Verificar si hubo un error
 if (!$resultadoEliminar) {
@@ -29,7 +29,7 @@ if (!$resultadoEliminar) {
    // Eliminar de la tabla formularios
 $queryEliminar = "DELETE FROM menu_items WHERE enlace = 'formulario_dinamico_datos.php?id=" . $_GET['id'] . "' ";
 
-$resultadoEliminar = $mysqli->query($queryEliminar);
+$resultadoEliminar=sqlsrv_query( $mysqli,$queryEliminar, array(), array('Scrollable' => 'buffered'));
 
 
 }
@@ -47,8 +47,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
 
     // Verificar si el formulario ya existe
     $query = "SELECT * FROM formularios WHERE nombre = '$nombreFormulario'";
-    $result = $mysqli->query($query);
-    if ($result->num_rows > 0) {
+    $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
+    if (sqlsrv_num_rows($result) > 0) {
         echo '<div class="alert alert-danger"><strong>¡Ups!</strong> El formulario con ese nombre ya existe.</div>';
     } else {
         // Insertar el registro en la tabla "formularios"
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
 
 $query = "INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, empresa, menu_id, tipo, usuario) VALUES ('$nombreFormulario', '$tabla', '$fecha', '$fechaHora', '" . implode(",", $camposSeleccionados) . "','$empresa', '$menuID' ,'".$_POST["tipo"]."','$idusuario')";
 
-        if ($mysqli->query($query) === TRUE) {
+        if (sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'))===TRUE){
             $formularioID = mysqli_insert_id($mysqli); // Obtener el ID del formulario creado
 
    // Insertar el nuevo menú en la tabla "menu_items"
@@ -64,7 +64,7 @@ $query = "INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, emp
    
    if(!empty($menuID)){
             $queryMenu = "INSERT INTO menu_items (nombre, padre_id,enlace,empresa, fecha,fechayhora, usuario, icono) VALUES ('$nombreFormulario', '$menuID','formulario_dinamico_datos.php?id=$formularioID','$empresa','$fecha','$fechayhora','$idusuario','".$_POST["icono"]."')";
-            $mysqli->query($queryMenu);
+            sqlsrv_query( $mysqli,$queryMenu, array(), array('Scrollable' => 'buffered'));
             
    }
 
@@ -72,12 +72,12 @@ $query = "INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, emp
             foreach ($camposSeleccionados as $campo) {
                 // Obtener el tipo de campo de la tabla seleccionada
                 $queryTipoCampo = "SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = '$tabla' AND COLUMN_NAME = '$campo'";
-                $resultTipoCampo = $mysqli->query($queryTipoCampo);
-                $rowTipoCampo = $resultTipoCampo->fetch_assoc();
+                $resultTipoCampo=sqlsrv_query( $mysqli,$queryTipoCampo, array(), array('Scrollable' => 'buffered'));
+                $rowTipoCampo = sqlsrv_fetch_array($resultTipoCampo, SQLSRV_FETCH_ASSOC);
                 $tipoCampo = $rowTipoCampo['COLUMN_TYPE'];
 
                 $queryDetalle = "INSERT INTO detalle_formularios (formulario, campo, tipo, requerido, usuario, fecha, fechayhora) VALUES ('$formularioID', '$campo', '$tipoCampo', '0', '$idusuario', '$fecha', '$fechaHora')";
-                $mysqli->query($queryDetalle);
+                sqlsrv_query( $mysqli,$queryDetalle, array(), array('Scrollable' => 'buffered'));
                 
                 $camposRegistrados[] = $campo;
             }
@@ -99,9 +99,9 @@ $query = "INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, emp
 
             // Obtener los campos del formulario desde la tabla "detalle_formularios"
             $queryCampos = "SELECT campo FROM detalle_formularios WHERE formulario = '$formularioID'";
-            $resultCampos = $mysqli->query($queryCampos);
+            $resultCampos=sqlsrv_query( $mysqli,$queryCampos, array(), array('Scrollable' => 'buffered'));
 
-            while ($rowCampo = $resultCampos->fetch_assoc()) {
+            while ($rowCampo = sqlsrv_fetch_array($resultCampos, SQLSRV_FETCH_ASSOC)) {
                 echo '<option style="margin-left: 15px;" value="' . $rowCampo['campo'] . '">' . $rowCampo['campo'] . '</option>';
             }
 
@@ -124,7 +124,7 @@ $query = "INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, emp
                   
                         // Realizar una consulta a la base de datos para obtener la lista de tablas
                         $query = "SHOW TABLES ";
-                        $result = $mysqli->query($query);
+                        $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
                         while ($row = $result->fetch_array()) {
                             if ($row[0] != "$tabla")
@@ -159,7 +159,7 @@ $query = "INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, emp
     // Actualizar el campo "requerido" en la tabla "detalle_formularios" para los campos seleccionados
     foreach ($camposRequeridos as $campo) {
         $queryUpdate = "UPDATE detalle_formularios SET requerido = '1' WHERE formulario = '$formularioID' AND campo = '$campo'";
-        $mysqli->query($queryUpdate);
+        sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
     }
 
 // Recorrer $_POST en busca de los campos dinámicos
@@ -171,7 +171,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
         
         // Realizar la actualización en la tabla detalle_formularios
         $queryUpdate = "UPDATE detalle_formularios SET dinamico = '$valorCampo' WHERE formulario = '$formularioID' AND campo = '$campoOriginal'";
-        $mysqli->query($queryUpdate);
+        sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
     }
 }
     echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los campos requeridos se han guardado correctamente.</div>';
@@ -209,7 +209,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
                         <?php
                         // Realizar una consulta a la base de datos para obtener la lista de tablas
                         $query = "SHOW TABLES ";
-                        $result = $mysqli->query($query);
+                        $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
                         while ($row = $result->fetch_array()) {
                             if ($row[0] != "$tabla")
@@ -241,9 +241,9 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
                 <?php
                 // Consulta a la base de datos para obtener la lista de menús
                 $queryMenus = "SELECT * FROM menu_items";
-                $resultMenus = $mysqli->query($queryMenus);
+                $resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
-                while ($rowMenu = $resultMenus->fetch_assoc()) {
+                while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '</option>';
                 }
                 ?>
@@ -597,10 +597,10 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
 
                     <?php // Realizar una consulta a la base de datos para obtener los campos de la tabla
                     $query = "SHOW COLUMNS FROM $tabla";
-                    $result = $mysqli->query($query);
+                    $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
                     $cuenta = 1;
-                    while ($row = $result->fetch_assoc()) {
+                    while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
                         if ($row["Field"] != "id") {
                             if ($cuenta == 1) {
                                 echo '<option style="margin-left: 15px;" selected value="' . $row["Field"] . '">' . $row["Field"] . '</option>';
@@ -628,7 +628,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
     // Consultar los campos asociados al formulario en la tabla "detalle_formularios"
     if (isset($formularioID)) {
         $queryCampos = "SELECT campo, tipo, requerido FROM detalle_formularios WHERE formulario = '$formularioID'";
-        $resultCampos = $mysqli->query($queryCampos);
+        $resultCampos=sqlsrv_query( $mysqli,$queryCampos, array(), array('Scrollable' => 'buffered'));
 
         echo '
             <table>
@@ -639,7 +639,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
                 </tr>
         ';
 
-        while ($rowCampo = $resultCampos->fetch_assoc()) {
+        while ($rowCampo = sqlsrv_fetch_array($resultCampos, SQLSRV_FETCH_ASSOC)) {
             echo '
                 <tr>
                     <td>' . $rowCampo['campo'] . '</td>
@@ -659,7 +659,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
 
 // Consultar los registros de la tabla
 $sql = "SELECT * FROM formularios";
-$resultado = $mysqli->query($sql);
+$resultado=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
 echo '<div class="card container-fluid">';
 echo '<div class="header">';
@@ -681,8 +681,8 @@ echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
 
-if ($resultado->num_rows > 0) {
-    while ($row = $resultado->fetch_assoc()) {
+if (sqlsrv_num_rows($resultado) > 0) {
+    while ($row = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)) {
         echo '<tr>'; ?>
         
             <td>
