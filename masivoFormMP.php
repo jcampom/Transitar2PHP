@@ -30,7 +30,7 @@ $fbase = date('Y-m-01');
 $ffin = date('Y-m-d', strtotime($fbase . '- 90 days'));
 $cadsql = "SELECT r1.ressan_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) AS fecha,
             Tcomparendos_origen AS origen,  Tcomparendos_idinfractor AS ident,  Tcomparendos_ID AS compid,
-            CONCAT(nombres, ' ', apellidos) AS nombre, CAST(r1.ressan_fecha AS DATE) AS fechasancion,
+            (nombres + ' ' + apellidos) AS nombre, CAST(r1.ressan_fecha AS DATE) AS fechasancion,
             r1.ressan_ano AS aniosancion, r1.ressan_numero AS ressancionnum, sigla AS siglasancion,
             r1.ressan_id AS sancionId, r1.ressan_archivo AS archivosancion
         FROM resolucion_sancion r1 
@@ -56,12 +56,21 @@ $result1->free_result();
 } elseif (isset($_POST['generar'])) {
 $sancion = 2;
 $compsid = implode(',', $_POST['check']);
-$sqltrans = "START TRANSACTION; ";
+$sqltrans = "BEGIN TRANSACTION; ";
 $sqltrans .= "
+    DECLARE @usuario VARCHAR(20);
+    DECLARE @tipo INT;
+    DECLARE @tipo2 INT;
+    DECLARE @fecha DATETIME;
+    DECLARE @anio INT;
+    DECLARE @archivo VARCHAR(200);
+    DECLARE @archivo2  VARCHAR(200);
+	DECLARE @numres BIGINT;
+
     SET @usuario = '{$_SESSION['MM_Username']}';
     SET @tipo = 16;
     SET @tipo2 = 30;
-    SET @fecha = NOW();
+    SET @fecha = GETDATE();
     SET @anio = YEAR(@fecha);
     SET @archivo = '../sanciones/gdp_mandpago_pdf.php';
     SET @archivo2 = '../sanciones/gdp_mandpagocita_pdf.php';
@@ -71,9 +80,9 @@ $sqltrans .= "
     INSERT INTO resolucion_sancion
         ([ressan_ano],[ressan_numero],[ressan_tipo],[ressan_comparendo],[ressan_archivo]
         ,[ressan_fecha],[ressan_compid],[ressan_usuario],[ressan_resant])
-    SELECT YEAR(NOW()), (ROW_NUMBER() OVER(ORDER BY Tcomparendos_ID ASC)) + (SELECT COALESCE(MAX(ressan_numero), 0) FROM resolucion_sancion r2 WHERE r2.ressan_tipo=@tipo AND r2.ressan_ano=YEAR(DATE_ADD(NOW(), INTERVAL 90 DAY))),
-        @tipo, Tcomparendos_comparendo, @archivo, NOW(), Tcomparendos_ID, @usuario, 
-        (SELECT TOP 1 CONCAT(ressan_ano, '-', ressan_numero, '-SA') AS ressan_anterior FROM resolucion_sancion 
+    SELECT YEAR(GETDATE()), (ROW_NUMBER() OVER(ORDER BY Tcomparendos_ID ASC)) + (SELECT COALESCE(MAX(ressan_numero), 0) FROM resolucion_sancion r2 WHERE r2.ressan_tipo=@tipo AND r2.ressan_ano=YEAR(DATEADD(DAY, 90, GETDATE()))),
+        @tipo, Tcomparendos_comparendo, @archivo, GETDATE(), Tcomparendos_ID, @usuario, 
+        (SELECT TOP 1 (ressan_ano + '-' + ressan_numero + '-SA') AS ressan_anterior FROM resolucion_sancion 
         WHERE ressan_tipo = $sancion AND (ressan_comparendo = Tcomparendos_comparendo OR ressan_compid=Tcomparendos_id) ORDER BY ressan_fecha ASC)
     FROM Tcomparendos 
     INNER JOIN (SELECT MIN(ressan_fecha) AS ressan_fecha, ressan_compid, ressan_comparendo FROM resolucion_sancion WHERE ressan_tipo=2 AND (ressan_compid IN ($compsid) OR ressan_comparendo IN (SELECT Tcomparendos_comparendo FROM Tcomparendos WHERE Tcomparendos_id IN ($compsid))) GROUP BY ressan_compid, ressan_comparendo) r1 ON (r1.ressan_compid = Tcomparendos_ID OR r1.ressan_comparendo = Tcomparendos_comparendo)
@@ -82,7 +91,7 @@ $sqltrans .= "
     INSERT INTO resolucion_sancion
         ([ressan_ano],[ressan_numero],[ressan_tipo],[ressan_comparendo],[ressan_archivo]
         ,[ressan_fecha],[ressan_compid],[ressan_usuario])
-    SELECT YEAR(NOW()), (ROW_NUMBER() OVER(ORDER BY Tcomparendos_ID ASC)) + (SELECT COALESCE(MAX(ressan_numero), 0) FROM resolucion_sancion r2 WHERE r2.ressan_tipo=@tipo2 AND r2.ressan_ano=YEAR(DATE_ADD(NOW(), INTERVAL 90 DAY))),
+    SELECT YEAR(NOW()), (ROW_NUMBER() OVER(ORDER BY Tcomparendos_ID ASC)) + (SELECT COALESCE(MAX(ressan_numero), 0) FROM resolucion_sancion r2 WHERE r2.ressan_tipo=@tipo2 AND r2.ressan_ano=YEAR(DATEADD(DAY,90,GETDATE()))),
         @tipo2, Tcomparendos_comparendo, @archivo2, NOW(), Tcomparendos_ID, @usuario
     FROM Tcomparendos 
     INNER JOIN (SELECT MIN(ressan_fecha) AS ressan_fecha, ressan_compid, ressan_comparendo FROM resolucion_sancion WHERE ressan_tipo=2 AND (ressan_compid IN ($compsid) OR ressan_comparendo IN (SELECT Tcomparendos_comparendo FROM Tcomparendos WHERE Tcomparendos_id IN ($compsid))) GROUP BY ressan_compid, ressan_comparendo) r1 ON (r1.ressan_compid = Tcomparendos_ID OR r1.ressan_comparendo = Tcomparendos_comparendo)
@@ -90,10 +99,12 @@ $sqltrans .= "
 
     UPDATE Tcomparendos SET Tcomparendos_estado=11 WHERE Tcomparendos_ID IN ($compsid);
 ";
-$sqltrans .= "COMMIT;";
+$sqltrans .= "COMMIT TRANSACTION;";
 
 // Verificar permiso de DiasHabil, añadir Transaccion.
-if ($mysqli->multi_query($sqltrans)) {
+
+$stmt = sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'));
+if ($stmt ) {
     $menspost3 = "Se generaron los mandamientos de pago correctamente";
 } else {
     $menspost3 = "Ha ocurrido un error. No se generaron los mandamientos de pago. Consulte al administrador por el error: " . serialize(sqlsrv_errors());

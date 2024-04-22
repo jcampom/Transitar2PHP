@@ -98,7 +98,7 @@ if (($gestor = fopen($_FILES['lote_archivo']['tmp_name'], "r")) !== FALSE) {
     }
     fclose($gestor);
 
-    if ($mysqli->commit()) {
+    if (sqlsrv_commit( $mysqli )) {
         $reject = $reject == "" ? "" : "<table style='color: #f50 !important; font-weight: bold;'><tr><td>Comparendo</td><td>Num. Resolucion</td><td>Fecha Resolucion</td><td>Resolucion Anterior</td></tr>" . utf8_decode($reject) . "</table>";
         $menspost1 = "La estructura enviada del archivo resultó en $correct filas correctas y $invali incorrectas.";
         $menspost2 = "Se encontraron $fila registros en el archivo enviado.<br>
@@ -107,7 +107,7 @@ if (($gestor = fopen($_FILES['lote_archivo']['tmp_name'], "r")) !== FALSE) {
         $menspost3 = "Se realizaron $insert relaciones de resoluciones, se actualizaron $update_ant resoluciones y $res_ok resoluciones ya existían y no se efectuaron cambios.<br/>
                     Se actualizaron $update comparendos y en $comp_ok no se efectuaron cambios.";
     } else {
-        $mysqli->rollback();
+		sqlsrv_rollback( $mysqli );
         $menspost3 = "Ha ocurrido un error en la transacción. Consulte al administrador.";
     }
 }
@@ -311,7 +311,7 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
     } else {
         echo "No se encontraron resultados";
     }
-    $mysqli->close();
+	sqlsrv_close( $mysqli );
     ?>
 </select>
                                             </div>

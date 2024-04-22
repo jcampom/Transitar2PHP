@@ -141,7 +141,7 @@ if ($result == "") {
     $fechafinmp = ($_GET['fechafinmp']) ? $_GET['fechafinmp'] : date('Y-m-d');
     $where .= " AND CAST(resolucion_sancion.ressan_fecha AS DATE) BETWEEN '$fechainimp' AND '$fechafinmp'";
 
-    $query = "SELECT Tcomparendos_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) fechacomp, Tcomparendos_origen AS origen, CAST(ressan_fecha AS DATE) AS fechares, Tcomparendos_ID AS compid, CONCAT(ressan_ano, '-', ressan_numero, '-', sigla) AS numero, Tcomparendos_idinfractor AS identif, CONCAT(nombres, ' ', apellidos) AS nombre, ressan_archivo AS archivo, ressan_id AS resid FROM comparendos
+    $query = "SELECT Tcomparendos_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) fechacomp, Tcomparendos_origen AS origen, CAST(ressan_fecha AS DATE) AS fechares, Tcomparendos_ID AS compid, (ressan_ano + '-' + ressan_numero + '-' + sigla) AS numero, Tcomparendos_idinfractor AS identif, (nombres + ' ' + apellidos) AS nombre, ressan_archivo AS archivo, ressan_id AS resid FROM comparendos
 INNER JOIN resolucion_sancion ON ressan_compid = Tcomparendos_ID AND ressan_tipo = 16 
 INNER JOIN resolucion_sancion_tipo ON ressan_tipo = id 
 INNER JOIN ciudadanos ON CAST(Tcomparendos_idinfractor AS VARCHAR(30)) = numero_documento 

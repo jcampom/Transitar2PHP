@@ -184,8 +184,8 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
         $sqltrans = " UPDATE comparendos SET Tcomparendos_idinfractor = '{$_POST['Tcomparendos_idinfractor']}', Tcomparendos_estado = '15' WHERE Tcomparendos_ID = '$compid';";
          sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'));
     }
- // Confirmar la transacción
-    $mysqli->commit();
+	// Confirmar la transacción
+    sqlsrv_commit( $mysqli );
     
          $notifica = sqlsrv_query( $mysqli,"SELECT id FROM notificaciones N WHERE N.compId = $compid AND N.tipo = $tipo ORDER BY id DESC LIMIT 1", array(), array('Scrollable' => 'buffered'));
         $rownot = sqlsrv_fetch_array($notifica, SQLSRV_FETCH_ASSOC);
@@ -193,10 +193,10 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
         $result = ""; 
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
-    $mysqli->rollback();
+	sqlsrv_rollback( $mysqli );
 
     // Imprimir el número de error
-    echo "Número de error: " . $mysqli->errno;
+    echo "Número de error: " . serialize(sqlsrv_errors());
 }
 
  

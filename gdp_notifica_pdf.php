@@ -38,7 +38,7 @@ if (isset($_GET['ref_not']) && is_numeric($_GET['ref_not'])) {
         $notnew = strftime("%d de %B de %Y", strtotime($rownot['fnotnew']));
         $fecha = strftime("%d de %B de %Y a las %H:%M", strtotime($rownot['fechacomp']));
 
-        $ciudadano = "SELECT numero_documento, CONCAT(nombres, ' ', ciudadanos.apellidos) AS nombre, nombre tipoid
+        $ciudadano = "SELECT numero_documento, (nombres+ ' ' + ciudadanos.apellidos) AS nombre, nombre tipoid
 			FROM ciudadanos INNER JOIN tipo_identificacion ON tipo_documento = id  
 			WHERE (numero_documento = (SELECT CONVERT(Tcomparendos_idinfractor, VARCHAR)
 				from comparendos where Tcomparendos_comparendo=?))";

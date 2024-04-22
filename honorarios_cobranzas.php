@@ -282,7 +282,7 @@ if(isset($_POST['Comprobar'])){
         SELECT C.TAcuerdop_ID AS id, C.TAcuerdop_numero AS numero, C.TAcuerdop_valor AS valor, C.TAcuerdop_identificacion AS ident, 
         (SELECT nombre FROM acuerdosp_estados WHERE id=C.TAcuerdop_estado) AS estado, 
         CAST(C.TAcuerdop_fecha AS DATE) AS fecha, C.TAcuerdop_honorarios AS honorarios, C.TAcuerdop_cobranza AS cobranza, 
-        (CONCAT(CAST(C.TAcuerdop_cuota AS CHAR), '/', CAST(C.TAcuerdop_cuotas AS CHAR))) AS otro, 
+        (CAST(C.TAcuerdop_cuota AS CHAR)+ '/'+ CAST(C.TAcuerdop_cuotas AS CHAR)) AS otro, 
         (@row_number:=@row_number + 1) AS fila 
         FROM acuerdos_pagos C, (SELECT @row_number := 0) r 
         WHERE C.TAcuerdop_ID<>'' 

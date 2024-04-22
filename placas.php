@@ -1,41 +1,25 @@
 <?php include 'menu.php';
-
 if(!empty($_POST)){
-
-  $insertQuery = "INSERT INTO especies_venales (tipo, tipo_servicio, clase_vehiculo, docasignacion, entasignacion, asignacion, cantidad, proveedor, factura, fecha, usuario, fecha_factura, clasificacion) VALUES (6, '".$_POST['tipo_servicio']."', '".$_POST['clase_vehiculo']."', '".$_POST['documento_asignacion']."', '".$_POST['entidad_asignacion']."', '".$_POST['documento_asignacion']."', '".$_POST['cantidad']."', '".$_POST['proveedor']."', '".$_POST['factura']."', '".$_POST['fecha']."', '$idusuario', '".$_POST['fecha_factura']."', '".$_POST['clasificacion']."')";
-
-    // Ejecutar la consulta de inserción
-    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
-  
-
-    // Ejecutar la consulta de inserción
- 
-        $ultimoIdInsertado = $mysqli->insert_id;
-     
-for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
-
-      
- $placa = $_POST['letras'].$i.$_POST['letras_motos'];       
- $insert_detalle = "INSERT INTO placas (Tplacas_placa, Tplacas_estado, Tplacas_servicio, Tplacas_clase, Tplacas_clasif, tplacas_tercero, Tplacas_fechac, Tplacas_fechau, Tplacas_IDAdmin, Tplacas_user) VALUES ('$placa', '".$_POST['estado']."', '".$_POST['tipo_servicio']."', '".$_POST['clase_vehiculo']."', '".$_POST['clasificacion']."', '".$_POST['entidad_asignacion']."', '$fechayhora', '$fechayhora', '$ultimoIdInsertado', '$idusuario')";
- 
-    sqlsrv_query( $mysqli,$insert_detalle, array(), array('Scrollable' => 'buffered'));
+	$insertQuery = "SET NOCOUNT ON";
+	$insertQuery = $insertQuery .";". "INSERT INTO especies_venales (tipo, tipo_servicio, clase_vehiculo, docasignacion, entasignacion, asignacion, cantidad, proveedor, factura, fecha, usuario, fecha_factura, clasificacion) VALUES (6, '".$_POST['tipo_servicio']."', '".$_POST['clase_vehiculo']."', '".$_POST['documento_asignacion']."', '".$_POST['entidad_asignacion']."', '".$_POST['documento_asignacion']."', '".$_POST['cantidad']."', '".$_POST['proveedor']."', '".$_POST['factura']."', '".$_POST['fecha']."', '$idusuario', '".$_POST['fecha_factura']."', '".$_POST['clasificacion']."')";
+	$insertQuery = $insertQuery .";". "SELECT scope_identity() as lastid"; 
+	$stmt=sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'));
+	// Ejecutar la consulta de inserción
+	if ($stmt){
+		// Ejecutar la consulta de inserción
+		while ($rowID = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC)) {
+			$ultimoIdInsertado = $rowID['lastid'];
+		}
+		for ($i = $_POST['inicio']; $i <= $_POST['fin']; $i++) {
+			$placa = $_POST['letras'].$i.$_POST['letras_motos'];
+			$insert_detalle = "INSERT INTO placas (Tplacas_placa, Tplacas_estado, Tplacas_servicio, Tplacas_clase, Tplacas_clasif, tplacas_tercero, Tplacas_fechac, Tplacas_fechau, Tplacas_IDAdmin, Tplacas_user) VALUES ('$placa', '".$_POST['estado']."', '".$_POST['tipo_servicio']."', '".$_POST['clase_vehiculo']."', '".$_POST['clasificacion']."', '".$_POST['entidad_asignacion']."', '$fechayhora', '$fechayhora', '$ultimoIdInsertado', '$idusuario')";
+			sqlsrv_query( $mysqli,$insert_detalle, array(), array('Scrollable' => 'buffered'));
+		}
+		echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
+	} else {
+		echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
+	}
 }
-
-
-
-        
-        
-        echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
-        
-
- 
- 
-    } else {
-   echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
-    }  
-    
-}
-    
 ?>
 <div class="card container-fluid">
     <div class="header">

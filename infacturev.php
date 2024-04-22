@@ -15,7 +15,7 @@ if (isset($_GET['generar'])) {
         $andwhere .= " AND Tcomparendos_idinfractor = '{$_GET['infractor']}'";
     }
 
-    $query = "SELECT CONVERT(CONCAT(R.ressan_ano, '-', R.ressan_numero, '-', T.sigla) USING utf8) AS resolucion,
+    $query = "SELECT CONVERT((R.ressan_ano + '-' + R.ressan_numero + '-' + T.sigla) USING utf8) AS resolucion,
                 CAST(R.ressan_fecha AS DATE) AS fechares, Tcomparendos_comparendo AS comparendo, 
                 CAST(C.Tcomparendos_fecha AS DATE) AS fechacomp, E.nombre AS estadoant, 
                 R.ressan_resant AS resant, CAST(RA.ressan_fecha AS DATE) AS fecharant, N.username AS usuario,

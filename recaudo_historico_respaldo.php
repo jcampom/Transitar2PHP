@@ -130,13 +130,9 @@ if (isset($_POST['buscar'])) {
             (" . $_POST['liquidacion'] . ", '" . $_POST['fecha'] . "', " . $_POST['total'] . ", '" . $_POST['infractor'] . "', '" . traenombrecampo(Tciudadanos, Tciudadanos_ident, "Tciudadanos_nombres+' '+Tciudadanos_apellidos", Tciudadanos_nombres, $_POST['infractor']) . "', '" . $hoy . "', '" . $_SESSION['MM_Username'] . "');\n";
         $query_rec = $query_rec . "COMMIT TRANSACTION;";
 
-        if ($mysqli->multi_query($query_rec)) {
-            do {
-                // Vaciamos cada conjunto de resultados
-                if ($result = $mysqli->store_result()) {
-                    $result->free(); // Liberamos los resultados
-                }
-            } while ($mysqli->next_result());
+		$stmt = sqlsrv_query( $mysqli,$query_rec, array(), array('Scrollable' => 'buffered'));
+
+        if ($stmt) {
             echo "<script>alert(\"La actualizacion se ejecutó exitosamente.\");</script>";
         } else {
             echo "<script>alert(\"La actualización no se pudo realizar, revise los valores!!!\");</script>";

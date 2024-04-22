@@ -930,7 +930,9 @@ skin_close();
 if ($error)
   echo ("<p class=\"centr\"><a href=\"".$_SERVER["PHP_SELF"]."\">Start from the beginning</a> (DROP the old tables before restarting)</p>\n");
 
-if ($mysqli) $mysqli->close();
+if ($mysqli){
+	sqlsrv_close( $mysqli );
+}
 if ($file && !$gzipmode) fclose($file);
 else if ($file && $gzipmode) gzclose($file);
 

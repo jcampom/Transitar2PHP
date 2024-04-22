@@ -68,11 +68,13 @@ if (!empty($_POST)) {
         $usuario = $idusuario; // Reemplaza esto con el usuario actual
         $fecha = date('Y-m-d');
         $fechayhora = date('Y-m-d H:i:s');
-        $sql_tablas = "INSERT INTO tablas (nombre, usuario, empresa, fecha, fechayhora) VALUES ('$nombreTabla', '$usuario', '$empresa', '$fecha', '$fechayhora')";
-        sqlsrv_query( $mysqli,$sql_tablas, array(), array('Scrollable' => 'buffered'));
+        $sql_tablas = "SET NOCOUNT ON;INSERT INTO tablas (nombre, usuario, empresa, fecha, fechayhora) VALUES ('$nombreTabla', '$usuario', '$empresa', '$fecha', '$fechayhora');SELECT scope_identity() as lastid";
+        $stmt = sqlsrv_query( $mysqli,$sql_tablas, array(), array('Scrollable' => 'buffered'));
 
         // Obtener el ID del registro insertado en la tabla "tablas"
-        $tablaId = $mysqli->insert_id;
+		while ($row = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC)) {
+			$tablaId = $row['lastid'];
+		}
 
         // Guardar los datos de los campos en la tabla "detalle_tablas"
         for ($i = 0; $i < count($campos); $i++) {

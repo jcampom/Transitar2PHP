@@ -18,7 +18,7 @@ SELECT
     V.valor AS RECEFECTIVO,
     0 AS RECCHEQUE,
     V.valor AS RECTOTAL,
-    CASE WHEN S.ressan_id IS NOT NULL THEN CONCAT(RESSAN_ANO, '-', RESSAN_NUMERO, '-', resolucion_tipo_sigla)
+    CASE WHEN S.ressan_id IS NOT NULL THEN (RESSAN_ANO + '-' + RESSAN_NUMERO + '-' + resolucion_tipo_sigla)
          ELSE dbo.NumComp(C.Tcomparendos_comparendo, C.Tcomparendos_origen) END AS RECDOCUMENTO,
     CASE Tcomparendos_origen WHEN '99999999' THEN 'S' ELSE 'N' END AS RECPOLCA,
     C.Tcomparendos_idinfractor AS RECNIP,

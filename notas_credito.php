@@ -1,146 +1,97 @@
 <?php include 'menu.php';
 
 if(!empty($_POST)){
-$liquidacion = $_POST['liquidacion'];
-
-            $consulta_liquidaciones="SELECT * FROM liquidaciones where id = '$liquidacion'";
-
-            $resultado_liquidaciones=sqlsrv_query( $mysqli,$consulta_liquidaciones, array(), array('Scrollable' => 'buffered'));
-
-            $row_liquidaciones=sqlsrv_fetch_array($resultado_liquidaciones, SQLSRV_FETCH_ASSOC);
-            
-            $estado = $row_liquidaciones['estado'];
-            
+	$liquidacion = $_POST['liquidacion'];
+	$consulta_liquidaciones="SELECT * FROM liquidaciones where id = '$liquidacion'";
+	$resultado_liquidaciones=sqlsrv_query( $mysqli,$consulta_liquidaciones, array(), array('Scrollable' => 'buffered'));
+	$row_liquidaciones=sqlsrv_fetch_array($resultado_liquidaciones, SQLSRV_FETCH_ASSOC);
+	$estado = $row_liquidaciones['estado'];
 }
-            
 if(!empty($_POST['valor']) && $estado == 3){
-// Crear la consulta SQL
-$liquidacion = $_POST['liquidacion'];
-$valor = $_POST['valor'];
-$saldo = $_POST['valor']; 
-$identificacion = $row_liquidaciones['ciudadano'];
-
-
-$query = "INSERT INTO notas_credito (liquidacion, valor, saldo, identificacion, estado, fecha, usuario)
-VALUES ('$liquidacion', '$valor', '$saldo', '$identificacion', '1', '$fechayhora', '$idusuario')";
-
-// Ejecutar la consulta
-if (sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'))){
-    
- $id_nuevo = $mysqli->insert_id;
-     
- $queryUpdate = "UPDATE notas_credito SET id = '$id_nuevo' WHERE liquidacion = '$liquidacion'";
-$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
- 
-         echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> La nota credito ha sido realizado con éxito </div>';
-         
-         // Se anula la liquidacion
- $queryUpdate = "UPDATE liquidaciones SET estado = '4' WHERE id = '$liquidacion'";
-$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
- 
-}else{
-         echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al crear la nota credito</div>';    
+	// Crear la consulta SQL
+	$liquidacion = $_POST['liquidacion'];
+	$valor = $_POST['valor'];
+	$saldo = $_POST['valor'];
+	$identificacion = $row_liquidaciones['ciudadano'];
+	$query = "SET NOCOUNT ON";
+	$query = $query .";". "INSERT INTO notas_credito (liquidacion, valor, saldo, identificacion, estado, fecha, usuario)
+	VALUES ('$liquidacion', '$valor', '$saldo', '$identificacion', '1', '$fechayhora', '$idusuario')";
+	$query = $query .";". "SELECT scope_identity() as lastid";
+	// Ejecutar la consulta
+	$stmt = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
+	if ($stmt){
+		while ($rowID = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC)) {
+			$id_nuevo = $rowID['lastid'];
+		}
+		$queryUpdate = "UPDATE notas_credito SET id = '$id_nuevo' WHERE liquidacion = '$liquidacion'";
+		$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
+		echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> La nota credito ha sido realizado con éxito </div>';
+		// Se anula la liquidacion
+		$queryUpdate = "UPDATE liquidaciones SET estado = '4' WHERE id = '$liquidacion'";
+		$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
+	}else{
+		echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al crear la nota credito</div>';
+	}
 }
-    
-    
-} 
-
-
 if(!empty($_POST['nota_credito'])){
-// Crear la consulta SQL
-$liquidacion = $_POST['liquidacion'];
-
-
-
-         // Se anula la liquidacion
- $queryUpdate = "UPDATE notas_credito SET estado = '4' WHERE liquidacion = '$liquidacion'";
-
-
-// Ejecutar la consulta
-if (sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'))){
-         echo '<div class="alert alert-warning"><strong>¡Bien Hecho! </strong> La nota credito ha sido Anulada con éxito </div>';
-         
-         // Se anula la liquidacion
- $queryUpdate2 = "UPDATE liquidaciones SET estado = '3' WHERE id = '$liquidacion'";
-$resultadoUpdate2=sqlsrv_query( $mysqli,$queryUpdate2, array(), array('Scrollable' => 'buffered'));
- 
-}else{
-         echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al anular la nota credito</div>';    
+	// Crear la consulta SQL
+	$liquidacion = $_POST['liquidacion'];
+	// Se anula la liquidacion
+	$queryUpdate = "UPDATE notas_credito SET estado = '4' WHERE liquidacion = '$liquidacion'";
+	// Ejecutar la consulta
+	if (sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'))){
+		echo '<div class="alert alert-warning"><strong>¡Bien Hecho! </strong> La nota credito ha sido Anulada con éxito </div>';
+		// Se anula la liquidacion
+		$queryUpdate2 = "UPDATE liquidaciones SET estado = '3' WHERE id = '$liquidacion'";
+		$resultadoUpdate2=sqlsrv_query( $mysqli,$queryUpdate2, array(), array('Scrollable' => 'buffered'));
+	}else{
+		echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al anular la nota credito</div>';
+	}
 }
-    
-    
-} 
-
-
 if(!empty($_POST['traspaso'])){
-// Crear la consulta SQL
-$liquidacion = $_POST['liquidacion'];
-$identificacion_cambio = $_POST['traspaso'];
-
-$identificacion = $row_liquidaciones['ciudadano'];
-
-
-$query = "INSERT INTO notas_credito_cambio (liquidacion,identificacion,identificacion_cambio, fecha, usuario)
-VALUES ('$liquidacion', '$identificacion', '$identificacion_cambio', '$fechayhora', '$idusuario')";
-
-// Ejecutar la consulta
-if (sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'))){
-    
- $id_nuevo = $mysqli->insert_id;
-     
- $queryUpdate = "UPDATE notas_credito SET id = '$id_nuevo' WHERE liquidacion = '$liquidacion'";
-$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
- 
- 
-         echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> La nota credito ha sido traspasada con éxito </div>';
-         
-         // Se anula la liquidacion
- $queryUpdate = "UPDATE notas_credito SET identificacion = '$identificacion_cambio' WHERE liquidacion = '$liquidacion'";
-$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
- 
-}else{
-         echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al crear la nota credito</div>';    
+	// Crear la consulta SQL
+	$liquidacion = $_POST['liquidacion'];
+	$identificacion_cambio = $_POST['traspaso'];
+	$identificacion = $row_liquidaciones['ciudadano'];
+	$query = "SET NOCOUNT ON";
+	$query = $query .";". "INSERT INTO notas_credito_cambio (liquidacion,identificacion,identificacion_cambio, fecha, usuario)
+	VALUES ('$liquidacion', '$identificacion', '$identificacion_cambio', '$fechayhora', '$idusuario')";
+	$query = $query .";". "SELECT scope_identity() as lastid"; 
+	// Ejecutar la consulta
+	$stmt=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
+	if ($stmt){
+		while ($rowID = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC)) {
+			$id_nuevo = $rowID['lastid'];
+		}
+		$queryUpdate = "UPDATE notas_credito SET id = '$id_nuevo' WHERE liquidacion = '$liquidacion'";
+		$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
+		echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> La nota credito ha sido traspasada con éxito </div>';
+		// Se anula la liquidacion
+		$queryUpdate = "UPDATE notas_credito SET identificacion = '$identificacion_cambio' WHERE liquidacion = '$liquidacion'";
+		$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
+	}else{
+		echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al crear la nota credito</div>';
+	}
 }
-    
-    
-} 
-
-
 if(!empty($_POST['nota_credito'])){
-// Crear la consulta SQL
-$liquidacion = $_POST['liquidacion'];
-
-
-
-         // Se anula la liquidacion
- $queryUpdate = "UPDATE notas_credito SET estado = '4' WHERE liquidacion = '$liquidacion'";
-
-
-// Ejecutar la consulta
-if (sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'))){
-         echo '<div class="alert alert-warning"><strong>¡Bien Hecho! </strong> La nota credito ha sido Anulada con éxito </div>';
-         
-         // Se anula la liquidacion
- $queryUpdate2 = "UPDATE liquidaciones SET estado = '3' WHERE id = '$liquidacion'";
- $resultadoUpdate2=sqlsrv_query( $mysqli,$queryUpdate2, array(), array('Scrollable' => 'buffered'));
- 
-}else{
-         echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al anular la nota credito</div>';    
+	// Crear la consulta SQL
+	$liquidacion = $_POST['liquidacion'];
+	// Se anula la liquidacion
+	$queryUpdate = "UPDATE notas_credito SET estado = '4' WHERE liquidacion = '$liquidacion'";
+	// Ejecutar la consulta
+	if (sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'))){
+		echo '<div class="alert alert-warning"><strong>¡Bien Hecho! </strong> La nota credito ha sido Anulada con éxito </div>';
+		// Se anula la liquidacion
+		$queryUpdate2 = "UPDATE liquidaciones SET estado = '3' WHERE id = '$liquidacion'";
+		$resultadoUpdate2=sqlsrv_query( $mysqli,$queryUpdate2, array(), array('Scrollable' => 'buffered'));
+	}else{
+		echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Hubo un error al anular la nota credito</div>';
+	}
 }
-    
-    
-} 
-
-
-
-
- $consulta_liquidaciones="SELECT * FROM liquidaciones where id = '$liquidacion'";
-
-            $resultado_liquidaciones=sqlsrv_query( $mysqli,$consulta_liquidaciones, array(), array('Scrollable' => 'buffered'));
-
-            $row_liquidaciones=sqlsrv_fetch_array($resultado_liquidaciones, SQLSRV_FETCH_ASSOC);
-            
-            $estado = $row_liquidaciones['estado'];
+$consulta_liquidaciones="SELECT * FROM liquidaciones where id = '$liquidacion'";
+$resultado_liquidaciones=sqlsrv_query( $mysqli,$consulta_liquidaciones, array(), array('Scrollable' => 'buffered'));
+$row_liquidaciones=sqlsrv_fetch_array($resultado_liquidaciones, SQLSRV_FETCH_ASSOC);
+$estado = $row_liquidaciones['estado'];
 
 ?>
 

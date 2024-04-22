@@ -20,7 +20,7 @@ if (!isset($_POST['generar'])) {
     
     $qry2="SELECT Tnotifica_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) AS fecha, Tcomparendos_origen AS origen,
             Tcomparendos_lugar AS lugar,  Tcomparendos_idinfractor AS ident,  Tcomparendos_ID AS compid,
-            CONCAT(nombres, ' ', apellidos) AS nombre
+            (nombres + ' ' + apellidos) AS nombre
         FROM Tnotifica 
             INNER JOIN comparendos ON Tcomparendos_ID = Tnotifica_compid AND Tcomparendos_estado IN (1,15) AND Tcomparendos_origen = 1
             INNER JOIN ciudadanos ON numero_documento = Tcomparendos_idinfractor

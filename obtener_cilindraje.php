@@ -16,13 +16,13 @@ $clase = $_POST['clase'];
 
 // Preparar la consulta SQL
 $queryMenus = "SELECT * FROM vehiculos_cilindraje";
-$resultMenus = $mysqli->query($queryMenus);
+$resultMenus=sqlsrv_query( $mysqli,$queryMenus, array(), array('Scrollable' => 'buffered'));
 
 $query = "SELECT id, nombre, minimo, maximo FROM vehiculos_cilindraje WHERE nombre = '$clase'";
 
- $resultMenus = $mysqli->query($query);
+$resultMenus=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 	$options = '<select data-live-search="true" id="cilindraje" name="cilindraje" class="form-control">';
- while ($rowMenu = $resultMenus->fetch_assoc()) {
+ while ($rowMenu = sqlsrv_fetch_array($resultMenus, SQLSRV_FETCH_ASSOC)) {
   $options .= '<option style="margin-left: 15px;" value="' . $rowMenu['id'] . '">' . $rowMenu['nombre'] . '(' . $rowMenu['minimo'] . '-' . $rowMenu['maximo'] .')</option>';
 }
 

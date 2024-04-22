@@ -1,307 +1,193 @@
 <?php include 'menu.php'; 
-
-
 if(!empty($_POST['tipo_tramite'])){
-$tipo_tramite = $_POST['tipo_tramite'];
+	$tipo_tramite = $_POST['tipo_tramite'];
 }else{
-$tipo_tramite = $_GET['tipo_tramite'];    
+	$tipo_tramite = $_GET['tipo_tramite'];
 }
-
 $liquidacion = $_POST['liquidacion'];
-
-
 if(!empty($_POST['liquidacion2'])){
-    
-
-
-$tipo_tramite2 = $_POST['tipo_tramite2'];
-
-$liquidacion2 = $_POST['liquidacion2'];
-
-$tramite = $_POST['tramite2'];
-
-
-
-if($tipo_tramite2 == 2){
-    
-        // Recopilar los datos del formulario
-$certificado_ensenanza = $_POST['no_certificado_ensenanza'];
-$fecha_certificado_ensenanza = $_POST['fecha_certificado_ensenanza'];
-$organismo_expide_ensenanza = $_POST['organismo_expide_ensenanza'];
-$fecha_certificado_medico = $_POST['fecha_certificado_medico'];
-$no_certificado_medico = $_POST['no_certificado_medico'];
-$organismo_expide_medico = $_POST['organismo_expide_medico'];
-$categoria_licencia = $_POST['categoria_licencia'];
-$licencia_conduccion = $_POST['licencia_conduccion'];
-$fecha_expide_licencia = $_POST['fecha_expide_licencia'];
-
-$organismo_expide_licencia = $_POST['organismo_expide_licencia'];
-$fecha_vence_licencia = $_POST['fecha_vence_licencia'];
-$sustrato = $_POST['sustrato'];
-$debe_conducir_con_lentes = isset($_POST['debe_conducir_con_lentes']) ? 1 : 0;
-$menor_de_18_anos_no_puede_conducir_por_carretera = isset($_POST['menor_de_18_anos_no_puede_conducir_por_carretera']) ? 1 : 0;
-$debe_conducir_con_aparato_ortopedico = isset($_POST['debe_conducir_con_aparato_ortopedico']) ? 1 : 0;
-$no_puede_conducir_ningun_otro_tipo_de_vehiculo = isset($_POST['no_puede_conducir_ningun_otro_tipo_de_vehiculo']) ? 1 : 0;
-$otras_no_especificadas = isset($_POST['otras_no_especificadas']) ? 1 : 0;
-$no_puede_conducir_de_noche = isset($_POST['no_puede_conducir_de_noche']) ? 1 : 0;
-$diseno_especial_del_vehiculo = isset($_POST['diseno_especial_del_vehiculo']) ? 1 : 0;
-$no_puede_conducir_conjunto_vehiculos = isset($_POST['no_puede_conducir_conjunto_vehiculos']) ? 1 : 0;
-$ninguna = isset($_POST['ninguna']) ? 1 : 0;
-
-$categoria_licencia_actual = $_POST['categoria_licencia_actual'];
-$licencia_conduccion_actual = $_POST['licencia_conduccion_actual'];
-$fecha_expide_licencia_actual = $_POST['fecha_expide_licencia_actual'];
-
-$identificacion_antigua = $_POST['numero_documento_actual'];
-
-$identificacion_nueva = $_POST['numero_documento'];
-
-// Crear la consulta SQL
-$query = "INSERT INTO tramites_realizados (certificado_ensenanza, fecha_certificado_ensenanza, organismo_expide_ensenanza, fecha_certificado_medico, no_certificado_medico, organismo_expide_medico, categoria_licencia, licencia_conduccion, fecha_expide_licencia, organismo_expide_licencia, fecha_vence_licencia, sustrato, debe_conducir_con_lentes, menor_de_18_anos_no_puede_conducir_por_carretera, debe_conducir_con_aparato_ortopedico, no_puede_conducir_ningun_otro_tipo_de_vehiculo, otras_no_especificadas, no_puede_conducir_de_noche, diseno_especial_del_vehiculo, no_puede_conducir_conjunto_vehiculos, ninguna,tipo_tramite, liquidacion, usuario, fecha,fechayhora,categoria_licencia_actual, licencia_conduccion_actual, fecha_expide_licencia_actual,identificacion_antigua,identificacion_nueva,tramite)
-VALUES ('$certificado_ensenanza', '$fecha_certificado_ensenanza', '$organismo_expide_ensenanza', '$fecha_certificado_medico', '$no_certificado_medico', '$organismo_expide_medico', '$categoria_licencia', '$licencia_conduccion', '$fecha_expide_licencia', '$organismo_expide_licencia', '$fecha_vence_licencia', '$sustrato', '$debe_conducir_con_lentes', '$menor_de_18_anos_no_puede_conducir_por_carretera', '$debe_conducir_con_aparato_ortopedico', '$no_puede_conducir_ningun_otro_tipo_de_vehiculo', '$otras_no_especificadas', '$no_puede_conducir_de_noche', '$diseno_especial_del_vehiculo', '$no_puede_conducir_conjunto_vehiculos', '$ninguna','$tipo_tramite2', '$liquidacion2', '$idusuario', '$fecha','$fechayhora','$categoria_licencia_actual', '$licencia_conduccion_actual', '$fecha_expide_licencia_actual','$identificacion_antigua','$identificacion_nueva','$tramite')";
-
-// Ejecutar la consulta
-if (sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'))){
-     echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> El Tramite ha sido realizado con éxito </div>';
-     
-     
-// Se actualiza el tramite
- $queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '2' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
-$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
-     
-if($tramite == 24){ //EXPEDICION LICENCIA DE CONDUCCION
-
-
-// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
-  // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_auto = '$identificacion_nueva', categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', expedicion_licencia_auto = '$fecha_expide_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
-
-}elseif($tramite == 25){ //REFRENDACION LICENCIA DE CONDUCCION
-	
-	// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
-  // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET   vigencia_licencia_auto = '$fecha_vence_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
-
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
- 
- 
-}elseif($tramite == 26 ){ //RECATEGORIZACION LICENCIA DE CONDUCCION
-	
-// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
- 
-  // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
-
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
- 
-}elseif($tramite == 28){ //DUPLICADO DE LICENCIA DE CONDUCCION
-	
-// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
-  // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
- 
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
-  
-}elseif($tramite == 29){ //EXPEDICION LC POR CAMBIO DE DOCUMENTO VEHICULO
-	
-	// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
-  // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_auto = '$identificacion_nueva', categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', expedicion_licencia_auto = '$fecha_expide_licencia',  organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato', numero_documento = '$identificacion_nueva' WHERE numero_documento = '$identificacion_antigua' ";
- 
- 
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
- 
-}elseif($tramite == 66){ //EXPEDICION INICIAL LICENCIA DE CONDUCCION MOTO
-	
-// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
-  // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_moto = '$fecha_vence_licencia', categoria_licencia_moto = '$categoria_licencia', vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
- 
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
-  
-}elseif($tramite == 67){ //REFRENDACION LICENCIA DE CONDUCCION MOTO
-	
-	// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
-  // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET  vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
- 
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
-
-}elseif($tramite == 68){ //CAMBIO DE DOCUMENTO LICENCIA DE CONDUCCION
-	
-
-// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
-  
-    // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET  sustrato_licencia_auto = '$sustrato' and numero_documento = '$identificacion_nueva' WHERE numero_documento = '$identificacion_antigua' ";
-
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
-  
-  
-}elseif($tramite == 69){ //EXPEDICION LC POR CAMBIO DE DOCUMENTO MOTO
-
-// se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
-    // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_ciudadano = "UPDATE ciudadanos SET licencia_moto = '$fecha_vence_licencia', categoria_licencia_moto = '$categoria_licencia', vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato', numero_documento = '$identificacion_nueva'  WHERE numero_documento = '$identificacion_antigua' ";
- 
-$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
-  
-}
-
-
- $consulta_detalle_tramites="SELECT * FROM detalle_conceptos_liquidaciones where estado = 0 and liquidacion = '$liquidacion2'";
-
-            $resultado_detalle_tramites=sqlsrv_query( $mysqli,$consulta_detalle_tramites, array(), array('Scrollable' => 'buffered'));
-
-            if (sqlsrv_num_rows($resultado_detalle_tramites) > 0) {   
-     
-            }else{
-         // Se actualiza la liquidacion
-    $queryUpdate2 = "UPDATE liquidaciones SET estado = '2' WHERE id = '$liquidacion2'";
-    $resultadoUpdate2=sqlsrv_query( $mysqli,$queryUpdate2, array(), array('Scrollable' => 'buffered'));
-    
-
-    
-            }
-    
-    
-    
-} else {
-      echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Ha ocurrido un error: ' . serialize(sqlsrv_errors()) .' </div>';  
-    echo "Error al insertar el registro: " . serialize(sqlsrv_errors());
-}
-
-}//Terminan los tramites RNC
-
-if($tipo_tramite2 == 1){ //Comienzan tramites RNA
-
-$formularioId = $_POST['formulario_id'];
-
-if($tramite != 1 && $tramite != 8){
-// Consultar la tabla "formularios" para obtener los detalles del formulario
-$consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
-$resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
-$existe = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC);
-
-$campos = $existe['campos'];
-$tabla = $existe['tabla'];
-$campo_actualiza = $existe['campo_actualiza'];
-$campo_utiliza = $existe['campo_utiliza'];
-$nombre_tabla = $existe['nombre'];
-
-
-
-
-
-
-
-   // Obtener los valores enviados por el formulario
-    $valores = $_POST['campo'];
-    
-    $sustrato = $valores["sustrato"];
-    
-    
-    unset($valores['formulario_id']);
-
-    // Crear la consulta de inserción dinámica
-    $camposInsert = $campos;
-    
-   $campo_utiliza = $_POST['campo'][$campo_utiliza];
-    
-    $placa = $_POST['campo']['placa'];
-    
-    
-
-
-    $valoresInsert = "'" . implode("', '", array_values($valores)) . "'";
-
-    $insertQuery = "INSERT INTO $tabla ($camposInsert,fecha,usuario,liquidacion,tramite) VALUES ($valoresInsert,'$fecha','$idusuario','$liquidacion2','$tramite')";
-
-    // Ejecutar la consulta de inserción
-    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
-        echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
-  
-  if(empty($campo_utiliza)){
-  $campo_utiliza = $mysqli->insert_id; 
-  }
-  
-  if(!empty($campo_actualiza)){
-                // Se actualiza el vehiculo
- $actualizar_vehiculo = "UPDATE vehiculos SET $campo_actualiza = '$campo_utiliza' WHERE numero_placa = '$placa'";
-$resultado_vehiculo=sqlsrv_query( $mysqli,$actualizar_vehiculo, array(), array('Scrollable' => 'buffered'));
- 
-  }
- 
- 
-                // Se actualiza el tramite
- $queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '1' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
-$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
- 
- 
- // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
- 
-    } else {
-   echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
-    }    
-}else{   
-
-  include 'insertar_ciudadano.php';
-   include 'insertar_vehiculo.php'; 
-   
-   
-
-    $insertQuery = "INSERT INTO tramites_vehiculos (liquidacion,tramite,placa,fecha_tramite, fecha,usuario) VALUES ('$liquidacion2','$tramite','$numeroPlaca','$fecha','$fecha','$idusuario')";
-    
-       // Ejecutar la consulta de inserción
-    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
-        echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
-        
-        // Se actualiza el tramite
- $queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '1' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
-$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
- 
- 
- // se cambia el estado del sustrato de licencia de conduccion a usado
- $actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
-$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
- 
- 
-    } else {
-   echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
-    } 
-    
-}   
-}
+	$tipo_tramite2 = $_POST['tipo_tramite2'];
+	$liquidacion2 = $_POST['liquidacion2'];
+	$tramite = $_POST['tramite2'];
+	if($tipo_tramite2 == 2){
+		// Recopilar los datos del formulario
+		$certificado_ensenanza = $_POST['no_certificado_ensenanza'];
+		$fecha_certificado_ensenanza = $_POST['fecha_certificado_ensenanza'];
+		$organismo_expide_ensenanza = $_POST['organismo_expide_ensenanza'];
+		$fecha_certificado_medico = $_POST['fecha_certificado_medico'];
+		$no_certificado_medico = $_POST['no_certificado_medico'];
+		$organismo_expide_medico = $_POST['organismo_expide_medico'];
+		$categoria_licencia = $_POST['categoria_licencia'];
+		$licencia_conduccion = $_POST['licencia_conduccion'];
+		$fecha_expide_licencia = $_POST['fecha_expide_licencia'];
+		$organismo_expide_licencia = $_POST['organismo_expide_licencia'];
+		$fecha_vence_licencia = $_POST['fecha_vence_licencia'];
+		$sustrato = $_POST['sustrato'];
+		$debe_conducir_con_lentes = isset($_POST['debe_conducir_con_lentes']) ? 1 : 0;
+		$menor_de_18_anos_no_puede_conducir_por_carretera = isset($_POST['menor_de_18_anos_no_puede_conducir_por_carretera']) ? 1 : 0;
+		$debe_conducir_con_aparato_ortopedico = isset($_POST['debe_conducir_con_aparato_ortopedico']) ? 1 : 0;
+		$no_puede_conducir_ningun_otro_tipo_de_vehiculo = isset($_POST['no_puede_conducir_ningun_otro_tipo_de_vehiculo']) ? 1 : 0;
+		$otras_no_especificadas = isset($_POST['otras_no_especificadas']) ? 1 : 0;
+		$no_puede_conducir_de_noche = isset($_POST['no_puede_conducir_de_noche']) ? 1 : 0;
+		$diseno_especial_del_vehiculo = isset($_POST['diseno_especial_del_vehiculo']) ? 1 : 0;
+		$no_puede_conducir_conjunto_vehiculos = isset($_POST['no_puede_conducir_conjunto_vehiculos']) ? 1 : 0;
+		$ninguna = isset($_POST['ninguna']) ? 1 : 0;
+		$categoria_licencia_actual = $_POST['categoria_licencia_actual'];
+		$licencia_conduccion_actual = $_POST['licencia_conduccion_actual'];
+		$fecha_expide_licencia_actual = $_POST['fecha_expide_licencia_actual'];
+		$identificacion_antigua = $_POST['numero_documento_actual'];
+		$identificacion_nueva = $_POST['numero_documento'];
+		// Crear la consulta SQL
+		$query = "INSERT INTO tramites_realizados (certificado_ensenanza, fecha_certificado_ensenanza, organismo_expide_ensenanza, fecha_certificado_medico, no_certificado_medico, organismo_expide_medico, categoria_licencia, licencia_conduccion, fecha_expide_licencia, organismo_expide_licencia, fecha_vence_licencia, sustrato, debe_conducir_con_lentes, menor_de_18_anos_no_puede_conducir_por_carretera, debe_conducir_con_aparato_ortopedico, no_puede_conducir_ningun_otro_tipo_de_vehiculo, otras_no_especificadas, no_puede_conducir_de_noche, diseno_especial_del_vehiculo, no_puede_conducir_conjunto_vehiculos, ninguna,tipo_tramite, liquidacion, usuario, fecha,fechayhora,categoria_licencia_actual, licencia_conduccion_actual, fecha_expide_licencia_actual,identificacion_antigua,identificacion_nueva,tramite)
+		VALUES ('$certificado_ensenanza', '$fecha_certificado_ensenanza', '$organismo_expide_ensenanza', '$fecha_certificado_medico', '$no_certificado_medico', '$organismo_expide_medico', '$categoria_licencia', '$licencia_conduccion', '$fecha_expide_licencia', '$organismo_expide_licencia', '$fecha_vence_licencia', '$sustrato', '$debe_conducir_con_lentes', '$menor_de_18_anos_no_puede_conducir_por_carretera', '$debe_conducir_con_aparato_ortopedico', '$no_puede_conducir_ningun_otro_tipo_de_vehiculo', '$otras_no_especificadas', '$no_puede_conducir_de_noche', '$diseno_especial_del_vehiculo', '$no_puede_conducir_conjunto_vehiculos', '$ninguna','$tipo_tramite2', '$liquidacion2', '$idusuario', '$fecha','$fechayhora','$categoria_licencia_actual', '$licencia_conduccion_actual', '$fecha_expide_licencia_actual','$identificacion_antigua','$identificacion_nueva','$tramite')";
+		// Ejecutar la consulta
+		if (sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'))){
+			echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> El Tramite ha sido realizado con éxito </div>';
+			// Se actualiza el tramite
+			$queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '2' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
+			$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
+			if($tramite == 24){ //EXPEDICION LICENCIA DE CONDUCCION
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET licencia_auto = '$identificacion_nueva', categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', expedicion_licencia_auto = '$fecha_expide_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 25){ //REFRENDACION LICENCIA DE CONDUCCION
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET   vigencia_licencia_auto = '$fecha_vence_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 26 ){ //RECATEGORIZACION LICENCIA DE CONDUCCION
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 28){ //DUPLICADO DE LICENCIA DE CONDUCCION
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET sustrato_licencia_auto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 29){ //EXPEDICION LC POR CAMBIO DE DOCUMENTO VEHICULO
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET licencia_auto = '$identificacion_nueva', categoria_licencia_auto = '$categoria_licencia', vigencia_licencia_auto = '$fecha_vence_licencia', expedicion_licencia_auto = '$fecha_expide_licencia',  organismo_licencia_auto = '$organismo_expide_licencia', sustrato_licencia_auto = '$sustrato', numero_documento = '$identificacion_nueva' WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 66){ //EXPEDICION INICIAL LICENCIA DE CONDUCCION MOTO
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET licencia_moto = '$fecha_vence_licencia', categoria_licencia_moto = '$categoria_licencia', vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 67){ //REFRENDACION LICENCIA DE CONDUCCION MOTO
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET  vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato'  WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 68){ //CAMBIO DE DOCUMENTO LICENCIA DE CONDUCCION
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET  sustrato_licencia_auto = '$sustrato' and numero_documento = '$identificacion_nueva' WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}elseif($tramite == 69){ //EXPEDICION LC POR CAMBIO DE DOCUMENTO MOTO
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_ciudadano = "UPDATE ciudadanos SET licencia_moto = '$fecha_vence_licencia', categoria_licencia_moto = '$categoria_licencia', vigencia_licencia_moto = '$fecha_vence_licencia', expedicion_licencia_moto = '$fecha_expide_licencia', organismo_licencia_moto = '$organismo_expide_licencia', sustrato_licencia_moto = '$sustrato', numero_documento = '$identificacion_nueva'  WHERE numero_documento = '$identificacion_antigua' ";
+				$resultado_actualizar_ciudadano=sqlsrv_query( $mysqli,$actualizar_ciudadano, array(), array('Scrollable' => 'buffered'));
+			}
+			$consulta_detalle_tramites="SELECT * FROM detalle_conceptos_liquidaciones where estado = 0 and liquidacion = '$liquidacion2'";
+			$resultado_detalle_tramites=sqlsrv_query( $mysqli,$consulta_detalle_tramites, array(), array('Scrollable' => 'buffered'));
+			if (sqlsrv_num_rows($resultado_detalle_tramites) > 0) {
+			}else{
+				// Se actualiza la liquidacion
+				$queryUpdate2 = "UPDATE liquidaciones SET estado = '2' WHERE id = '$liquidacion2'";
+				$resultadoUpdate2=sqlsrv_query( $mysqli,$queryUpdate2, array(), array('Scrollable' => 'buffered'));
+			}
+		} else {
+			echo '<div class="alert alert-danger"><strong>¡Ups! </strong> Ha ocurrido un error: ' . serialize(sqlsrv_errors()) .' </div>';
+			echo "Error al insertar el registro: " . serialize(sqlsrv_errors());
+		}
+	}//Terminan los tramites RNC
+	if($tipo_tramite2 == 1){ //Comienzan tramites RNA
+		$formularioId = $_POST['formulario_id'];
+		if($tramite != 1 && $tramite != 8){
+			// Consultar la tabla "formularios" para obtener los detalles del formulario
+			$consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
+			$resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
+			$existe = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC);
+			$campos = $existe['campos'];
+			$tabla = $existe['tabla'];
+			$campo_actualiza = $existe['campo_actualiza'];
+			$campo_utiliza = $existe['campo_utiliza'];
+			$nombre_tabla = $existe['nombre'];
+			// Obtener los valores enviados por el formulario
+			$valores = $_POST['campo'];
+			$sustrato = $valores["sustrato"];
+			unset($valores['formulario_id']);
+			// Crear la consulta de inserción dinámica
+			$camposInsert = $campos;
+			$campo_utiliza = $_POST['campo'][$campo_utiliza];
+			$placa = $_POST['campo']['placa'];
+			$valoresInsert = "'" . implode("', '", array_values($valores)) . "'";
+			$insertQuery = "SET NOCOUNT ON";
+			$insertQuery = $insertQuery .";". "INSERT INTO $tabla ($camposInsert,fecha,usuario,liquidacion,tramite) VALUES ($valoresInsert,'$fecha','$idusuario','$liquidacion2','$tramite')";
+			$insertQuery = $insertQuery .";". "SELECT scope_identity() as lastid"; 
+			// Ejecutar la consulta de inserción
+			$stmt = sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'));
+			if ($stmt){
+				echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
+				if(empty($campo_utiliza)){
+					while ($rowID = sqlsrv_fetch_array( $stmt, SQLSRV_FETCH_ASSOC)) {
+						$campo_utiliza = $rowID['lastid'];
+					}
+				}
+				if(!empty($campo_actualiza)){
+					// Se actualiza el vehiculo
+					$actualizar_vehiculo = "UPDATE vehiculos SET $campo_actualiza = '$campo_utiliza' WHERE numero_placa = '$placa'";
+					$resultado_vehiculo=sqlsrv_query( $mysqli,$actualizar_vehiculo, array(), array('Scrollable' => 'buffered'));
+				}
+				// Se actualiza el tramite
+				$queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '1' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
+				$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+			} else {
+				echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
+			}
+		}else{
+			include 'insertar_ciudadano.php';
+			include 'insertar_vehiculo.php';
+			$insertQuery = "INSERT INTO tramites_vehiculos (liquidacion,tramite,placa,fecha_tramite, fecha,usuario) VALUES ('$liquidacion2','$tramite','$numeroPlaca','$fecha','$fecha','$idusuario')";
+			// Ejecutar la consulta de inserción
+			if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
+				echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
+				// Se actualiza el tramite
+				$queryUpdate = "UPDATE detalle_conceptos_liquidaciones SET estado = '1' WHERE liquidacion = '$liquidacion2' and tramite = '".$_POST['tramite2']."'";
+				$resultadoUpdate=sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
+				// se cambia el estado del sustrato de licencia de conduccion a usado
+				$actualizar_sustrato = "UPDATE especies_venales_detalle SET estado = '5' WHERE id = '$sustrato' and tipo = '2' ";
+				$resultado_actualizar_sustrato=sqlsrv_query( $mysqli,$actualizar_sustrato, array(), array('Scrollable' => 'buffered'));
+			} else {
+				echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
+			}
+		}
+	}
 }
 ?>
 

@@ -193,7 +193,7 @@ if ($_POST['generar']) {
         $sql2 .= " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Texportplano', 'INSERT', '" . $id2 . "', '$mensp', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
         $sql2 .= " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Trecaudos_arch', 'INSERT', '" . $id2 . "', '$mensp', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
         $sql2 .= " INSERT INTO Trecaudos_ec (Trecaudos_ec_numcuenta, Trecaudos_ec_fechadesde, Trecaudos_ec_fechahasta, Trecaudos_ec_divipo, Trecaudos_ec_tiporecaudo, Trecaudos_ec_numrec, Trecaudos_ec_sumrec, Trecaudos_ec_oficio, Trecaudos_ec_codchequeo, Trecaudos_ec_idarch, Trecaudos_ec_pdf, Trecaudos_ec_expimp, Trecaudos_ec_user, Trecaudos_ec_fecha) VALUES ('$ndivipo', '" . $_POST['fecha_ini'] . "', '" . $_POST['fecha_fin'] . "', '$ndivipo', '1', '" . ($consec - 1) . "', '$valortotal', '" . $_POST['oficio'] . "', '" . $rsumaascii . "', '" . $id2 . "', '$mensp', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        $rsql2 = $mysqli->multi_query($sql2);
+        $rsql2 = sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
         $result2 = serialize(sqlsrv_errors());
         fclose($fp);
     } else {

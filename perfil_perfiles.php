@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     
         $stmtDetalle = $mysqli->prepare("INSERT INTO detalle_perfiles (perfil_id, opcion_id, fecha,fechayhora) VALUES ('$perfilID', '$opcionId','$fecha','$fechayhora')");
-        if (!sqlsrv_execute( $stmtDetalle ))) {
+        if (!sqlsrv_execute( $stmtDetalle )) {
             die('Error al guardar la opción: ' . $stmtDetalle->error);
         }
     }

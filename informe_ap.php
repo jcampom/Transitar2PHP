@@ -35,22 +35,22 @@ if (isset($_GET['Comprobar'])) {
             acuerdosp_periodos.nombre AS periodo, TAcuerdop_cuota AS cuota, TAcuerdop_cuotas AS cuotas,
             TAcuerdop_identificacion AS ident, TAcuerdop_estado AS estado, TAcuerdop_fechapago AS fecha, 
             TAcuerdop_useranula AS anula, TAcuerdop_fechaanula AS fanula, acuerdosp_estados.nombre AS nestado,
-            TAcuerdop_solicitud AS documento, CONCAT(RS.ressan_ano, '-', RS.ressan_numero, '-', RT.sigla) AS resolucion, RS.ressan_archivo AS archivo, Tcomparendos_origen AS origen
+            TAcuerdop_solicitud AS documento, (RS.ressan_ano + '-' + RS.ressan_numero + '-' + RT.sigla) AS resolucion, RS.ressan_archivo AS archivo, Tcomparendos_origen AS origen
         FROM acuerdos_pagos
             INNER JOIN acuerdosp_estados ON TAcuerdop_estado = acuerdosp_estados.id
             INNER JOIN acuerdosp_periodos ON acuerdosp_periodos.id = TAcuerdop_periodicidad
             LEFT JOIN comparendos ON Tcomparendos_comparendo = TAcuerdop_comparendo
             LEFT JOIN resolucion_sancion RS ON ressan_comparendo = TAcuerdop_comparendo AND ressan_tipo = 4
-				AND DATE(ressan_fecha) = DATE(TAcuerdop_fecha) AND TAcuerdop_estado != 5
+				AND CAST(ressan_fecha AS DATE)  = CAST(TAcuerdop_fecha AS DATE) AND TAcuerdop_estado != 5
             LEFT JOIN resolucion_sancion_tipo RT ON RS.ressan_tipo = RT.id
-        WHERE DATE(TAcuerdop_fecha) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere
+        WHERE CAST(TAcuerdop_fecha as DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere
         ORDER BY TAcuerdop_comparendo, TAcuerdop_numero, TAcuerdop_cuota, TAcuerdop_fechapago";
     $registros = sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
     
     // echo $Query;
     if (sqlsrv_num_rows($registros) > 0) {
         $Query1 = "SELECT COUNT(DISTINCT TAcuerdop_numero) AS CANT FROM acuerdos_pagos
-               WHERE DATE(TAcuerdop_fecha) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere";
+               WHERE CAST(TAcuerdop_fecha AS DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere";
         $Result = sqlsrv_query( $mysqli,$Query1, array(), array('Scrollable' => 'buffered'));
         $cantidad = sqlsrv_fetch_array($Result, SQLSRV_FETCH_ASSOC);
         $mesliq = "<div class='highlight2'>Se encontraron " . $cantidad['CANT'] . " AP</div>";

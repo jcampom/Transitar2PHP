@@ -57,7 +57,7 @@ function desembargacomparendosihay($ncompder, $idecomp, $nliq) {
             $sqltrans .= " COMMIT END TRY BEGIN CATCH ROLLBACK TRAN PRINT ltrim(str(error_number())) END CATCH";
 
             $resultt=sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered')) or die('Error');
-            $result = mysqli_error($mysqli);
+            $result = serialize(sqlsrv_errors());
             if ($result == "" || true) {
                 $qry1 = "SELECT ressan_id AS id, ressan_archivo AS ruta FROM resolucion_sancion WHERE ressan_numero = $numero " . "AND ressan_ano = $anio AND ressan_comparendo = '$ncompder' AND ressan_tipo = 35";
 		$query=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
@@ -111,7 +111,7 @@ if (isset($_POST['update'])) {
                 $sqltrans = "UPDATE medcautcomp SET 
                     levarchivo = '$archivo',  levnumero = (select max(levnumero)+1 from medcautcomp), mcestado = 2,levfecha = NOW(), levusuario = '$usuario'  WHERE id = $mcid ";
                 $resultt=sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered')) or die('Error');
-                $result = mysqli_error($mysqli);
+                $result = serialize(sqlsrv_errors());
             }
             //		
             $sqq = "select levnumero,compid from medcautcomp WHERE id = $mcid ";

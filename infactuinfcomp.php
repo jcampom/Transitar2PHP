@@ -17,8 +17,8 @@ if (isset($_GET['generar'])) {
     }
 
     $query = "SELECT Tcomparendos_comparendo as comparendo, Tcomparendos_fecha AS fechacomp, N.id AS notId,
-                C1.numero_documento AS newdoc, CONCAT(C1.nombres, ' ', C1.apellidos) AS newnomb,
-                C2.numero_documento AS antdoc, CONCAT(C2.nombres, ' ', C2.apellidos) AS antnomb, 
+                C1.numero_documento AS newdoc, (C1.nombres + ' ' + C1.apellidos) AS newnomb,
+                C2.numero_documento AS antdoc, (C2.nombres + ' ' + C2.apellidos) AS antnomb, 
                 Tcomparendos_origen AS origen, archivo, documento, CAST(N.fecha AS DATE) as fecha, nauto, N.username AS usuario,
                 ValorCompSMLV(Tcomparendos_ID) AS COMVALOR
             FROM comparendos C 

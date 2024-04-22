@@ -549,13 +549,7 @@ global $mysqli;
         . " Tinteresesm_finicial BETWEEN '$fechaini' AND '$fechafin' OR "
         . " Tinteresesm_ffinal BETWEEN '$fechaini' AND '$fechafin' ORDER BY Tinteresesm_ffinal ASC";
 
-    $result=sqlsrv_query( $mysqli,$query_tasa, array(), array('Scrollable' => 'buffered'));
-
-    // Check for errors
-    if (!$result) {
-        die("Query failed: " . mysqli_error($mysqli));
-    }
-
+    $result=sqlsrv_query( $mysqli,$query_tasa, array(), array('Scrollable' => 'buffered')) or die("error: " . serialize(sqlsrv_errors()));
 
     return $result;
 }
@@ -564,12 +558,8 @@ global $mysqli;
 function ValorInteresMora($fechini, $fechfin, $valor) {
 global $mysqli;
  $qry1 = "SELECT id FROM tinteresesm WHERE '$fechfin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal";
- $queryval=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
+ $queryval=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered')) or die("Consulta fallida: " . serialize(sqlsrv_errors()));
 
-    // Verifica si hay errores
-    if (!$queryval) {
-        die("Consulta fallida: " . mysqli_error($mysqli));
-    }
 $rows_toval = sqlsrv_num_rows($queryval);
     $result = BuscarTasaEA($fechini, $fechfin);
     $totalRows_result = sqlsrv_num_rows($result);
@@ -1818,7 +1808,7 @@ function getNumResolucion($tipo, &$numero, &$desc, $anio = null, $dt = false) {
 
     $stmt = $mysqli->prepare("CALL num_resolucion(?, ?, ?, ?, ?, @num, @dsc)");
     $stmt->bind_param("iisii", $tipo, $numero, $desc, $year, $tabla);
-    sqlsrv_execute( $stmt ));
+    sqlsrv_execute( $stmt );
     @$stmt->bind_result($numero, $desc);
     $stmt->fetch();
    

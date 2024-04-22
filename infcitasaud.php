@@ -19,7 +19,7 @@ if (isset($_GET['generar'])) {
 
     $query = "SELECT Tcomparendos_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) AS fechacomp, 
                 E.nombre AS estado, Tcomparendos_idinfractor AS identif, Tcomparendos_origen AS origen,
-                CONCAT(R.ressan_ano, '-', R.ressan_numero, '-', sigla) AS resolucion,
+                (R.ressan_ano + '-' + R.ressan_numero + '-' + sigla) AS resolucion,
                 CAST(R.ressan_fecha AS DATE) AS fechares, R.ressan_archivo AS citacion, C.fechahora AS fechacita,
                 C.archivo, C.video, R.ressan_id AS notId, C.username AS usuario, ValorCompSMLV(Tcomparendos_ID) AS COMVALOR 
             FROM resolucion_sancion R

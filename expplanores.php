@@ -82,9 +82,9 @@ function analizarRespuesta($resolucionXML, $responseXML, $arrayResolucion, &$reg
         $cuota = ($arrayResolucion['cuota']) ? $arrayResolucion['cuota'] : 0;
         
         if ($check) {
-            $sqlExport = "INSERT INTO Texportplano (Texportplano_comp, Texportplano_tipo, Texportplano_idarch, Texportplano_user, Texportplano_fecha, Texportplano_cuota) VALUES ('" . $arrayResolucion['comp'] . "', 3, 0, '" . $_SESSION['MM_Username'] . "', '$fechaini', $cuota) "
-                    . "UPDATE resolucion_sancion SET ressan_exportado=1 WHERE ressan_id = {$arrayResolucion['idres']}";
-            $mysqli->multi_query($sqlExport);
+            $sqlExport = "INSERT INTO Texportplano (Texportplano_comp, Texportplano_tipo, Texportplano_idarch, Texportplano_user, Texportplano_fecha, Texportplano_cuota) VALUES ('" . $arrayResolucion['comp'] . "', 3, 0, '" . $_SESSION['MM_Username'] . "', '$fechaini', $cuota)";
+            $sqlExport = $sqlExport . ";". "UPDATE resolucion_sancion SET ressan_exportado=1 WHERE ressan_id = {$arrayResolucion['idres']}";
+			sqlsrv_query( $mysqli,$sqlExport, array(), array('Scrollable' => 'buffered'));
         }
     }
     
@@ -139,7 +139,7 @@ if ($_POST['Comprobar'] || $_GET["pagina"]) {
         $fechafinall = date('Y-m-d');
     }
     $_SESSION['fechafinal'] = $fechafinall;
-    $where = " WHERE (STR_TO_DATE(RESFECHA, '%d/%m/%Y') BETWEEN '$fechainicio' AND '$fechafinall')";
+    $where = " WHERE (convert(datetime, RESFECHA, 103) BETWEEN '$fechainicio' AND '$fechafinall')";
     $_SESSION['resolucion'] = $sespos['resolucion'];
     if ($sespos['resolucion']  <> '') {
         $where .= " AND (tipores = '{$sespos['resolucion']}') ";
@@ -156,9 +156,9 @@ if ($_POST['Comprobar'] || $_GET["pagina"]) {
     if ($sespos['numres'] <> 0) {
         $where .= " AND (RESNUMERO LIKE '%{$sespos['numres']}%')";
     }
-    $query_base = "SELECT ROW_NUMBER() OVER (ORDER BY STR_TO_DATE(RESFECHA, '%d/%m/%Y'), RESNUMERO) AS fila,
+    $query_base = "SELECT ROW_NUMBER() OVER (ORDER BY convert(datetime, RESFECHA, 103), RESNUMERO) AS fila,
             RESNUMERO, RESNIPINFRAC, RESCOMP, RESVALOR, RESINFRACCION,
-            sigla, estado, idres, STR_TO_DATE(RESFECHA, '%d/%m/%Y') as fecha
+            sigla, estado, idres, convert(datetime, RESFECHA, 103) as fecha
         FROM VExportResol $where";
 
     if ($paginar == 1) {
