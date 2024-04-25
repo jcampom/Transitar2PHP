@@ -32,7 +32,7 @@ if (isset($_POST['buscar'])) {
 		    if ($_POST['tiporecaudo'] == 1) {
     $query_ap = "SELECT TAcuerdop_comparendo, TAcuerdop_periodicidad, TAcuerdop_identificacion, TAcuerdop_cuota, TAcuerdop_valor, TAcuerdop_fechapago, TAcuerdop_estado FROM acuerdos_pagos WHERE TAcuerdop_numero='" . $_POST['documento_tipo'] . "'";
     $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
-    $query_rec = "START TRANSACTION;";
+    $query_rec = "BEGIN TRANSACTION;";
     $inserciones = 0;
     $subtotal = 0;
 

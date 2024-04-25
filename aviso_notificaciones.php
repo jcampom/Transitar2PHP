@@ -39,7 +39,7 @@ if (!isset($_POST['generar'])) {
 } else {
     if (count($_POST['check']) > 0) {
         $compsid = implode(',', $_POST['check']);
-        $sqltrans = "START TRANSACTION;";
+        $sqltrans = "BEGIN TRANSACTION;";
      
            
            $tipo_noti = 29;
@@ -49,7 +49,7 @@ if (!isset($_POST['generar'])) {
            
 
 // Consulta SQL
-$sql = "SELECT IFNULL(MAX(numero), 0) + 1 AS nuevo_id FROM avisos WHERE tipo = 29";
+$sql = "SELECT ISNULL(MAX(numero), 0) + 1 AS nuevo_id FROM avisos WHERE tipo = 29";
 
 // Ejecutar la consulta
 $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
@@ -60,7 +60,7 @@ $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     // Obtener el nuevo ID
     $num = $row['nuevo_id'];
     
-    $numres = "(SELECT IFNULL(MAX(ressan_numero), 0) FROM resolucion_sancion WHERE ressan_tipo = '$tipo_noti' AND ressan_ano = '$ano')";
+    $numres = "(SELECT ISNULL(MAX(ressan_numero), 0) FROM resolucion_sancion WHERE ressan_tipo = '$tipo_noti' AND ressan_ano = '$ano')";
     $desfijar = "DiasHabil(CAST('$fecha' AS DATE), (SELECT Tnotifparams_autodesfdias FROM Tnotifparams))";
     
 $sql = "
@@ -70,8 +70,8 @@ $sql = "
         29,
         '../sanciones/gdp_avisonot_pdf.php',
         '../sanciones/gdp_avisonotindma_pdf.php',
-        DiasHabil(NOW(), (SELECT Tnotifparams_autodesfdias FROM Tnotifparams)),
-        NOW(),
+        DiasHabil(GETDATE(), (SELECT Tnotifparams_autodesfdias FROM Tnotifparams)),
+        GETDATE(),
         '{$_SESSION['MM_Username']}'
     )";
 

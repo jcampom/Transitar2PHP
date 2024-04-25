@@ -37,7 +37,7 @@ $update = 0;
 $update_ant = 0;
 
 if (($gestor = fopen($_FILES['lote_archivo']['tmp_name'], "r")) !== FALSE) {
-    $sqltrans = " START TRANSACTION ";
+    $sqltrans = " BEGIN TRANSACTION ";
     while (($datos = fgetcsv($gestor, 0, ";")) !== FALSE) {
         if (count($datos) == 3 || count($datos) == 4) {
             $comparendo = ltrim(substr($datos[0], -10), '0');

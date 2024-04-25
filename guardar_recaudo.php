@@ -74,13 +74,16 @@ $resultado_dt=sqlsrv_query( $mysqli,$actualizar_dt, array(), array('Scrollable' 
         }
 
     foreach ($titulos as $titulo) {
-        $numero = $mysqli->real_escape_string($titulo['numero']);
-        $fecha = $mysqli->real_escape_string($titulo['fecha']);
-        $valor = $mysqli->real_escape_string($titulo['valor']);
+        //$numero = $mysqli->real_escape_string($titulo['numero']);
+        //$fecha = $mysqli->real_escape_string($titulo['fecha']);
+        //$valor = $mysqli->real_escape_string($titulo['valor']);
+        //$sql = "INSERT INTO titulos (numero, fecha, valor) VALUES ('$numero', '$fecha', '$valor')";
+		
+		$sql = "INSERT INTO titulos (numero, fecha, valor) VALUES (?, ?, ?)";
+		$parameters = [$titulo['numero'], $titulo['fecha'],$titulo['valor']];
+		$result = sqlsrv_query( $mysqli, $sql, $parameters, array('Scrollable' => 'buffered'));		
 
-        $sql = "INSERT INTO titulos (numero, fecha, valor) VALUES ('$numero', '$fecha', '$valor')";
-
-        if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))!==TRUE){		
+        if ($result)!==TRUE){		
             echo "Error al insertar el título: " . serialize(sqlsrv_errors());
         }
     }

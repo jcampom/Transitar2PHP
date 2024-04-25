@@ -28,7 +28,7 @@ SELECT
          ELSE 1 END AS RECTIPOREC,
     (SELECT TRIM(Tsedes_divipo) FROM dbo.Tsedes LIMIT 1) AS RECSECRET,
     V.liq AS RECNUM,
-    IFNULL(A.TAcuerdop_cuota, 0) AS NUMERO_CUTOAS,
+    ISNULL(A.TAcuerdop_cuota, 0) AS NUMERO_CUTOAS,
     TI.Ttipoidentificacion_simit AS ID_TIPO_DOC,
     V.interes AS INTERESES,
     CASE WHEN S.ressan_tipo IS NULL AND A.TAcuerdop_ID IS NULL THEN ABS(V.descuento) ELSE 0 END AS DESCUENTO,
@@ -46,6 +46,6 @@ FROM
     LEFT OUTER JOIN VResLast AS S ON S.ressan_comparendo = C.Tcomparendos_comparendo AND ((S.ressan_tipo IN (2, 10, 16) AND A.TAcuerdop_numero IS NULL) OR (S.ressan_tipo = 4 AND A.TAcuerdop_numero IS NOT NULL))
     LEFT OUTER JOIN resolucion_sancion_tipo AS T ON S.ressan_tipo = T.id
 WHERE
-    (E.Texportplano_ID IS NULL) AND (R.Trecaudos_fecharecaudo >= NOW() - INTERVAL 1 YEAR);
+    (E.Texportplano_ID IS NULL) AND (R.Trecaudos_fecharecaudo >= GETDATE() - INTERVAL 1 YEAR);
 ";
 ?>

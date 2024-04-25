@@ -9,10 +9,10 @@ SELECT
     municipio.nombre AS COMDIVIPOMUNI,
     localidad.nombre AS COMDIVIPOLOCALIDADCOMUNA,
     Comp.Tcomparendos_placa AS COMPLACA,
-    IFNULL(MunCiu.nombre, 0) AS COMDIVIPOMATRI,
+    ISNULL(MunCiu.nombre, 0) AS COMDIVIPOMATRI,
     Comp.Tcomparendos_tipo AS COMTIPOVEHI,
     Serv.simit AS COMTIPOSER,
-    IFNULL(Radi.simit, 1) AS COMCODIGORADIO,
+    ISNULL(Radi.simit, 1) AS COMCODIGORADIO,
     Moda.id_simit AS COMCODIGOMODALIDAD,
     Comp.Tcomparendos_tipopasajero AS COMCODIGOPASAJEROS,
     Comp.Tcomparendos_idinfractor AS COMINFRACTOR,
@@ -26,7 +26,7 @@ SELECT
     END AS COMEDADINFRACTOR,
     Infr.direccion AS COMDIRINFRACTOR,
     Infr.email AS COMEMAIL,
-    IFNULL(Infr.telefono, Infr.celular) AS COMTELEINFRACTOR,
+    ISNULL(Infr.telefono, Infr.celular) AS COMTELEINFRACTOR,
     InfrCiu.nombre AS COMIDCIUDAD,
     CASE WHEN Tcomparendos_tipoinfractor = '4' THEN Infr.licencia_moto ELSE Infr.licencia_auto END AS COMLICENCIA,
     CASE WHEN Tcomparendos_tipoinfractor = '4' THEN Infr.categoria_licencia_moto ELSE Infr.categoria_licencia_auto END AS COMCATEGORIA,
@@ -41,7 +41,7 @@ SELECT
     empresa.nombre AS COMNOMBREEMPRESA,
     empresa.Tterceros_identifica AS COMNITEMPRESA,
     Comp.Tcomparendos_TO AS COMTARJETAOPERACION,
-    IFNULL(agente.Tterceros_placa, Comp.Tcomparendos_agente) AS COMPPLACAAGENTE,
+    ISNULL(agente.Tterceros_placa, Comp.Tcomparendos_agente) AS COMPPLACAAGENTE,
     Comp.Tcomparendos_observaciones AS COMOBSERVA,
     CASE WHEN Tcomparendos_fuga > 0 THEN 'S' ELSE 'N' END AS COMFUGA,
     CASE WHEN Tcomparendos_accidente > 0 THEN 'S' ELSE 'N' END AS COMACCI,
@@ -64,7 +64,7 @@ SELECT
     ValorCompSMLV(Comp.Tcomparendos_ID) AS COMVALINFRA,
     Comp.Tcomparendos_gradoalcohol AS COMGRADOALCOHOL,
     CASE WHEN Tcomparendos_origen = '1' THEN 'S' ELSE 'N' END AS FOTOMULTA,
-    DATE_FORMAT(IFNULL(TN.Tnotifica_notificaf, Comp.Tcomparendos_fecha), '%d/%m/%Y') AS FECHANOTIFICACION
+    DATE_FORMAT(ISNULL(TN.Tnotifica_notificaf, Comp.Tcomparendos_fecha), '%d/%m/%Y') AS FECHANOTIFICACION
 FROM
     comparendos AS Comp
 LEFT OUTER JOIN

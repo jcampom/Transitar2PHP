@@ -1694,14 +1694,16 @@ function BuscarPropietario1($doc, $tipo) {
     global $mysqli;
     
     // Escapar las variables para prevenir la inyección de SQL
-    $doc = $mysqli->real_escape_string($doc);
+    //$doc = $mysqli->real_escape_string($doc);
     $tipo = (int)$tipo; // Asegurarse de que $tipo sea un entero
 
     // Consulta SQL
-    $sql = "SELECT * FROM ciudadanos WHERE numero_documento = '$doc' AND tipo_identificacion = '$tipo'";
+    //$sql = "SELECT * FROM ciudadanos WHERE numero_documento = '$doc' AND tipo_identificacion = '$tipo'";
+	$sql = "SELECT * FROM ciudadanos WHERE numero_documento = ? AND tipo_identificacion = ?";
+	$parameters = [$doc, $tipo];
 
     // Ejecutar la consulta
-    $result = sqlsrv_query( $mysqli,$sql);
+    $result = sqlsrv_query( $mysqli,$sql,$parameters,array('Scrollable' => 'buffered'));
 
     return $result;
 }

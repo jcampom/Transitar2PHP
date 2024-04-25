@@ -65,9 +65,9 @@ if (isset($_POST['generar'])) {
     } else {
         //echo "#".$mensp.$mensn."#<br>";
 
-        // $sqltrans = "START TRANSACTION;";
+        // $sqltrans = "BEGIN TRANSACTION;";
         // $sqltrans .= $gen;
-        // $sqltrans .= "COMMIT;";
+        // $sqltrans .= "COMMIT TRANSACTION;";
         //  echo $sqltrans."<br>";
         // exit;
         // if ($mysqli->multi_query($sqltrans)) {

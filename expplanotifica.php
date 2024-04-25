@@ -157,7 +157,7 @@ LEFT JOIN (
     WHERE estadoant != 15
     GROUP BY compId, estadoant
 ) AS N ON C.Tcomparendos_ID = N.compId
-SET C.Tcomparendos_estado = IFNULL(N.estadoant, 1)
+SET C.Tcomparendos_estado = ISNULL(N.estadoant, 1)
 WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15;
 ";
 				
@@ -273,7 +273,7 @@ if ($_POST['generar']) {
         $idscomp = implode(',', $idcomp);
         
         
-        // $sql2 = "  UPDATE C SET Tcomparendos_estado = IFNULL(N.estadoant, 1) 
+        // $sql2 = "  UPDATE C SET Tcomparendos_estado = ISNULL(N.estadoant, 1) 
         //     FROM comparendos C 
         //         LEFT JOIN (SELECT compId, MAX(estadoant) AS estadoant FROM notificaciones 
         //         WHERE estadoant != 15 
@@ -287,7 +287,7 @@ LEFT JOIN (
     WHERE estadoant != 15
     GROUP BY compId
 ) N ON C.Tcomparendos_ID = N.compId
-SET C.Tcomparendos_estado = IFNULL(N.estadoant, 1)
+SET C.Tcomparendos_estado = ISNULL(N.estadoant, 1)
 WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
 
     // echo $sql2;

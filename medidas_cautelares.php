@@ -111,7 +111,7 @@ $querychk_result=sqlsrv_query( $mysqli,$querychk, array(), array('Scrollable' =>
 }
 
 if ($ninscri > 0) {
-    // $sqltrans .= " COMMIT";
+    // $sqltrans .= " COMMIT TRANSACTION";
     //$resultt = sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered')) or die('Error');
      $result = "";
 } else {
@@ -276,7 +276,7 @@ $registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffere
                                
                                     <?php
                                  
-                                   $qry1="SELECT IFNULL(MAX(mcnumero), 0) + 1 AS numero FROM medcautcomp WHERE YEAR(fecha) = $year" 
+                                   $qry1="SELECT ISNULL(MAX(mcnumero), 0) + 1 AS numero FROM medcautcomp WHERE YEAR(fecha) = $year" 
                                    $resultnum=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
                                    $numrow = sqlsrv_fetch_array($resultnum, SQLSRV_FETCH_ASSOC);
                                     ?>

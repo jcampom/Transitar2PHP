@@ -91,8 +91,8 @@ $sqltrans .= "
     INSERT INTO resolucion_sancion
         ([ressan_ano],[ressan_numero],[ressan_tipo],[ressan_comparendo],[ressan_archivo]
         ,[ressan_fecha],[ressan_compid],[ressan_usuario])
-    SELECT YEAR(NOW()), (ROW_NUMBER() OVER(ORDER BY Tcomparendos_ID ASC)) + (SELECT COALESCE(MAX(ressan_numero), 0) FROM resolucion_sancion r2 WHERE r2.ressan_tipo=@tipo2 AND r2.ressan_ano=YEAR(DATEADD(DAY,90,GETDATE()))),
-        @tipo2, Tcomparendos_comparendo, @archivo2, NOW(), Tcomparendos_ID, @usuario
+    SELECT YEAR(GETDATE()), (ROW_NUMBER() OVER(ORDER BY Tcomparendos_ID ASC)) + (SELECT COALESCE(MAX(ressan_numero), 0) FROM resolucion_sancion r2 WHERE r2.ressan_tipo=@tipo2 AND r2.ressan_ano=YEAR(DATEADD(DAY,90,GETDATE()))),
+        @tipo2, Tcomparendos_comparendo, @archivo2, GETDATE(), Tcomparendos_ID, @usuario
     FROM Tcomparendos 
     INNER JOIN (SELECT MIN(ressan_fecha) AS ressan_fecha, ressan_compid, ressan_comparendo FROM resolucion_sancion WHERE ressan_tipo=2 AND (ressan_compid IN ($compsid) OR ressan_comparendo IN (SELECT Tcomparendos_comparendo FROM Tcomparendos WHERE Tcomparendos_id IN ($compsid))) GROUP BY ressan_compid, ressan_comparendo) r1 ON (r1.ressan_compid = Tcomparendos_ID OR r1.ressan_comparendo = Tcomparendos_comparendo)
     WHERE Tcomparendos_estado = 6 AND Tcomparendos_ID IN ($compsid)  ORDER BY Tcomparendos_comparendo, ressan_fecha;

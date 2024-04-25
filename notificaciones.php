@@ -99,7 +99,7 @@ if($tipo == 1){
             $resultc = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
             $ciud = sqlsrv_fetch_array($resultc, SQLSRV_FETCH_ASSOC);
 
-            $resulna = sqlsrv_query( $mysqli,"SELECT IFNULL(MAX(nauto, array(), array('Scrollable' => 'buffered')), 0, array(), array('Scrollable' => 'buffered')) + 1 AS numero FROM notificaciones", array(), array('Scrollable' => 'buffered'));
+            $resulna = sqlsrv_query( $mysqli,"SELECT ISNULL(MAX(nauto, array(), array('Scrollable' => 'buffered')), 0, array(), array('Scrollable' => 'buffered')) + 1 AS numero FROM notificaciones", array(), array('Scrollable' => 'buffered'));
             $resulnar = sqlsrv_fetch_array($resulna, SQLSRV_FETCH_ASSOC);
             $nauto = $resulnar['numero'];
         }

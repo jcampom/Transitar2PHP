@@ -109,7 +109,7 @@ if (isset($_POST['update'])) {
 				*/
 
                 $sqltrans = "UPDATE medcautcomp SET 
-                    levarchivo = '$archivo',  levnumero = (select max(levnumero)+1 from medcautcomp), mcestado = 2,levfecha = NOW(), levusuario = '$usuario'  WHERE id = $mcid ";
+                    levarchivo = '$archivo',  levnumero = (select max(levnumero)+1 from medcautcomp), mcestado = 2,levfecha = GETDATE(), levusuario = '$usuario'  WHERE id = $mcid ";
                 $resultt=sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered')) or die('Error');
                 $result = serialize(sqlsrv_errors());
             }
@@ -194,7 +194,7 @@ if (isset($_POST['update'])) {
 				INNER JOIN detalle_conceptos_liquidaciones  ON comparendo=C.Tcomparendos_ID 
 				INNER JOIN liquidaciones ON liquidaciones.id = detalle_conceptos_liquidaciones.liquidacion
 				LEFT JOIN resolucion_sancion ressan35 ON ressan35.ressan_comparendo=Tcomparendos_comparendo and ressan35.ressan_tipo = 35
-			WHERE C.Tcomparendos_estado=2 AND M.levnumero IS NULL AND liquidaciones.estado=3 AND detalle_conceptos_liquidaciones.concepto like '%LEVANTAMIENTO MEDIDA CAUTELAR COMPARENDO%' AND IFNULL(ressan35.ressan_comparendo,'')=''  $where2 ";
+			WHERE C.Tcomparendos_estado=2 AND M.levnumero IS NULL AND liquidaciones.estado=3 AND detalle_conceptos_liquidaciones.concepto like '%LEVANTAMIENTO MEDIDA CAUTELAR COMPARENDO%' AND ISNULL(ressan35.ressan_comparendo,'')=''  $where2 ";
 		}
 		$query .= 
 			" UNION
@@ -208,7 +208,7 @@ if (isset($_POST['update'])) {
             INNER JOIN bancos B ON M.banco = B.id
             INNER JOIN resolucion_sancion RS ON RS.ressan_compid = Tcomparendos_ID AND RS.ressan_tipo = 16 
 			LEFT JOIN resolucion_sancion ressan35 ON ressan35.ressan_comparendo=Tcomparendos_comparendo and ressan35.ressan_tipo = 35
-			WHERE C.Tcomparendos_estado=13 AND M.levnumero IS NULL  AND IFNULL(ressan35.ressan_comparendo,'')='' $where 
+			WHERE C.Tcomparendos_estado=13 AND M.levnumero IS NULL  AND ISNULL(ressan35.ressan_comparendo,'')='' $where 
 		ORDER BY fechains	";	
 		
 		$registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));

@@ -11,13 +11,16 @@ $liquidacion = $_POST['liquidacion'];
 
 $valor_total = 0;
     foreach ($titulos as $titulo) {
-        $numero = $mysqli->real_escape_string($titulo['numero']);
-        $fecha = $mysqli->real_escape_string($titulo['fecha']);
-        $valor = $mysqli->real_escape_string($titulo['valor']);
+        //$numero = $mysqli->real_escape_string($titulo['numero']);
+        //$fecha = $mysqli->real_escape_string($titulo['fecha']);
+        //$valor = $mysqli->real_escape_string($titulo['valor']);
+        //$sql = "INSERT INTO titulos (numero, fecha, valor,liquidacion, empresa) VALUES ('$numero', '$fecha', '$valor','$liquidacion','$empresa')";
+		
+		$sql = "INSERT INTO titulos (numero, fecha, valor,liquidacion, empresa) VALUES (?, ?, ?,?,?)";
+		$parameters = [$titulo['numero'], $titulo['fecha'],$titulo['valor'],$liquidacion,$empresa];
+		$result = sqlsrv_query( $mysqli, $sql, $parameters, array('Scrollable' => 'buffered'));			
 
-        $sql = "INSERT INTO titulos (numero, fecha, valor,liquidacion, empresa) VALUES ('$numero', '$fecha', '$valor','$liquidacion','$empresa')";
-
-        if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))!==TRUE){
+        if ($result)!==TRUE){
             echo "Error al insertar el título: " . serialize(sqlsrv_errors());
         }
         $valor_total += $valor;
