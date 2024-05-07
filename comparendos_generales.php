@@ -28,17 +28,17 @@ if (isset($_GET['Comprobar'])) {
         $andwhere .= " AND Tcomparendos_codinfraccion = '{$_GET['codigo']}' ";
     }
 
-    $sql = "SELECT ciu.id AS ciuId, ciu.numero_documento AS ident, ciu.apellidos AS apellido, 
-            ciu.nombres AS nombre, comp.Tcomparendos_placa AS placa, comp.Tcomparendos_comparendo AS comparendo,
-            comp.Tcomparendos_origen AS origen, comp.Tcomparendos_estado AS estadoId, comp.Tcomparendos_codinfraccion AS codigo,
-            est.nombre AS estado, CAST(comp.Tcomparendos_fecha AS DATE) AS fechacomp, noti.Tnotifica_notificaf AS fnotifica
-        FROM comparendos AS comp
-           INNER JOIN ciudadanos AS ciu ON comp.Tcomparendos_idinfractor = ciu.numero_documento
-
-            INNER JOIN comparendos_estados AS est ON comp.Tcomparendos_estado = est.id
-            LEFT JOIN Tnotifica AS noti ON noti.Tnotifica_comparendo = comp.Tcomparendos_comparendo
-        WHERE CAST(comp.Tcomparendos_fecha AS DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere
-        ORDER BY comp.Tcomparendos_comparendo DESC limit 50";
+    $sql = "SELECT TOP 50 ciu.id AS ciuId, ciu.numero_documento AS ident, ciu.apellidos AS apellido, 
+ ciu.nombres AS nombre, comp.Tcomparendos_placa AS placa, comp.Tcomparendos_comparendo AS comparendo,
+ comp.Tcomparendos_origen AS origen, comp.Tcomparendos_estado AS estadoId, comp.Tcomparendos_codinfraccion AS codigo,
+ est.nombre AS estado, CAST(comp.Tcomparendos_fecha AS DATE) AS fechacomp, noti.Tnotifica_notificaf AS fnotifica
+ FROM comparendos AS comp
+ INNER JOIN ciudadanos AS ciu ON comp.Tcomparendos_idinfractor = ciu.numero_documento
+ 
+ INNER JOIN comparendos_estados AS est ON comp.Tcomparendos_estado = est.id
+ LEFT JOIN Tnotifica AS noti ON noti.Tnotifica_comparendo = comp.Tcomparendos_comparendo
+ WHERE CAST(comp.Tcomparendos_fecha AS DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere
+ ORDER BY comp.Tcomparendos_comparendo DESC";
     //echo "<script>console.log(\"".$sql."\");</script>";
 //echo $sql;
 

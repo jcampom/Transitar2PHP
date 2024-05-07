@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Consultar la tabla "formularios" para obtener los detalles del formulario
-$consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
+$consulta = "SELECT * FROM formularios WHERE id = ".$formularioId;
 $resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 $existe = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC);
 
@@ -27,30 +27,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['insertar']) && $_POST
   
     $valoresInsert = "'" . implode("', '", array_values($valores)) . "'";
 
-   foreach ($valores as $campo2 => $valor) {
-        $campoLimpio = trim($campo2);
-        $camposInsert .= "$campoLimpio, ";
-    }
-        $camposInsert = rtrim($camposInsert, ', ');
-    
-       $valoresInsert = '';
-    foreach ($valores as $campo => $valor) {
-      
-        $valorCampo = $valor;
-        
-if (is_array($valorCampo)) {
-    $opcionesComoString = implode(", ", $valorCampo);
-     $valoresInsert .= "'$opcionesComoString', ";
-} else {
- $valoresInsert .= "'$valorCampo',";
-}
-       
-    }
-    
-        $valoresInsert = rtrim($valoresInsert, ', ');
-    
- 
+	foreach ($valores as $campo2 => $valor) {
+		$campoLimpio = trim($campo2);
+		$camposInsert .= "$campoLimpio, ";
+	}
+	$camposInsert = rtrim($camposInsert, ', ');
 
+	$valoresInsert = '';
+	foreach ($valores as $campo => $valor) {
+
+		$valorCampo = $valor;
+
+		if (is_array($valorCampo)) {
+			$opcionesComoString = implode(", ", $valorCampo);
+			$valoresInsert .= "'$opcionesComoString', ";
+		} else {
+			$valoresInsert .= "'$valorCampo',";
+		}
+
+	}
+    
+	$valoresInsert = rtrim($valoresInsert, ', ');
     
     $insertQuery = "INSERT INTO $tabla ($camposInsert) VALUES ($valoresInsert)";
 
@@ -58,9 +55,9 @@ if (is_array($valorCampo)) {
     
     // echo $insertQuery;
     if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
-        echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
+		echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
     } else {
-   echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
+		echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
     }
 }
 
@@ -174,7 +171,7 @@ $resultado_imagen=sqlsrv_query( $mysqli,$actualizar_imagen, array(), array('Scro
         echo '<form action="" method="POST" enctype="multipart/form-data">';
 
 	
-		$consultaCampos2 = "SELECT * FROM `detalle_formularios` WHERE formulario = $formularioId ";
+		$consultaCampos2 = "SELECT * FROM detalle_formularios WHERE formulario = $formularioId ";
         $resultadoCampos2=sqlsrv_query( $mysqli,$consultaCampos2, array(), array('Scrollable' => 'buffered'));
 
         
@@ -271,27 +268,26 @@ $valorCampo = explode(",", $valorCampo);
 
         <?php
         // Consultar los campos de la tabla "detalle_formularios" para el formulario actual
-        $consultaCampos = "SELECT campo, tipo, requerido, dinamico, label, multiple, file FROM `detalle_formularios` WHERE formulario = $formularioId";
+        $consultaCampos = 'SELECT campo, tipo, requerido, dinamico, [label] as "label", multiple, [file] as "file" FROM detalle_formularios WHERE formulario = '.$formularioId;
         $resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
-$cantidad_campos = 0;
+		$cantidad_campos = 0;
         if ($resultadoCampos && sqlsrv_num_rows($resultadoCampos) > 0) {
           
             // Crear el formulario dinámicamente
             echo '<form action="formulario_dinamico_datos.php" method="POST" enctype="multipart/form-data">';
 
             while ($campo = sqlsrv_fetch_array($resultadoCampos, SQLSRV_FETCH_ASSOC)) {
-                  $cantidad_campos += 1;
+				$cantidad_campos += 1;
                 $campoLimpio = trim($campo['campo']);
                 $tipoCampo = $campo['tipo'];
                 $requerido = $campo['requerido'];
                 $dinamico = $campo['dinamico'];
                 
-                if(!empty($campo['label'])){
-   $label = $campo['label'];
-    }else{
-   $label = ucwords(str_replace("_", " ", $campoLimpio)). '';
-       
-    }
+				if(!empty($campo['label'])){
+					$label = $campo['label'];
+				}else{
+					$label = ucwords(str_replace("_", " ", $campoLimpio)). '';
+				}
 
                 echo '<div class="col-md-4">';
                 echo '<div class="form-group form-float">';
@@ -300,54 +296,52 @@ $cantidad_campos = 0;
 
                 // Determinar el tipo de campo y generar el input correspondiente
                 
-                if (!empty($dinamico)){
-                    if($campo['multiple'] == 1){
-                        
-                        echo '<select data-live-search="true" multiple name="campo[' . $campoLimpio . '][]" id="' . $campoLimpio . '" class="form-control"'; 
-                    }else{
-                    echo '<select data-live-search="true"  name="campo[' . $campoLimpio . ']" id="' . $campoLimpio . '" class="form-control"';
-                    }
-                    if ($requerido == 1) {
-        echo ' required';
-    }
-                echo '>';
-   $consultaRegistros2 = "SELECT id, nombre FROM $dinamico";
+				if (!empty($dinamico)){
+					if($campo['multiple'] == 1){
+						echo '<select data-live-search="true" multiple name="campo[' . $campoLimpio . '][]" id="' . $campoLimpio . '" class="form-control"'; 
+					}else{
+						echo '<select data-live-search="true"  name="campo[' . $campoLimpio . ']" id="' . $campoLimpio . '" class="form-control"';
+					}
+					if ($requerido == 1) {
+						echo ' required';
+					}
+					echo '>';
+					$consultaRegistros2 = "SELECT id, nombre FROM $dinamico";
 
-   $resultadoRegistros2=sqlsrv_query( $mysqli,$consultaRegistros2, array(), array('Scrollable' => 'buffered'));
+					$resultadoRegistros2=sqlsrv_query( $mysqli,$consultaRegistros2, array(), array('Scrollable' => 'buffered'));
 
-   while ($registro2 = sqlsrv_fetch_array($resultadoRegistros2, SQLSRV_FETCH_ASSOC)) {     
-       echo '<option style="margin-left: 15px;" value="'.$registro2['id'].'">'.$registro2['nombre'].'</option>';
-   }
-                     
-    echo '</select>';
+					while ($registro2 = sqlsrv_fetch_array($resultadoRegistros2, SQLSRV_FETCH_ASSOC)) {     
+					   echo '<option style="margin-left: 15px;" value="'.$registro2['id'].'">'.$registro2['nombre'].'</option>';
+					}
+					echo '</select>';
                 }elseif ($tipoCampo == 'date') {
                     echo '<input type="date" name="campo[' . $campoLimpio . ']" id="' . $campoLimpio . '" class="form-control" ';
                     
-                     if ($requerido == 1) {
-        echo ' required';
-    }
-    echo '>';
+					if ($requerido == 1) {
+						echo ' required';
+					}
+					echo '>';
                 } elseif ($tipoCampo == 'int' or $tipoCampo == 'int(11)') {
                     echo '<input type="number" name="campo[' . $campoLimpio . ']" id="' . $campoLimpio . '" class="form-control" ';
                     if ($requerido == 1) {
-        echo ' required';
-    }
-    echo '>';
+						echo ' required';
+					}
+					echo '>';
                 } elseif ($tipoCampo === 'email') {
                     echo '<input type="email" name="campo[' . $campoLimpio . ']" id="' . $campoLimpio . '" class="form-control" ';
                     if ($requerido == 1) {
-        echo ' required';
-    }
-    echo '>';
+						echo ' required';
+					}
+					echo '>';
                 } elseif ($tipoCampo === 'checkbox') {
                     echo '<input type="checkbox" name="campo[' . $campoLimpio . ']" id="' . $campoLimpio . '">';
                 } else {
                     echo '<input type="text" class="form-control" name="campo[' . $campoLimpio . ']" id="' . $campoLimpio . '"';
                     if ($requerido == 1) {
-        echo ' required';
-    }
-    echo '>';
-                }
+						echo ' required';
+				}
+				echo '>';
+			}
 
                 echo '</div>';
                 echo '</div>';
@@ -372,27 +366,27 @@ $cantidad_campos = 0;
         <h2>Filtros</h2>
          <form method="GET" action="" enctype="multipart/form-data">
              <?php 
-        if(!empty($_GET['cantidad_filtros'])){
-			$cantidad_filtros = $_GET['cantidad_filtros'];
-		}else{
-			$cantidad_filtros = 4;   
-        }
+				if(!empty($_GET['cantidad_filtros'])){
+					$cantidad_filtros = $_GET['cantidad_filtros'];
+				}else{
+					$cantidad_filtros = 4;   
+				}
         
-         $consultaCampos = "SELECT COUNT(*) as cantidad FROM `detalle_formularios` WHERE formulario = $formularioId";
-        $resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
+				$consultaCampos = "SELECT COUNT(*) as cantidad FROM detalle_formularios WHERE formulario = $formularioId";
+				$resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
 
 
-           $campo = sqlsrv_fetch_array($resultadoCampos, SQLSRV_FETCH_ASSOC);
+				$campo = sqlsrv_fetch_array($resultadoCampos, SQLSRV_FETCH_ASSOC);
            
-           $cantidad_campos = $campo['cantidad'];
+				$cantidad_campos = $campo['cantidad'];
              ?>
-          <select name="cantidad_filtros" id="cantidad_filtros" onchange="this.form.submit()">
-            <option value="<?php echo $cantidad_filtros; ?><" <?php if ($cantidad_filtros == 1) echo 'selected'; ?>><?php echo $cantidad_filtros; ?></option>
-       <?php for ($i = 1; $i <= $cantidad_campos; $i++) { ?>
-<option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-<?php } ?>
-            <!-- Agrega más opciones según tus necesidades -->
-        </select>
+			<select name="cantidad_filtros" id="cantidad_filtros" onchange="this.form.submit()">
+				<option value="<?php echo $cantidad_filtros; ?><" <?php if ($cantidad_filtros == 1) echo 'selected'; ?>><?php echo $cantidad_filtros; ?></option>
+				<?php for ($i = 1; $i <= $cantidad_campos; $i++) { ?>
+				<option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+				<?php } ?>
+				<!-- Agrega más opciones según tus necesidades -->
+			</select>
             <input type="hidden" name="id" value="<?php echo $formularioId; ?>">
         </form>
     </div>
@@ -403,40 +397,32 @@ $cantidad_campos = 0;
         <?php
         
       
-        $consultaCampos = "SELECT campo, tipo, label, dinamico FROM `detalle_formularios` WHERE formulario = $formularioId limit $cantidad_filtros";
-$resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
-
+        $consultaCampos = 'SELECT TOP '.$cantidad_filtros.' campo, tipo, [label] as "label", dinamico FROM detalle_formularios WHERE formulario = '.$formularioId;
+		$resultadoCampos=sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
         if ($resultadoCampos && sqlsrv_num_rows($resultadoCampos) > 0) {
             while ($campo = sqlsrv_fetch_array($resultadoCampos, SQLSRV_FETCH_ASSOC)) {
                 $campoLimpio = trim($campo['campo']);
                 $tipoCampo = $campo['tipo'];
              
-if(!empty($campo['label'])){
-   $label = $campo['label'];
-    }else{
-   $label = ucwords(str_replace("_", " ", $campoLimpio)). '';
-       
-    }
-if ($tipoCampo == 'date') {
-                echo '<div class="col-md-4">';
-                echo '<div class="form-group form-float">';
-                echo '<div class="form-line">';
-      
-
-               
-
-    echo '<label for="' . $campoLimpio . '_filtro_inicio">' . $label . ' (Inicio):</label>';
-    echo '<input type="date" name="' . $campoLimpio . '_inicio" id="' . $campoLimpio . '_filtro_inicio" class="form-control">';
-
-      echo '</div>';
-                echo '</div>';
-                echo '</div>';
-                
-                   echo '<div class="col-md-4">';
-                echo '<div class="form-group form-float">';
-                echo '<div class="form-line">';
-    echo '<label for="' . $campoLimpio . '_filtro_fin">' . $label . ' (Fin):</label>';
-    echo '<input type="date" name="' . $campoLimpio . '_fin123" id="' . $campoLimpio . '_filtro_fin" class="form-control">';
+				if(!empty($campo['label'])){
+					$label = $campo['label'];
+				}else{
+					$label = ucwords(str_replace("_", " ", $campoLimpio)). '';       
+				}
+				if ($tipoCampo == 'date') {
+					echo '<div class="col-md-4">';
+					echo '<div class="form-group form-float">';
+					echo '<div class="form-line">';
+					echo '<label for="' . $campoLimpio . '_filtro_inicio">' . $label . ' (Inicio):</label>';
+					echo '<input type="date" name="' . $campoLimpio . '_inicio" id="' . $campoLimpio . '_filtro_inicio" class="form-control">';
+					echo '</div>';
+					echo '</div>';
+					echo '</div>';
+					echo '<div class="col-md-4">';
+					echo '<div class="form-group form-float">';
+					echo '<div class="form-line">';
+					echo '<label for="' . $campoLimpio . '_filtro_fin">' . $label . ' (Fin):</label>';
+					echo '<input type="date" name="' . $campoLimpio . '_fin123" id="' . $campoLimpio . '_filtro_fin" class="form-control">';
 				} elseif ($tipoCampo == 'range' ) {
 					
 					echo '<div class="form-group form-float">';
@@ -489,19 +475,19 @@ if ($tipoCampo == 'date') {
 						echo '</select>';
 					}
                 } elseif ($tipoCampo === 'email') {
-                                 echo '<div class="col-md-4">';
+					echo '<div class="col-md-4">';
 					echo '<div class="form-group form-float">';
 					echo '<div class="form-line">';
 					echo '<label for="' . $campoLimpio . '_filtro">' . $label . ':</label>';
 						echo '<input type="email" name="' . $campoLimpio . '_filtro" id="' . $campoLimpio . '_filtro" class="form-control">';
-					} elseif ($tipoCampo === 'checkbox') {
-									 echo '<div class="col-md-4">';
+				} elseif ($tipoCampo === 'checkbox') {
+					echo '<div class="col-md-4">';
 					echo '<div class="form-group form-float">';
 					echo '<div class="form-line">';
 					echo '<label for="' . $campoLimpio . '_filtro">' . $label . ':</label>';
-						echo '<input type="checkbox" name="' . $campoLimpio . '_filtro" id="' . $campoLimpio . '_filtro">';
-					} else {
-									 echo '<div class="col-md-4">';
+					echo '<input type="checkbox" name="' . $campoLimpio . '_filtro" id="' . $campoLimpio . '_filtro">';
+				} else {
+					echo '<div class="col-md-4">';
 					echo '<div class="form-group form-float">';
 					echo '<div class="form-line">';
 					echo '<label for="' . $campoLimpio . '_filtro">' . $label . ':</label>';
@@ -535,18 +521,17 @@ if ($tipoCampo == 'date') {
                         foreach ($camposTabla as $campo) {
                             $campoLimpio = trim($campo);
                             
-            $consulta_label="SELECT * FROM detalle_formularios where campo = '$campo' and formulario = '$formularioId'";
+							$consulta_label="SELECT * FROM detalle_formularios where campo = '$campo' and formulario = '$formularioId'";
 
-            $resultado_label=sqlsrv_query( $mysqli,$consulta_label, array(), array('Scrollable' => 'buffered'));
+							$resultado_label=sqlsrv_query( $mysqli,$consulta_label, array(), array('Scrollable' => 'buffered'));
 
-            $row_label=sqlsrv_fetch_array($resultado_label, SQLSRV_FETCH_ASSOC);
-            
-            if(!empty($row_label['label'])){
-              $label = $row_label['label'];
-            }else{
-              $label = ucwords($campoLimpio);  
-            }
-            
+							$row_label=sqlsrv_fetch_array($resultado_label, SQLSRV_FETCH_ASSOC);
+							
+							if(!empty($row_label['label'])){
+							  $label = $row_label['label'];
+							}else{
+							  $label = ucwords($campoLimpio);  
+							}
             
                             if ($campoLimpio !== 'id') {
                                 echo '<th>' . $label . '</th>';
@@ -560,103 +545,105 @@ if ($tipoCampo == 'date') {
                     <?php
                     // Consultar los registros de la tabla
                     $consultaRegistros = "SELECT * FROM $tabla ";
+					// Obtener los filtros enviados por GET
+					$filtros = array();
+					foreach ($_GET as $key => $value) {
+						if (!empty($value) && substr($key, -11) === '_filtro_ini' or !empty($value) && substr($key, -11) === '_filtro_fin' or !empty($value) && substr($key, -7) === '_filtro' or !empty($value) && substr($key, -7) === '_inicio' or !empty($value) && substr($key, -7) === '_fin123') {
+							$campoFiltro = substr($key, 0, -7);
+							//$valorFiltro = $mysqli->real_escape_string($value);
+							$valorFiltro = $value;
+							
+							if (isset($_GET[$campoFiltro . '_inicio']) && isset($_GET[$campoFiltro . '_fin123'])) {
+								// $fechaInicio = $mysqli->real_escape_string($_GET[$campoFiltro . '_inicio']);
+								// $fechaFin = $mysqli->real_escape_string($_GET[$campoFiltro . '_fin123']);
+								$fechaInicio = $_GET[$campoFiltro . '_inicio'];
+								$fechaFin = $_GET[$campoFiltro . '_fin123'];
+								$filtros[] = "$campoFiltro BETWEEN '$fechaInicio' AND '$fechaFin'";
+							} elseif (substr($key, -11) === '_filtro_ini' ) {
+								// $inicio = $mysqli->real_escape_string($_GET[substr($key, 0, -11) . '_filtro_ini']);
+								// $fin = $mysqli->real_escape_string($_GET[substr($key, 0, -11) . '_filtro_fin']);
+								$inicio = $_GET[substr($key, 0, -11) . '_filtro_ini'];
+								$fin = $_GET[substr($key, 0, -11) . '_filtro_fin'];
+								$filtros[] = "".substr($key, 0, -11)." BETWEEN '$inicio' AND '$fin'";
+							} elseif( substr($key, -7) === '_filtro') {
+								$filtros[] = "$campoFiltro LIKE '%$valorFiltro%'";
+							}
+						}
+					}
+					
+					/* ojojojoj */
+					// Construir la consulta de registros con los filtros aplicados
+					$consultaRegistros = "SELECT TOP 10 * FROM $tabla ";
+					if (!empty($filtros)) {
+						$consultaRegistros .= " WHERE " . implode(" AND ", $filtros);
+					}
+                    $resultadoRegistros = sqlsrv_query( $mysqli,$consultaRegistros, array(), array('Scrollable' => 'buffered')); 
                     
-
-
-// Obtener los filtros enviados por GET
-$filtros = array();
-foreach ($_GET as $key => $value) {
-    if (!empty($value) && substr($key, -11) === '_filtro_ini' or !empty($value) && substr($key, -11) === '_filtro_fin' or !empty($value) && substr($key, -7) === '_filtro' or !empty($value) && substr($key, -7) === '_inicio' or !empty($value) && substr($key, -7) === '_fin123') {
-        $campoFiltro = substr($key, 0, -7);
-        $valorFiltro = $mysqli->real_escape_string($value);
-		
-        if (isset($_GET[$campoFiltro . '_inicio']) && isset($_GET[$campoFiltro . '_fin123'])) {
-            $fechaInicio = $mysqli->real_escape_string($_GET[$campoFiltro . '_inicio']);
-            $fechaFin = $mysqli->real_escape_string($_GET[$campoFiltro . '_fin123']);
-            $filtros[] = "`$campoFiltro` BETWEEN '$fechaInicio' AND '$fechaFin'";
-        } elseif (substr($key, -11) === '_filtro_ini' ) {
-            $inicio = $mysqli->real_escape_string($_GET[substr($key, 0, -11) . '_filtro_ini']);
-            $fin = $mysqli->real_escape_string($_GET[substr($key, 0, -11) . '_filtro_fin']);
-            $filtros[] = "`".substr($key, 0, -11)."` BETWEEN '$inicio' AND '$fin'";
-		} elseif( substr($key, -7) === '_filtro') {
-            $filtros[] = "`$campoFiltro` LIKE '%$valorFiltro%'";
-        }
-    }
-}
-/* ojojojoj
-// Construir la consulta de registros con los filtros aplicados
-$consultaRegistros = "SELECT * FROM $tabla ";
-if (!empty($filtros)) {
-    $consultaRegistros .= " WHERE " . implode(" AND ", $filtros);
-}
-
-$consultaRegistros .=" limit 10";
-
-                    $resultadoRegistros=sqlsrv_query( $mysqli,$consultaRegistros, array(), array('Scrollable' => 'buffered'));
-                    
-	////	echo $consultaRegistros;
+					////	echo $consultaRegistros;
 
                     if ($resultadoRegistros && sqlsrv_num_rows($resultadoRegistros) > 0) {
-                        while ($registro = sqlsrv_fetch_array($resultadoRegistros, SQLSRV_FETCH_ASSOC)) {
+                        while ($registro = sqlsrv_fetch_array( $resultadoRegistros, SQLSRV_FETCH_ASSOC)) {
                             echo '<tr>';
-                                 echo '<td>';
-if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { 
-                echo '<a href="?editar=' . $registro['id'] . '&id=' . $formularioId . '"><button style="margin-right:5px;margin-bottom:5px;width:40px" class="btn btn-primary" data-toggle="modal" data-target="#modalEditar"><i class="fas fa-edit"></i></button></a>';
+							echo '<td>';
+							if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { 
+								echo '<a href="?editar=' . $registro['id'] . '&id=' . $formularioId . '"><button style="margin-right:5px;margin-bottom:5px;width:40px" class="btn btn-primary" data-toggle="modal" data-target="#modalEditar"><i class="fas fa-edit"></i></button></a>';
                 
-}
+							}
 
- if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { 
-                            echo '<a href="#" style="width:40px;margin-bottom:5px" onclick="confirmarEliminar(' . $registro['id'] . ');" class="btn btn-danger"><i class="fas fa-trash"></i></a>';
- }
+							if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { 
+								echo '<a href="#" style="width:40px;margin-bottom:5px" onclick="confirmarEliminar(' . $registro['id'] . ');" class="btn btn-danger"><i class="fas fa-trash"></i></a>';
+							}
                             echo '</td>';
                             foreach ($camposTabla as $campo) {
                                 $campoLimpio = trim($campo);
+								//echo '<LI>JLCM:formulario_dinamico_datos.php:#599 -->'.$campoLimpio;
                                 if ($campoLimpio !== 'id') {
-                                    
-            $consulta_dinamico="SELECT * FROM detalle_formularios where campo = '$campoLimpio' and formulario = '$formularioId'";
-
-            $resultado_dinamico=sqlsrv_query( $mysqli,$consulta_dinamico, array(), array('Scrollable' => 'buffered'));
-
-            $row_dinamico=sqlsrv_fetch_array($resultado_dinamico, SQLSRV_FETCH_ASSOC);
+                                    //echo "<br/>JLCM::#601 --> campoLimpio = ".$campoLimpio;
+									$consulta_dinamico="SELECT * FROM detalle_formularios where campo = '$campoLimpio' and formulario = '$formularioId'";
+									$resultado_dinamico=sqlsrv_query( $mysqli,$consulta_dinamico, array(), array('Scrollable' => 'buffered')); 
+									$row_dinamico= sqlsrv_fetch_array( $resultado_dinamico, SQLSRV_FETCH_ASSOC);
             
-            $dinamico = $row_dinamico['dinamico'];
-        ///  REVISAR CONDICION DE NOMBRE EN LAS BUSQUEDAS DE CAMPO DINAMICO   ////    
-            if(empty($dinamico)){
-                echo '<td>' . $registro[$campoLimpio] . '</td>';
-            }else{
-				$tablaDinamica= $dinamico;
-				$idDinamica= "id";
-				$nombreDinamica = "nombre";
-				$arrayDinamico = explode(",",$dinamico);
-				if(count($arrayDinamico )==1) {
-					$tablaDinamica= $dinamico;
-					$idDinamica= "id";
-					$nombreDinamica = "nombre";
-				} else {
-					if(count($arrayDinamico )==2) { 
-						$tablaDinamica= $arrayDinamico[0];
-						$idDinamica= $arrayDinamico[1];
-						$nombreDinamica = "nombre";
-					} else {
-						if(count($arrayDinamico )==3) { 
-							$tablaDinamica= $arrayDinamico[0];
-							$idDinamica= $arrayDinamico[1];
-							$nombreDinamica = $arrayDinamico[2];
-						}
-					}
-				}
-				$consulta_dinamico2="SELECT * FROM $tablaDinamica where $idDinamica = '".$registro[$campoLimpio]."'";
-
-				$resultado_dinamico2=sqlsrv_query( $mysqli,$consulta_dinamico2, array(), array('Scrollable' => 'buffered'));
-
-				$row_dinamico2=sqlsrv_fetch_array($resultado_dinamico2, SQLSRV_FETCH_ASSOC);
-				   echo '<td>' . $row_dinamico2['$nombreDinamica'] . '</td>';
-               
-               
-            }
+									$dinamico = $row_dinamico['dinamico'];
+									///  REVISAR CONDICION DE NOMBRE EN LAS BUSQUEDAS DE CAMPO DINAMICO   ////    
+									if(empty($dinamico)){
+										$tipoDato = $row_dinamico['tipo'];
+										if ($tipoDato==="date"){
+											if (!(empty($registro[$campoLimpio]))){
+												echo '<td>' . date_format($registro[$campoLimpio], 'Y/m/d'). '</td>';
+											}
+										}else{
+											echo '<td>' . $registro[$campoLimpio] . '</td>';	
+										}									
+									}else{
+										$tablaDinamica= $dinamico;
+										$idDinamica= "id";
+										$nombreDinamica = "nombre";
+										$arrayDinamico = explode(",",$dinamico);
+										if(count($arrayDinamico )==1) {
+											$tablaDinamica= $dinamico;
+											$idDinamica= "id";
+											$nombreDinamica = "nombre";
+										} else {
+											if(count($arrayDinamico )==2) { 
+												$tablaDinamica= $arrayDinamico[0];
+												$idDinamica= $arrayDinamico[1];
+												$nombreDinamica = "nombre";
+											} else {
+												if(count($arrayDinamico )==3) { 
+													$tablaDinamica= $arrayDinamico[0];
+													$idDinamica= $arrayDinamico[1];
+													$nombreDinamica = $arrayDinamico[2];
+												}
+											}
+										}
+										$consulta_dinamico2="SELECT * FROM $tablaDinamica where $idDinamica = '".$registro[$campoLimpio]."'";
+										//echo '<LI>JLCM:formulario_dinamico_datos.php:#633 -->'.$consulta_dinamico2;
+										$resultado_dinamico2=sqlsrv_query( $mysqli,$consulta_dinamico2, array(), array('Scrollable' => 'buffered')); 
+										$row_dinamico2=sqlsrv_fetch_array( $resultado_dinamico2, SQLSRV_FETCH_ASSOC);
+										echo '<td>' . $row_dinamico2[$nombreDinamica] . '</td>';
+									}
                                 }
                             }
-                       
                             echo '</tr>';
                         }
                     } else {
@@ -665,14 +652,17 @@ if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
                    
                         echo '</tr>';
                     }
-     ojoojojoj */               ?>
+     /*ojoojojoj */					
+					?>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<?php } ?>
+<?php 
+} 
+?>
 <!-- Modal de confirmación de eliminación -->
 <div class="modal fade" id="modalEliminar" tabindex="-1" role="dialog" aria-labelledby="modalEliminarLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

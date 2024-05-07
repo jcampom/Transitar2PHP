@@ -112,27 +112,24 @@ include 'funcion_ciudadanos.php';
                         <label for="tramite">Trámite</label>
                         <select class="form-control" id="tramite" name="tramite" data-live-search="true">
                             <?php if(!empty($tramiteId)){ ?>
-                            <option style='margin-left: 15px;' value=''><?php
-            $consulta_tramites2="SELECT * FROM tramites";
-
-            $resultado_tramites2=sqlsrv_query( $mysqli,$consulta_tramites2, array(), array('Scrollable' => 'buffered'));
-
-            $row_tramites2=sqlsrv_fetch_array($resultado_tramites2, SQLSRV_FETCH_ASSOC);
-                      echo ucwords($row_tramites2['nombre']); ?></option>
+                            <option style='margin-left: 15px;' value=''>
+							<?php
+								$consulta_tramites2="SELECT * FROM tramites";
+								$resultado_tramites2=sqlsrv_query( $mysqli,$consulta_tramites2, array(), array('Scrollable' => 'buffered'));
+								$row_tramites2=sqlsrv_fetch_array($resultado_tramites2, SQLSRV_FETCH_ASSOC);
+								echo ucwords($row_tramites2['nombre']); ?></option>
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tramite...</option>
-                            
                             <?php } ?>
-                            <?php
-                            
-                            // Obtener los datos de la tabla tramites
-$sqlTramites = "SELECT id, nombre FROM tramites where tipo_documento = '$tipo_tramite' order by nombre";
-$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
-                            if (sqlsrv_num_rows($resultTramites) > 0) {
-                                while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
-                                    echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
-                                }
-                            }
+                            <?php                           
+								// Obtener los datos de la tabla tramites
+								$sqlTramites = "SELECT id, nombre FROM tramites where tipo_documento = '$tipo_tramite' order by nombre";
+								$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+								if (sqlsrv_num_rows($resultTramites) > 0) {
+									while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
+										echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
+									}
+								}
                             ?>
                         </select>
                     </div>
@@ -190,16 +187,13 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                 <div class="form-group form-float">
                     <div class="form-line">
                         <label>Tipo de servicio</label>
-     <select class="form-control" id="tipo_servicio" onchange="sustrato_placas()" name="tipo_servicio" data-live-search="true" >
-                           
-                            <option style='margin-left: 15px;' value=''>Seleccionar Tipo de servicio...</option>
-                            
-               
+						<select class="form-control" id="tipo_servicio" onchange="sustrato_placas()" name="tipo_servicio" data-live-search="true" >
+							<option style='margin-left: 15px;' value=''>Seleccionar Tipo de servicio...</option>
                             <?php
                             
-                            // Obtener los datos de la tabla tramites
-$sqlTramites = "SELECT id, nombre FROM tipo_servicio";
-$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            // Obtener los datos de la tabla tipo_servicio
+							$sqlTramites = "SELECT id, nombre FROM tipo_servicio";
+							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
                             if (sqlsrv_num_rows($resultTramites) > 0) {
                                 while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
@@ -211,22 +205,16 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                 </div>
             
             </div> 
-            
-            
-               <div class="col-md-6" style="display:none" id="matricula2">
+            <div class="col-md-6" style="display:none" id="matricula2">
                 <div class="form-group form-float">
                     <div class="form-line">
                         <label >Clase vehiculo</label>
-     <select class="form-control" id="clase_vehiculo" onchange="sustrato_placas()" name="clase_vehiculo" data-live-search="true" >
-                           
+						<select class="form-control" id="clase_vehiculo" onchange="sustrato_placas()" name="clase_vehiculo" data-live-search="true" >
                             <option style='margin-left: 15px;' value=''>Seleccionar Tipo de servicio...</option>
-                            
-               
                             <?php
-                            
-                            // Obtener los datos de la tabla tramites
-$sqlTramites = "SELECT id, nombre FROM clase_vehiculo";
-$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+                            // Obtener los datos de la tabla clase_vehiculo
+							$sqlTramites = "SELECT id, nombre FROM clase_vehiculo";
+							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
                             if (sqlsrv_num_rows($resultTramites) > 0) {
                                 while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
@@ -242,16 +230,12 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                 <div class="form-group form-float">
                     <div class="form-line">
                         <label >Clasificación Vehiculo</label>
-     <select class="form-control" id="clasificacion_vehiculo" name="clasificacion_vehiculo" data-live-search="true">
-                           
+						<select class="form-control" id="clasificacion_vehiculo" name="clasificacion_vehiculo" data-live-search="true">
                             <option style='margin-left: 15px;' value=''>Seleccionar Tipo de servicio...</option>
-                            
-               
                             <?php
-                            
                             // Obtener los datos de la tabla tramites
-$sqlTramites = "SELECT id, nombre FROM vehiculos_clasificacion";
-$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+							$sqlTramites = "SELECT id, nombre FROM vehiculos_clasificacion";
+							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
                             if (sqlsrv_num_rows($resultTramites) > 0) {
                                 while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
@@ -261,13 +245,9 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                         </select>
                     </div>
                 </div>
-            
             </div> 
             
-            
               <div id="div_sustrato"></div>
-            
-            
                 <?php }else if($tipo_tramite == 2){  ?>
                    <div class="col-md-12"> 
                     <div class="col-md-6">
@@ -277,13 +257,12 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
             <select class="form-control" id="tipo_servicio" name="tipo_servicio" data-live-search="true">
                           
                             <option style='margin-left: 15px;' value=''>Seleccionar tipo de servicio...</option>
-                            
                   
                             <?php
                             
                             // Obtener los datos de la tabla tramites
-$sqlTramites = "SELECT id, nombre FROM tipo_servicio ";
-$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+							$sqlTramites = "SELECT id, nombre FROM tipo_servicio ";
+							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
                             if (sqlsrv_num_rows($resultTramites) > 0) {
                                 while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
@@ -294,21 +273,17 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                     </div>
                 </div>
             </div> 
-            
-                  <div class="col-md-6">
-                <div class="form-group form-float">
+			<div class="col-md-6">
+				<div class="form-group form-float">
                     <div class="form-line">
                         <label >Clase de vehiculo</label>
-         <select class="form-control" id="clase_vehiculo" name="clase_vehiculo" data-live-search="true">
-                          
+						<select class="form-control" id="clase_vehiculo" name="clase_vehiculo" data-live-search="true">
                             <option style='margin-left: 15px;' value=''>Seleccionar clase de vehiculo...</option>
-                            
-                  
                             <?php
                             
                             // Obtener los datos de la tabla tramites
-$sqlTramites = "SELECT id, nombre FROM clase_vehiculo ";
-$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
+							$sqlTramites = "SELECT id, nombre FROM clase_vehiculo ";
+							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
                             if (sqlsrv_num_rows($resultTramites) > 0) {
                                 while ($row = sqlsrv_fetch_array($resultTramites, SQLSRV_FETCH_ASSOC)) {
                                     echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
@@ -334,12 +309,8 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
         <h2>Tramites seleccionados</h2>
     </div>
     <br>
-<ul id="tramites-seleccionados"></ul>
-
-
-<div id="conceptos-tramite" class="conceptos-container"></div>
-
-
+	<ul id="tramites-seleccionados"></ul>
+	<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
     
  <?php }else if($tipo_tramite == 4){   ?>
@@ -348,22 +319,19 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
         <h2>Datos Comparendo(s)</h2>
     </div>
     <br>
-<div id="comparendos-seleccionados"></div>
+	<div id="comparendos-seleccionados"></div>
 
-<div id="conceptos-tramite" class="conceptos-container"></div>
-
+	<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
  
- <?php }else if($tipo_tramite == 6){   ?>
- <div class="card container-fluid">
-    <div class="header">
-        <h2>Derechos de transito</h2>
-    </div>
-    <br>
-<div id="dt-seleccionados"></div>
-
-<div id="conceptos-tramite" class="conceptos-container"></div>
-
+	<?php }else if($tipo_tramite == 6){   ?>
+		<div class="card container-fluid">
+			<div class="header">
+				<h2>Derechos de transito</h2>
+		</div>
+		<br>
+		<div id="dt-seleccionados"></div>
+		<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
  
  <?php }else if($tipo_tramite == 5){   ?>
@@ -511,13 +479,15 @@ $('#agregar-tramite').click(function() {
   var tramiteNombre = selectedTramite.text();
   var claseVehiculo = '';
   var tipoVehiculo ='';
+  var placa = '';
 
   if (tramiteId !== '') {
     if (tramiteId === '1') {
       claseVehiculo = $('#clase_vehiculo').val();
       
       tipoVehiculo = $('#tipo_servicio').val();
-      
+      placa = $('#placa').val();
+	  console.log('placa====',placa);
       // Validar campos obligatorios
       if (claseVehiculo === '' || $('#tipo_servicio').val() === '' || $('#clasificacion_vehiculo').val() === '' ) {
         var camposVacios = [];
@@ -546,6 +516,7 @@ $('#agregar-tramite').click(function() {
     tramiteElement.attr('data-tramite-id', tramiteId); // Agregar atributo data con el ID del trámite
     tramiteElement.attr('data-clase-id', claseVehiculo); // Agregar atributo data con el ID de la clase de vehiculo
     tramiteElement.attr('data-tipo-id', tipoVehiculo); // Agregar atributo data con el ID del tipo de vehiculo
+	tramiteElement.attr('data-placa-id', placa); // Agregar atributo data con el ID de la placa
 
     removeButton.click(function() {
       tramiteElement.remove(); // Eliminar el elemento del trámite
@@ -586,52 +557,59 @@ select_tramites();
     }
   });
 
-  function cargarConceptos(tramiteId, conceptosContainer,claseVehiculo,tipoVehiculo) {
-  var tramitesSeleccionados = [];
-  var placa = $('#placa').val();
+  function cargarConceptos(tramiteId, conceptosContainer, claseVehiculo, tipoVehiculo) {
+      var tramitesSeleccionados = [];
+      //var placa = $('#placa').val();
+	  var placa = $('#sustrato_placa').val(); 
 
-  $('#tramites-seleccionados .tramite-item').each(function() {
-    var tramiteId2 = $(this).attr('data-tramite-id');
-    var claseVehiculo = $(this).attr('data-clase-id');
-    var tipoVehiculo = $(this).attr('data-tipo-id');
-    tramitesSeleccionados.push({
-      tramiteId: tramiteId2,
-   
-    });
-  });
-     var sistematizacion = 0;
+      $('#tramites-seleccionados .tramite-item').each(function() {
+          var tramiteId2 = $(this).attr('data-tramite-id');
+          var claseVehiculo = $(this).attr('data-clase-id');
+          var claseVehiculo = $(this).attr('data-clase-id');
+          var tipoVehiculo = $(this).attr('data-tipo-id');
+          //var placa = $(this).attr('data-placa-id');
+          tramitesSeleccionados.push({
+              tramiteId: tramiteId2,
+
+          });
+      });
+      var sistematizacion = 0;
       // Aquí identificamos si el primer registro en tramitesSeleccionados es igual a tramiteId
-    if (tramitesSeleccionados[0].tramiteId == tramiteId) {
-        
-        sistematizacion = 1;
-      // Realiza la acción que necesitas cuando el primer registro coincide con tramiteId
-
-    }else{
-       sistematizacion = 0; 
-    }
-          
-          
-          console.log('tramitesSeleccionados',tramitesSeleccionados[0]);
-          
-          console.log('Tramite_id',tramiteId);
-          
-          console.log('sistematizacion',sistematizacion);
-          
-        
-    $.ajax({
-      url: 'obtener_conceptos.php',
-      method: 'GET',
-      data: { tramiteId: tramiteId, claseVehiculo:claseVehiculo,sistematizacion: sistematizacion,placa:placa,tipoVehiculo:tipoVehiculo, tramitesSeleccionados: tramitesSeleccionados},
-      success: function(response) {
-        var conceptos = JSON.parse(response);
-        mostrarConceptos(conceptos, conceptosContainer, tramiteId);
-        // alert(conceptos);
- //alert(tipoVehiculo);
-      },
-      error: function() {
-        alert('Error al cargar los conceptos.');
+      if (tramitesSeleccionados[0].tramiteId == tramiteId) {
+          sistematizacion = 1;
+          // Realiza la acción que necesitas cuando el primer registro coincide con tramiteId
+      } else {
+          sistematizacion = 0;
       }
-    });
+
+      console.log('tramiteId', tramiteId);
+      console.log('claseVehiculo', claseVehiculo);
+      console.log('sistematizacion', sistematizacion);
+      console.log('placa', placa);
+      console.log('tipoVehiculo', tipoVehiculo);
+      console.log('tramitesSeleccionados', tramitesSeleccionados[0]);
+
+      $.ajax({
+          url: 'obtener_conceptos.php',
+          method: 'GET',
+          data: {
+              tramiteId: tramiteId,
+              claseVehiculo: claseVehiculo,
+              sistematizacion: sistematizacion,
+              placa: placa,
+              tipoVehiculo: tipoVehiculo,
+              tramitesSeleccionados: tramitesSeleccionados
+          },
+          success: function(response) {
+              var conceptos = JSON.parse(response);
+              mostrarConceptos(conceptos, conceptosContainer, tramiteId);
+              // alert(conceptos);
+              //alert(tipoVehiculo);
+          },
+          error: function() {
+              alert('Error al cargar los conceptos.');
+          }
+      });
   }
   
 // Objeto para almacenar los valores modificados de los conceptos
@@ -735,14 +713,16 @@ $(document).on('input', '.input-valor', function() {
 
 
 function obtenerTramitesSeleccionados() {
-  var tramitesSeleccionados = [];
-  
-  var placa = $('#placa').val();
+	console.log('JLCM:liquidaciones.php:712:obtenerTramitesSeleccionados');
+	var tramitesSeleccionados = [];
+	//var placa = $('#placa').val();
+	var placa = $('#sustrato_placa').val(); 
 
   $('#tramites-seleccionados .tramite-item').each(function() {
     var tramiteId = $(this).attr('data-tramite-id');
     var claseVehiculo = $(this).attr('data-clase-id');
     var tipoVehiculo = $(this).attr('data-tipo-id');
+	console.log('JLCM:liquidaciones.php:720:obtenerTramitesSeleccionados tramiteId=' + tramiteId + ',claseVehiculo=' + claseVehiculo + ', placa:' + placa);
     tramitesSeleccionados.push({
       tramiteId: tramiteId,
       claseVehiculo: claseVehiculo,
@@ -766,6 +746,7 @@ function obtenerTramitesSeleccionados() {
   }
 
   // Enviar los tramites seleccionados por AJAX
+  console.log('total_liquidacion::placa',placa);
   $.ajax({
     url: 'total_liquidacion.php',
     method: 'POST',
@@ -836,49 +817,67 @@ function sustrato_placas() {
     }
   });
 }
+
 function obtenerTramitesSeleccionados2() {
-  var tramitesSeleccionados = [];
-var placa = $('#placa').val();
-var valor_nota = $('#valor_nota').val();
-  $('#tramites-seleccionados .tramite-item').each(function() {
-    var tramiteId = $(this).attr('data-tramite-id');
-    var claseVehiculo = $(this).attr('data-clase-id');
-    var tipoVehiculo = $(this).attr('data-tipo-id');
-    
-    tramitesSeleccionados.push({
-      tramiteId: tramiteId,
-      claseVehiculo: claseVehiculo
+    var tramitesSeleccionados = [];
+    //var placa = $('#placa').val();
+	var placa = $('#sustrato_placa').val(); 
+    var valor_nota = $('#valor_nota').val();
+    $('#tramites-seleccionados .tramite-item').each(function() {
+        var tramiteId = $(this).attr('data-tramite-id');
+        var claseVehiculo = $(this).attr('data-clase-id');
+		var tipoServicio = $('#tipo_servicio').val();
+		var tipoVehiculo = $(this).attr('data-tipo-id');
+		
+		console.log('JLCM:liquidaciones.php:823:obtenerTramitesSeleccionados2 tramiteId=' + tramiteId + ',claseVehiculo=' + claseVehiculo + ',tipoVehiculo=' + tipoVehiculo + ', placa:' + placa + ', valor_nota=' + valor_nota);
+		if (tipoVehiculo === '') {
+			tramitesSeleccionados.push({
+				tramiteId: tramiteId,
+				claseVehiculo: claseVehiculo
+			});			
+		}else{
+			tramitesSeleccionados.push({
+				tramiteId: tramiteId,
+				claseVehiculo: claseVehiculo,
+				tipoVehiculo:tipoVehiculo
+			});				
+		}
+
     });
-  });
 
-  // Enviar los tramites seleccionados por AJAX
-  $.ajax({
-    url: 'total_liquidacion.php',
-    method: 'POST',
-    data: { tramitesSeleccionados: tramitesSeleccionados, placa:placa, valor_nota: valor_nota },
-    success: function(response) {
-      $('#total_liquidacion2').html(response); // Mostrar el total en el div "total_liquidacion"
+    // Enviar los tramites seleccionados por AJAX
+    $.ajax({
+        url: 'total_liquidacion.php',
+        method: 'POST',
+        data: {
+            tramitesSeleccionados: tramitesSeleccionados,
+            placa: placa,
+            valor_nota: valor_nota
+        },
+        success: function(response) {
+            $('#total_liquidacion2').html(response); // Mostrar el total en el div "total_liquidacion"
 
-   
-    },
-    error: function() {
-      alert('Error al obtener el total de liquidación.');
 
-      // Restaurar la opción seleccionada en caso de error
-      if (opcionSeleccionada) {
-        $('#tramite').append($('<option>', {
-          value: opcionSeleccionada,
-          text: $('#tramite option[value="' + opcionSeleccionada + '"]').text()
-        }));
-      }
-    }
-  });
+        },
+        error: function() {
+            alert('Error al obtener el total de liquidación.');
+
+            // Restaurar la opción seleccionada en caso de error
+            if (opcionSeleccionada) {
+                $('#tramite').append($('<option>', {
+                    value: opcionSeleccionada,
+                    text: $('#tramite option[value="' + opcionSeleccionada + '"]').text()
+                }));
+            }
+        }
+    });
 }
 
 
 <?php if($tipo_tramite == 1 or $tipo_tramite == 2 or $tipo_tramite == 9){ ?>
 $('#guardar-liquidacion').click(function() {
   // Obtener los valores des los campos
+  alert('guardar-liquidacion #2');
   var tipoTramite = <?php echo $tipo_tramite; ?>;
   var ciudadano = $('#numero_documento').val();
   var placa = $('#placa').val();
@@ -918,19 +917,28 @@ $('#guardar-liquidacion').click(function() {
       return;
     }
     
-  // Agregar los valores modificados al objeto data
-  var dataToSend = {
-    tipoTramite: tipoTramite,
-    ciudadano: ciudadano,
-    placa: placa,
-    tipoServicio: tipoServicio,
-    claseVehiculo: claseVehiculo,
-    clasificacionVehiculo: clasificacionVehiculo,
-    tramitesSeleccionados: tramitesSeleccionados,
-    valoresModificados: valoresModificados,
-    valor_nota: valor_nota// Agregamos los valores modificados aquí
-    
-  };
+	// Agregar los valores modificados al objeto data
+	var dataToSend = {
+		tipoTramite: tipoTramite,
+		ciudadano: ciudadano,
+		placa: placa,
+		tipoServicio: tipoServicio,
+		claseVehiculo: claseVehiculo,
+		clasificacionVehiculo: clasificacionVehiculo,
+		tramitesSeleccionados: tramitesSeleccionados,
+		valoresModificados: valoresModificados,
+		valor_nota: valor_nota// Agregamos los valores modificados aquí
+	};
+
+	console.log('guardar_liquidacion.php::934::tipoTramite:  ' + tipoTramite);
+	console.log('guardar_liquidacion.php::934::ciudadano:' + ciudadano);
+	console.log('guardar_liquidacion.php::934::placa:' + placa);
+	console.log('guardar_liquidacion.php::934::tipoServicio:' + tipoServicio);
+	console.log('guardar_liquidacion.php::934::claseVehiculo:' + claseVehiculo);
+	console.log('guardar_liquidacion.php::934::clasificacionVehiculo:' + clasificacionVehiculo);
+	console.log('guardar_liquidacion.php::934::tramitesSeleccionados:' + tramitesSeleccionados);
+	console.log('guardar_liquidacion.php::934::tramitesSeleccionados:' + valoresModificados);
+	console.log('guardar_liquidacion.php::934::valor_nota:' + valor_nota);
 
   // Enviar los campos y tramites seleccionados al archivo PHP
   $.ajax({
@@ -938,12 +946,13 @@ $('#guardar-liquidacion').click(function() {
     method: 'POST',
     data: dataToSend,
     success: function(response) {
-      // Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
-    //   location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
-    
-     // Abrir la URL en una nueva pestaña
-    window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
-    location.href = './liquidaciones.php';
+		// Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
+		//   location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
+		
+		// Abrir la URL en una nueva pestaña
+		alert(response);
+		window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
+		location.href = './liquidaciones.php';
     },
     error: function() {
       alert('Error al guardar los trámites.');
@@ -1028,6 +1037,7 @@ $(document).ready(function() {
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
     // Obtener los valores de los campos
+	alert('guardar-liquidacion #3');
     var tipoTramite = <?php echo $tipo_tramite; ?>;
     var ciudadano = $('#numero_documento').val();
     var placa = $('#placa').val();
@@ -1057,16 +1067,26 @@ $(document).ready(function() {
 
 // Función para guardar la liquidación con tramitesSeleccionados como parámetro
 function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseVehiculo, clasificacionVehiculo, tramitesSeleccionados) {
-  // Obtener todos los tramites seleccionados
-  var tramitesIds = [];
-  var comparendos = []; 
-  tramitesSeleccionados.forEach(function(element) {
-  //  tramitesIds.push(element.tramiteId);
-    comparendos.push(element.comparendo);
-  });
+	// Obtener todos los tramites seleccionados
+	var tramitesIds = [];
+	var comparendos = []; 
+	tramitesSeleccionados.forEach(function(element) {
+	//  tramitesIds.push(element.tramiteId);
+	comparendos.push(element.comparendo);
+	});
 
-var valor_nota = $('#valor_nota').val();
-  // Enviar los campos y tramites seleccionados al archivo PHP
+	var valor_nota = $('#valor_nota').val();
+	  // Enviar los campos y tramites seleccionados al archivo PHP
+	  
+	console.log('guardar_liquidacion.php::1057::tipoTramite:  ' + tipoTramite);
+	console.log('guardar_liquidacion.php::1057::ciudadano:' + ciudadano);
+	console.log('guardar_liquidacion.php::1057::placa:' + placa);
+	console.log('guardar_liquidacion.php::1057::tipoServicio:' + tipoServicio);
+	console.log('guardar_liquidacion.php::1057::claseVehiculo:' + claseVehiculo);
+	console.log('guardar_liquidacion.php::1057::clasificacionVehiculo:' + clasificacionVehiculo);
+	console.log('guardar_liquidacion.php::1057::tramitesSeleccionados:' + comparendos);
+	console.log('guardar_liquidacion.php::1057::valor_nota:' + valor_nota);
+
   $.ajax({
     url: 'guardar_liquidacion.php',
     method: 'POST',
@@ -1085,8 +1105,9 @@ var valor_nota = $('#valor_nota').val();
      // location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
      
       // Abrir la URL en una nueva pestaña
-    window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
-    location.href = './liquidaciones.php';
+		console.log("OK insercion --> " + response);
+		window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
+		location.href = './liquidaciones.php';
     },
     error: function() {
       alert('Error al guardar los trámites.');
@@ -1135,6 +1156,7 @@ $(document).ready(function() {
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
     // Obtener los valores de los campos
+	alert('guardar-liquidacion #4');
     var tipoTramite = <?php echo $tipo_tramite; ?>;
     var ciudadano = $('#numero_documento').val();
     var placa = $('#placa').val();
@@ -1162,15 +1184,24 @@ $(document).ready(function() {
 
 // Función para guardar la liquidación con tramitesSeleccionados como parámetro
 function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseVehiculo, clasificacionVehiculo, tramitesSeleccionados) {
-  // Obtener todos los tramites seleccionados
-  var tramitesIds = [];
-  var dt = []; 
-  tramitesSeleccionados.forEach(function(element) {
-  //  tramitesIds.push(element.tramiteId);
-    dt.push(element.dt);
-  });
-var valor_nota = $('#valor_nota').val();
-  // Enviar los campos y tramites seleccionados al archivo PHP
+	// Obtener todos los tramites seleccionados
+	var tramitesIds = [];
+	var dt = []; 
+	tramitesSeleccionados.forEach(function(element) {
+	//  tramitesIds.push(element.tramiteId);
+	dt.push(element.dt);
+	});
+	var valor_nota = $('#valor_nota').val();
+	// Enviar los campos y tramites seleccionados al archivo PHP
+	console.log('guardar_liquidacion.php::1183::tipoTramite:  ' + tipoTramite);
+	console.log('guardar_liquidacion.php::1183::ciudadano:' + ciudadano);
+	console.log('guardar_liquidacion.php::1183::placa:' + placa);
+	console.log('guardar_liquidacion.php::1183::tipoServicio:' + tipoServicio);
+	console.log('guardar_liquidacion.php::1183::claseVehiculo:' + claseVehiculo);
+	console.log('guardar_liquidacion.php::1183::clasificacionVehiculo:' + clasificacionVehiculo);
+	console.log('guardar_liquidacion.php::1183::tramitesSeleccionados:' + dt);
+	console.log('guardar_liquidacion.php::1183::valor_nota:' + valor_nota);
+
   $.ajax({
     url: 'guardar_liquidacion.php',
     method: 'POST',
@@ -1242,6 +1273,7 @@ $(document).ready(function() {
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
     // Obtener los valores de los campos
+	alert('guardar-liquidacion #1');
     var tipoTramite = <?php echo $tipo_tramite; ?>;
     var ciudadano = $('#numero_documento').val();
     var placa = $('#placa').val();
@@ -1283,10 +1315,19 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
   });
   
   
-  // Convertir el arreglo a una cadena JSON
-var tramitesSeleccionadosJson = JSON.stringify(tramitesSeleccionados);
-var valor_nota = $('#valor_nota').val();
-  // Enviar los campos y tramites seleccionados al archivo PHP
+	// Convertir el arreglo a una cadena JSON
+	var tramitesSeleccionadosJson = JSON.stringify(tramitesSeleccionados);
+	var valor_nota = $('#valor_nota').val();
+	// Enviar los campos y tramites seleccionados al archivo PHP
+	console.log('guardar_liquidacion.php::1308::tipoTramite:  ' + tipoTramite);
+	console.log('guardar_liquidacion.php::1308::ciudadano:' + ciudadano);
+	console.log('guardar_liquidacion.php::1308::placa:' + placa);
+	console.log('guardar_liquidacion.php::1308::tipoServicio:' + tipoServicio);
+	console.log('guardar_liquidacion.php::1308::claseVehiculo:' + claseVehiculo);
+	console.log('guardar_liquidacion.php::1308::clasificacionVehiculo:' + clasificacionVehiculo);
+	console.log('guardar_liquidacion.php::1308::tramitesSeleccionados:' + tramitesSeleccionadosJson);
+	console.log('guardar_liquidacion.php::1308::valor_nota:' + valor_nota);
+
   $.ajax({
     url: 'guardar_liquidacion.php',
     method: 'POST',

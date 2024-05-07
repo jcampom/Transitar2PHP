@@ -5,23 +5,21 @@ if(!empty($_POST['plantilla'])){
   $plantilla = $_POST["plantilla"];  
 if(!empty($_POST['nueva'])){
 
-    $insertQuery = "INSERT INTO plantillas_resoluciones (nombre,plantilla,tipo_resolucion,estado_cambio,resoluciones_creadas,cargo_firma, firma_ciudadano) VALUES ('".$_POST['nombre']."','$plantilla','".$_POST['tipo_resolucion']."','".$_POST['estado_cambio']."','".$_POST['resoluciones_creadas']."','".trim($_POST['cargo_firma'])."','".$_POST['firma_ciudadano']."')";
-    
+    $insertQuery = "SET NOCOUNT ON;INSERT INTO plantillas_resoluciones (nombre,plantilla,tipo_resolucion,estado_cambio,resoluciones_creadas,cargo_firma, firma_ciudadano) VALUES ('".$_POST['nombre']."','$plantilla','".$_POST['tipo_resolucion']."','".$_POST['estado_cambio']."','".$_POST['resoluciones_creadas']."','".trim($_POST['cargo_firma'])."','".$_POST['firma_ciudadano']."');SELECT scope_identity() as lastid";
+    $result_insertQuery = sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'));
        // Ejecutar la consulta de inserción
-    if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
-                    $id_plantilla = mysqli_insert_id($mysqli); // Obtener el ID de la plantilla creada
+    if ($result_insertQuery){
+		$row = sqlsrv_fetch_array( $result_insertQuery, SQLSRV_FETCH_ASSOC)
+		$id_plantilla = $row['lastid']; //Obtener el ID de la plantilla creada
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
-        
-             $query_plantilla = "INSERT INTO menu_items (nombre, padre_id,enlace,empresa, fecha,fechayhora, usuario, icono) VALUES ('".$_POST['nombre']."', '84','resoluciones.php?id=$id_plantilla','$empresa','$fecha','$fechayhora','$idusuario','gavel')";
-        
-            
-               if (sqlsrv_query( $mysqli,$query_plantilla, array(), array('Scrollable' => 'buffered'))){
-   echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Ha sido agregada la nueva resolucion al menu.</div>';
-               }else{
-   echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';  
-    }  
+		$query_plantilla = "INSERT INTO menu_items (nombre, padre_id,enlace,empresa, fecha,fechayhora, usuario, icono) VALUES ('".$_POST['nombre']."', '84','resoluciones.php?id=$id_plantilla','$empresa','$fecha','$fechayhora','$idusuario','gavel')";
+		if (sqlsrv_query( $mysqli,$query_plantilla, array(), array('Scrollable' => 'buffered'))){
+			echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Ha sido agregada la nueva resolucion al menu.</div>';
+		}else{
+			echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';  
+		}
     }else{
-   echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';  
+		echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';  
     }
 }
 

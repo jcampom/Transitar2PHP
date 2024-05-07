@@ -15,12 +15,14 @@ if(!isset($_SESSION)){
 	session_start();
 }
 
+global $opcionesPerfil;
+
 date_default_timezone_set('America/Bogota');
 
 if(isset($_SESSION['usuario'])){
 	$idusuario = $_SESSION['usuario'];
 	$consulta = "SELECT * FROM usuarios where id = '$idusuario' ";
-	$resultadoconsulta=sqlsrv_query( $mysqli,$consulta);
+	$resultadoconsulta=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 	$rowconsulta = sqlsrv_fetch_array( $resultadoconsulta, SQLSRV_FETCH_ASSOC);
 	$_SESSION['MM_Username'] = $rowconsulta['usuario'];
 	
@@ -48,7 +50,7 @@ if(isset($_SESSION['usuario'])){
 			$opcionId = $row['opcion_id'];
 			//die('JLCM:conexion.php:#2 --> opcionId = '.$opcionId);
 			$consulta_padre = "SELECT id ,nombre ,enlace ,padre_id ,icono ,empresa ,fecha ,fechayhora ,usuario FROM menu_items where CAST(id AS VARCHAR) ='$opcionId' ";
-			$resultado_padre = sqlsrv_query( $mysqli,$consulta_padre);
+			$resultado_padre = sqlsrv_query( $mysqli,$consulta_padre, array(), array('Scrollable' => 'buffered'));
 			$parametros_padre = sqlsrv_fetch_array( $resultado_padre, SQLSRV_FETCH_ASSOC);
 			if (sqlsrv_num_rows($resultado_padre) > 0) {
 				if ($parametros_padre['padre_id'] > 0){
@@ -59,40 +61,43 @@ if(isset($_SESSION['usuario'])){
 		}
 		// Imprimir las opciones del perfil
 		//print_r($opcionesPerfil);
-		//die('JLCM:conexion.php:#3 --> print_r ');
+		//die('JLCM:conexion.php:#3 --> '. print_r($opcionesPerfil));
 
 	} else {
 		//    echo "No se encontraron opciones para el perfil";
 	}
 
 	// Consulta SQL para obtener los permisos especiales del usuario
-	$sql = "SELECT opcion_id FROM permisos_usuarios WHERE usuario = '$idusuario'";
-	$resultado = sqlsrv_query( $mysqli,$sql);
-
+	$sql = "SELECT opcion_id FROM permisos_usuarios WHERE usuario = ". $idusuario;
+	$resultado = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+	//die('JLCM:conexion.php:#4 --> '. $sql);
 	// Verificar si se obtuvieron resultados
+	//die('JLCM:conexion.php:#4.1 --> '. $sql . ' = '. sqlsrv_num_rows($resultado));
 	if (sqlsrv_num_rows($resultado) > 0) {
-
+		//die('JLCM:conexion.php:#4.1 --> '. sqlsrv_num_rows($resultado));
 		// Recorrer los resultados y almacenar las opciones en la variable de los permisos del usuario
 		while ($row = sqlsrv_fetch_array( $resultado, SQLSRV_FETCH_ASSOC)) {
 			$opcionId = $row['opcion_id'];
 			$consulta_padre = "SELECT * FROM menu_items where CAST(id AS VARCHAR)= '$opcionId' ";
-			$resultado_padre = sqlsrv_query( $mysqli,$consulta_padre);
+			//echo 'JLCM:conexion.php:#5--> consulta_padre= '.$consulta_padre;
+			$resultado_padre = sqlsrv_query( $mysqli,$consulta_padre, array(), array('Scrollable' => 'buffered'));
 			$parametros_padre = sqlsrv_fetch_array( $resultado_padre, SQLSRV_FETCH_ASSOC);
 			if(@$parametros_padre['padre_id'] > 0){
 				$padre_op =$parametros_padre['padre_id'];
 				$opcionesPerfil[] = $parametros_padre['padre_id'];
 			}
 		}
+		
 
 		$consulta_parametros_liquidacion = "SELECT * FROM parametros_liquidacion where Tparametrosliq_ID = '1' ";
 
-		$resultado_parametros_liquidacion = sqlsrv_query( $mysqli,$consulta_parametros_liquidacion);
+		$resultado_parametros_liquidacion = sqlsrv_query( $mysqli,$consulta_parametros_liquidacion, array(), array('Scrollable' => 'buffered'));
 
 		$parametros_liquidacion = sqlsrv_fetch_array( $resultado_parametros_liquidacion, SQLSRV_FETCH_ASSOC);
 
 		$consulta_parametros_economicos = "SELECT * FROM parametros_economicos where Tparameconomicos_ID = '1' ";
 
-		$resultado_parametros_economicos = sqlsrv_query( $mysqli,$consulta_parametros_economicos);
+		$resultado_parametros_economicos = sqlsrv_query( $mysqli,$consulta_parametros_economicos, array(), array('Scrollable' => 'buffered'));
 
 		$parametros_economicos = sqlsrv_fetch_array( $resultado_parametros_economicos, SQLSRV_FETCH_ASSOC) ;
 
@@ -116,6 +121,10 @@ if(isset($_SESSION['usuario'])){
 		$fechayhora = date("Y-m-d H:i:s");
 
 		$opcionesPerfil[] = $opcionId;
+		
+		
+		
+		//print_r($opcionesPerfil);die('JLCM:conexion.php:#6');
 
 	}
 
@@ -127,7 +136,7 @@ if(isset($_SESSION['usuario'])){
 function ParamWebService(){
     global $mysqli;
     $sql = "SELECT * FROM parametros_simit_ws";
-    $result = sqlsrv_query( $mysqli,$sql);
+    $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     if (sqlsrv_num_rows($result) > 0) {
         $row_parm = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC) ; 
@@ -142,10 +151,9 @@ function ParamGen() {
     global $mysqli;
     $query_param = "SELECT Tparamgenerales_img_logo, Tparamgenerales_img_fondo, Tparamgenerales_titulo_app, Tparamgenerales_nombre_app, Tparamgenerales_diasnotifica, Tparamgenerales_minutossesion, Tparamgenerales_favicon from parametros_generales WHERE Tparamgenerales_ID = 1";
 
-    $result = sqlsrv_query( $mysqli,$query_param);
+    $result = sqlsrv_query( $mysqli,$query_param, array(), array('Scrollable' => 'buffered'));
     $row_param = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC) ; 
-    $result->free_result();
-
+	sqlsrv_free_stmt( $result);
     return $row_param;
 }
 
@@ -154,9 +162,9 @@ function ParamRecaudo() {
     global $mysqli;
     $query_paramrecaudo = "SELECT * from parametros_recaudo WHERE Tparametrosrecaudo_ID = 1";
 
-    $result = sqlsrv_query( $mysqli,$query_paramrecaudo);
+    $result = sqlsrv_query( $mysqli,$query_paramrecaudo, array(), array('Scrollable' => 'buffered'));
     $row_paramrecaudo = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
-    $result->free_result();
+    sqlsrv_free_stmt( $result);
 
     return $row_paramrecaudo;
 }
@@ -166,9 +174,9 @@ function ParamEcono() {
     global $mysqli;
     $query_parame = "SELECT * FROM parametros_economicos WHERE Tparameconomicos_ID = 1";
 
-    $result = sqlsrv_query( $mysqli,$query_parame);
+    $result = sqlsrv_query( $mysqli,$query_parame, array(), array('Scrollable' => 'buffered'));
     $row_parame =sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC); 
-    $result->free_result();
+    sqlsrv_free_stmt( $result);
 
     return $row_parame;
 }
@@ -178,9 +186,9 @@ function ParamLiquida() {
     global $mysqli;
     $sql = "SELECT * FROM parametros_liquidacion";
 
-    $parmliq = sqlsrv_query( $mysqli,$sql);
+    $parmliq = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     $row_parmliq =sqlsrv_fetch_array( $parmliq, SQLSRV_FETCH_ASSOC); 
-    $parmliq->free_result();
+	sqlsrv_free_stmt( $parmliq);
 
     return $row_parmliq;
 }
@@ -189,7 +197,7 @@ function ParamLiquida() {
 function BuscarSedes(){
     global $mysqli;
     $sql = "SELECT * FROM sedes WHERE ppal=1";
-    $result = sqlsrv_query( $mysqli,$sql);
+    $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     // Verificar si la consulta se ejecutó correctamente
     if (!$result) {
@@ -272,7 +280,7 @@ function ValDiaHabil($fecha, $tipo = 0) {
 function getCompDate($ncomparendo) {
         global $mysqli; // Usar la conexión global $mysqli
     $fcomp = "SELECT DATE_FORMAT(Tcomparendos_fecha, '%Y-%m-%d') AS compfecha FROM comparendos WHERE Tcomparendos_comparendo = '$ncomparendo'";
-    $query_fcomp = sqlsrv_query( $mysqli,$fcomp);
+    $query_fcomp = sqlsrv_query( $mysqli,$fcomp, array(), array('Scrollable' => 'buffered'));
 
     if ($query_fcomp) {
         if (sqlsrv_num_rows($query_fcomp) > 0) {
@@ -281,7 +289,7 @@ function getCompDate($ncomparendo) {
         } else {
             $fComp = "";
         }
-        $query_fcomp->free_result();
+		sqlsrv_free_stmt( $query_fcomp);
     } else {
         $fComp = "";
     }
@@ -294,7 +302,7 @@ function getFnotifica($ncomparendo) {
 
     // Consulta para obtener la fecha de notificación
     $fnotcomp = "SELECT Tnotifica_notificaf FROM Tnotifica WHERE Tnotifica_comparendo = '$ncomparendo'";
-    $result = sqlsrv_query( $mysqli,$fnotcomp);
+    $result = sqlsrv_query( $mysqli,$fnotcomp, array(), array('Scrollable' => 'buffered'));
 
     if (sqlsrv_num_rows($result) > 0) {
         $row_fnotcomp =sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
@@ -362,7 +370,7 @@ function DiasFestivos($fechaini, $fechafin, $tipo = 1){
     global $mysqli;
 
     $sql = "SELECT * FROM festivos WHERE Tfestivos_fecha BETWEEN '$fechaini' AND '$fechafin' AND DAYOFWEEK(Tfestivos_fecha) NOT IN (1,7) AND Tfestivos_tipo = 1";
-    $result = sqlsrv_query( $mysqli,$sql);
+    $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     $totalRows_diasf =sqlsrv_num_rows($result) ;
 
     return $totalRows_diasf;
@@ -372,15 +380,17 @@ function DiasFestivos($fechaini, $fechafin, $tipo = 1){
 // Function to search for the minimum wage (salario minimo) for a fine (comparendo) according to the corresponding year.
 function BuscarSMLV($anio, $original = false) {
     global $mysqli;
-    $anio = mysqli_real_escape_string($mysqli, $anio);
+
     $original = $original ? 1 : 0;
     
-    $sqll = "SELECT * FROM smlv WHERE smlv ='$anio'";
-    $queryl=sqlsrv_query( $mysqli,$sqll, array(), array('Scrollable' => 'buffered'));
+    $sqll = "SELECT * FROM smlv WHERE smlv =?";
+	$parameters = [$anio];
+	
+    $queryl=sqlsrv_query( $mysqli,$sqll, $parameters, array('Scrollable' => 'buffered'));
     $totalRows_servl = sqlsrv_num_rows($queryl);
 
     if ($totalRows_servl == 0) {
-        $sql2 = "SELECT * FROM smlv ORDER BY smlv DESC LIMIT 1";
+        $sql2 = "SELECT TOP 1 * FROM smlv ORDER BY smlv DESC";
         $queryl=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
     }
 
@@ -393,14 +403,15 @@ function BuscarSMLV($anio, $original = false) {
 // Function to search for the UVT value according to the corresponding year.
 function BuscarUVT($anio) {
     global $mysqli;
-    $anio = mysqli_real_escape_string($mysqli, $anio);
 
-    $sqll = "SELECT uvt_original FROM smlv WHERE smlv='$anio'";
-    $queryl=sqlsrv_query( $mysqli,$sqll, array(), array('Scrollable' => 'buffered'));
+    $sqll = "SELECT uvt_original FROM smlv WHERE smlv=?";
+	$parameters = [$anio];
+    $queryl=sqlsrv_query( $mysqli,$sqll, $parameters, array('Scrollable' => 'buffered'));
+	
     $totalRows_servl = sqlsrv_num_rows($queryl);
 
     if ($totalRows_servl == 0) {
-        $sql2 = "SELECT uvt_original FROM smlv ORDER BY smlv DESC LIMIT 1";
+        $sql2 = "SELECT TOP 1 uvt_original FROM smlv ORDER BY smlv DESC";
         $queryl=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
     }
 
@@ -678,7 +689,7 @@ function BuscarDerechoTran($id){
     global $mysqli;
 
     $query_placa = "SELECT * FROM derechos_transito WHERE TDT_ID='$id'";
-    $placa = sqlsrv_query( $mysqli,$query_placa);
+    $placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
     $row_placa =sqlsrv_fetch_array( $placa, SQLSRV_FETCH_ASSOC);
     
     return $row_placa;
@@ -689,7 +700,7 @@ function BuscarTramConceptos($tramite){
     global $mysqli;
 
     $query_conceptos = "SELECT * FROM detalle_tramites WHERE tramite_id='$tramite'";
-    $conceptos = sqlsrv_query( $mysqli,$query_conceptos);
+    $conceptos = sqlsrv_query( $mysqli,$query_conceptos, array(), array('Scrollable' => 'buffered'));
     
     return $conceptos;
 }
@@ -699,7 +710,7 @@ function DatosPlacaPlaca($placa){
     global $mysqli;
 
     $query_placa = "SELECT * FROM placas WHERE Tplacas_placa='$placa'";
-    $sql_placa = sqlsrv_query( $mysqli,$query_placa);
+    $sql_placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
     $row_placa =sqlsrv_fetch_array( $sql_placa, SQLSRV_FETCH_ASSOC);
     $totalRows_placa =sqlsrv_num_rows($sql_placa) ;
 
@@ -712,7 +723,7 @@ function BuscarConceptos($val, $fecha, $nrepetir = '', $clase = '', $servicio = 
 
     if ($clase !== '') {
         $sqlparam = "SELECT TOP 1 Tparametrosliq_agrupa AS agrupar FROM parametros_liquidacion";
-        $param = sqlsrv_query( $mysqli,$sqlparam);
+        $param = sqlsrv_query( $mysqli,$sqlparam, array(), array('Scrollable' => 'buffered'));
         $paramliq =sqlsrv_fetch_array( $param, SQLSRV_FETCH_ASSOC);
 
         if ($paramliq['agrupar']) {
@@ -751,7 +762,7 @@ function BuscarConceptos($val, $fecha, $nrepetir = '', $clase = '', $servicio = 
 
     $sql = "SELECT * FROM conceptos WHERE id='$val'" . $wq . $cl . $sv . $tt;
 
-    $query = sqlsrv_query( $mysqli,$sql);
+    $query = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     if (sqlsrv_num_rows($query) > 0) {
         $row_query =sqlsrv_fetch_array( $query, SQLSRV_FETCH_ASSOC);
@@ -774,7 +785,7 @@ function BuscarConceptos($val, $fecha, $nrepetir = '', $clase = '', $servicio = 
         }
 
         $sqlcf = "SELECT * FROM conceptos WHERE id='$val'" . $fechaconp . $wq;
-        $querycf = sqlsrv_query( $mysqli,$sqlcf);
+        $querycf = sqlsrv_query( $mysqli,$sqlcf, array(), array('Scrollable' => 'buffered'));
     } else {
         $querycf = $query;
     }
@@ -786,7 +797,7 @@ function BuscarTramConcepIntHon($val){
     global $mysqli;
 
     $sql = "SELECT * FROM detalle_tramites WHERE concepto_id='$val' ORDER BY concepto_id";
-    $query = sqlsrv_query( $mysqli,$sql);
+    $query = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     return $query;
 }
@@ -800,7 +811,7 @@ function BuscarIPC($anio){
 
     if ($anio < $aniohoy) {
         $sql = "SELECT SUM(TIPC_IPC) AS ipc FROM ipc WHERE TIPC_ano BETWEEN '$annio' AND '$aniohoy'";
-        $query = sqlsrv_query( $mysqli,$sql);
+        $query = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
         $row_query = $query->fetch_array();
         $result = $row_query['ipc'];
     } else {
@@ -816,7 +827,7 @@ function DerechoTranId($id) {
 
     $consulta2 = "";
     $query_parame = "SELECT * FROM parametros_economicos WHERE Tparameconomicos_ID = 1";
-    $parame = sqlsrv_query( $mysqli,$query_parame);
+    $parame = sqlsrv_query( $mysqli,$query_parame, array(), array('Scrollable' => 'buffered'));
     $row_parame = sqlsrv_fetch_array( $parame, SQLSRV_FETCH_ASSOC);
 
     $fechahoy = date('d-m-Y');
@@ -986,7 +997,7 @@ function generar_formulario($formularioId) {
     
     // Consultar la tabla "formularios" para obtener los detalles del formulario
 $consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
-$resultado = sqlsrv_query( $mysqli,$consulta);
+$resultado = sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 $existe = sqlsrv_fetch_array( $resultado, SQLSRV_FETCH_ASSOC);
 
 $campos = $existe['campos'];
@@ -1000,7 +1011,7 @@ $nombre_tabla = $existe['nombre'];
     echo '<br>';
 
     $consultaCampos = "SELECT campo, tipo, requerido, dinamico FROM `detalle_formularios` WHERE formulario = $formularioId";
-    $resultadoCampos = sqlsrv_query( $mysqli,$consultaCampos);
+    $resultadoCampos = sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
     $cantidad_campos = 0;
 
     if ($resultadoCampos && sqlsrv_num_rows($resultadoCampos) > 0) {
@@ -1025,7 +1036,7 @@ $nombre_tabla = $existe['nombre'];
                 }
                 echo '>';
                 $consultaRegistros2 = "SELECT id, nombre FROM $dinamico";
-                $resultadoRegistros2 = sqlsrv_query( $mysqli,$consultaRegistros2);
+                $resultadoRegistros2 = sqlsrv_query( $mysqli,$consultaRegistros2, array(), array('Scrollable' => 'buffered'));
 
                 while ($registro2 = sqlsrv_fetch_array( $resultadoRegistros2 , SQLSRV_FETCH_ASSOC)) {
                     echo '<option style="margin-left: 15px;" value="' . $registro2['id'] . '">' . $registro2['nombre'] . '</option>';
@@ -1165,18 +1176,18 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
     
     // Consulta a la tabla comparendos
     $sql = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$numeroDocumento'";
-    $result = sqlsrv_query( $mysqli,$sql);
+    $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     $row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
     
     // Obtenemos el valor en SMLV del comparendo
     $consulta_valor = "SELECT * FROM comparendos_codigos WHERE TTcomparendoscodigos_codigo = '" . $row['Tcomparendos_codinfraccion'] . "'";
-    $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor);
+    $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
     $row_valor = sqlsrv_fetch_array( $resultado_valor, SQLSRV_FETCH_ASSOC);
     
     // Obtenemos el valor del SMLV del año
     
     $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
-    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
     $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
     
     if ($ano_comparendo > 2019) {
@@ -1192,13 +1203,13 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
     
     // Realizar la consulta para obtener los conceptos asociados al comparendo
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '39'";
-    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite);
+    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total = 0;
     
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
-            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto);
+            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
             
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
@@ -1209,7 +1220,7 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
             
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano'";
-                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
                 
                 if ($row_concepto['valor_SMLV_UVT'] == 0) {
@@ -1249,13 +1260,13 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
     
     // Realizar la consulta para obtener los conceptos asociados al amnistías
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
-    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite);
+    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total2 = 0;
     
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
-            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto);
+            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
             
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
@@ -1266,7 +1277,7 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
             
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
-                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
                 
                 if ($row_concepto['porcentaje'] > 0) {
@@ -1331,18 +1342,18 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
     
     // Consulta a la tabla comparendos
     $sql = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$numeroDocumento'";
-    $result = sqlsrv_query( $mysqli,$sql);
+    $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     $row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
     
     // Obtenemos el valor en SMLV del comparendo
     $consulta_valor = "SELECT * FROM comparendos_codigos WHERE TTcomparendoscodigos_codigo = '" . $row['Tcomparendos_codinfraccion'] . "'";
-    $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor);
+    $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
     $row_valor = sqlsrv_fetch_array( $resultado_valor, SQLSRV_FETCH_ASSOC);
     
     // Obtenemos el valor del SMLV del año
     
     $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
-    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
     $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
     
     if ($ano_comparendo > 2019) {
@@ -1358,13 +1369,13 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
     
     // Realizar la consulta para obtener los conceptos asociados al comparendo
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '39'";
-    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite);
+    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total = 0;
     
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
-            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto);
+            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
             
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
@@ -1375,7 +1386,7 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
             
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano'";
-                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
                 
                 if ($row_concepto['valor_SMLV_UVT'] == 0) {
@@ -1419,13 +1430,13 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
     
     // Realizar la consulta para obtener los conceptos asociados al amnistías
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
-    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite);
+    $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total2 = 0;
     
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
-            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto);
+            $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
             
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
@@ -1436,7 +1447,7 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
             
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
-                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+                $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
                 
                 if ($row_concepto['porcentaje'] > 0) {
@@ -1510,26 +1521,26 @@ function generar_resolucion($comparendo, $plantilla,$tipo = 9999999999999999) {
   
   //obtenemos informacion de plantilla  
     $sql_plantilla = "SELECT * FROM plantillas_resoluciones WHERE id  = '$plantilla' or tipo_resolucion = '$tipo'";
-    $result_plantilla = sqlsrv_query( $mysqli,$sql_plantilla);
+    $result_plantilla = sqlsrv_query( $mysqli,$sql_plantilla, array(), array('Scrollable' => 'buffered'));
     $row_plantilla = sqlsrv_fetch_array( $result_plantilla, SQLSRV_FETCH_ASSOC);
 
     $contenido = $row_plantilla['plantilla'];
 //obtenemos informacion comparendo
     $sql_comparendo = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$comparendo'";
-    $result_comparendo = sqlsrv_query( $mysqli,$sql_comparendo);
+    $result_comparendo = sqlsrv_query( $mysqli,$sql_comparendo, array(), array('Scrollable' => 'buffered'));
     $row_comparendo = sqlsrv_fetch_array( $result_comparendo, SQLSRV_FETCH_ASSOC);
 
     $fecha_comparendo = fecha_letras($row_comparendo['Tcomparendos_fecha']);
     
 //obtenemos informacion codigo comparendo
     $sql_comparendo_codigo = "SELECT * FROM comparendos_codigos WHERE TTcomparendoscodigos_codigo = '".$row_comparendo['Tcomparendos_codinfraccion']."'";
-    $result_comparendo_codigo = sqlsrv_query( $mysqli,$sql_comparendo_codigo);
+    $result_comparendo_codigo = sqlsrv_query( $mysqli,$sql_comparendo_codigo, array(), array('Scrollable' => 'buffered'));
     $row_comparendo_codigo = sqlsrv_fetch_array( $result_comparendo_codigo, SQLSRV_FETCH_ASSOC);
 
 
 //obtenemos informacion de ciudadanos
     $sql_ciudadano = "SELECT * FROM ciudadanos where numero_documento = '".$row_comparendo['Tcomparendos_idinfractor']."'";
-    $resultado_ciudadano = sqlsrv_query( $mysqli,$sql_ciudadano);
+    $resultado_ciudadano = sqlsrv_query( $mysqli,$sql_ciudadano, array(), array('Scrollable' => 'buffered'));
     $ciudadano = sqlsrv_fetch_array( $resultado_ciudadano, SQLSRV_FETCH_ASSOC);
     
      //obtenemos informacion de la resolucion
@@ -1539,19 +1550,19 @@ function generar_resolucion($comparendo, $plantilla,$tipo = 9999999999999999) {
 
 //obtenemos informacion de ciudades
     $sql_ciudades= "SELECT * FROM ciudades where id = '".$ciudadano['ciudad_residencia']."'";
-    $resultado_ciudades = sqlsrv_query( $mysqli,$sql_ciudades);
+    $resultado_ciudades = sqlsrv_query( $mysqli,$sql_ciudades, array(), array('Scrollable' => 'buffered'));
     $ciudades = sqlsrv_fetch_array( $resultado_ciudades, SQLSRV_FETCH_ASSOC);
     $ciudad_ciudadano = $ciudades['nombre'];
     $nombre_ciudadano = $ciudadano['nombres'] ." ".$ciudadano['apellidos'];
 
 //obtenemos informacion de ciudades comparendo
     $sql_ciudades_comparendo= "SELECT * FROM ciudades where id = '".$row_comparendo['Tcomparendos_municipiodir']."'";
-    $resultado_ciudades_comparendo = sqlsrv_query( $mysqli,$sql_ciudades_comparendo);
+    $resultado_ciudades_comparendo = sqlsrv_query( $mysqli,$sql_ciudades_comparendo, array(), array('Scrollable' => 'buffered'));
     $ciudades_comparendo = sqlsrv_fetch_array( $resultado_ciudades_comparendo, SQLSRV_FETCH_ASSOC);
     
     //obtenemos informacion de tipo identificación
     $sql_tipoid= "SELECT * FROM tipo_identificacion where id = '".$ciudadano['tipo_documento']."'";
-    $resultado_tipoid = sqlsrv_query( $mysqli,$sql_tipoid);
+    $resultado_tipoid = sqlsrv_query( $mysqli,$sql_tipoid, array(), array('Scrollable' => 'buffered'));
     $tipoid = sqlsrv_fetch_array( $resultado_tipoid, SQLSRV_FETCH_ASSOC);
     
     $ciudad_comparendo = $ciudades_comparendo['nombre'];
@@ -1610,11 +1621,11 @@ function obtener_sistematizacion_comparendo($ano) {
     global $mysqli; // Asegúrate de que $mysqli esté disponible en el ámbito global si no está definido aquí.
 
     $consulta_concepto = "SELECT * FROM conceptos WHERE id = '1000000166'";
-    $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto);
+    $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
     $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
 
     $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano'";
-    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
     $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
 
     if ($row_concepto['valor_SMLV_UVT'] == 0) {
@@ -1632,13 +1643,13 @@ function valor_infraccion_comparendo($infraccion, $fecha_notifica) {
     global $mysqli; // Asegúrate de que $mysqli esté disponible en el ámbito global si no está definido aquí.
 
     $consulta_valor = "SELECT * FROM comparendos_codigos WHERE TTcomparendoscodigos_codigo = '$infraccion'";
-    $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor);
+    $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
     $row_valor = sqlsrv_fetch_array( $resultado_valor, SQLSRV_FETCH_ASSOC);
 
     $ano_comparendo = substr($fecha_notifica, 0, 4);
 
     $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
-    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv);
+    $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
     $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
 
     if ($ano_comparendo > 2019) {
@@ -1712,7 +1723,7 @@ function BuscarPropietario1($doc, $tipo) {
 function TipoPlac($serv, $clase, $clasifi){
     global $mysqli;
     $query_placa = "SELECT * FROM Tplacas WHERE Tplacas_servicio='$serv' AND Tplacas_clase='$clase' AND Tplacas_clasif='$clasifi' AND Tplacas_estado=3 ORDER BY Tplacas_ID ASC";
-    $placa = sqlsrv_query( $mysqli,$query_placa);
+    $placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
     $row_placa = sqlsrv_fetch_array( $placa, SQLSRV_FETCH_ASSOC);
     $totalRows_placa =sqlsrv_num_rows($placa) ;
     return $row_placa;
@@ -1727,7 +1738,7 @@ function BuscarPlacas($idplaca) {
         $query_placa = "SELECT * FROM Tplacas WHERE Tplacas_placa='$idplaca'";
     }
     //echo "|".$query_placa."|<br>";
-    $placa = sqlsrv_query( $mysqli,$query_placa);
+    $placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
     $row_placa = sqlsrv_fetch_array( $placa, SQLSRV_FETCH_ASSOC);
     return $row_placa;
 }
@@ -1737,7 +1748,7 @@ function BuscarClasePlacas($idclaseplaca) {
     global $mysqli;
     if (is_numeric($idclaseplaca)) {
         $query_placa = "SELECT * FROM TVehiculos_clase WHERE Tclase_ID=" . $idclaseplaca;
-        $placa = sqlsrv_query( $mysqli,$query_placa);
+        $placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
         $row_placa = sqlsrv_fetch_array( $placa, SQLSRV_FETCH_ASSOC);
     } else {
         $row_placa = null;
@@ -1755,7 +1766,7 @@ function DatosPlaca($placa){
         $query_placa = "SELECT * FROM Tplacas WHERE Tplacas_placa='$placa' AND Tplacas_estado=5";
     }
 
-    $placa = sqlsrv_query( $mysqli,$query_placa);
+    $placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
     $row_placa = sqlsrv_fetch_array( $placa, SQLSRV_FETCH_ASSOC);
     $totalRows_placa =sqlsrv_num_rows($placa) ;
     return $row_placa;
@@ -1766,7 +1777,7 @@ function VerificaPlaca($placa, $num){
     global $mysqli;
     $query_placa = "SELECT * FROM Tplacas WHERE Tplacas_placa='$placa' AND Tplacas_estado='$num'";
     //echo "|".$query_placa."|<br>";
-    $placa = sqlsrv_query( $mysqli,$query_placa);
+    $placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
     $row_placa = sqlsrv_fetch_array( $placa, SQLSRV_FETCH_ASSOC);
     $totalRows_placa =sqlsrv_num_rows($placa) ;
     if($totalRows_placa>0){
@@ -1798,7 +1809,7 @@ function gen_pdfheadfirm($userfirma = null){
             WHERE  
                 (sedes.ppal = 1)";
 
-    $query_header = sqlsrv_query( $mysqli,$head);
+    $query_header = sqlsrv_query( $mysqli,$head, array(), array('Scrollable' => 'buffered'));
     $result_header = sqlsrv_fetch_array( $query_header, SQLSRV_FETCH_ASSOC);
     return $result_header;
 }
@@ -1821,7 +1832,7 @@ function BuscarVehiPlaca($tabla, $condicion, $buscar, $orden) {
     global $mysqli;
     $sql = "SELECT " . $buscar . " FROM " . $tabla . " " . $condicion . " " . $orden;
     // echo $sql . "#<br>"; // Si deseas depurar la consulta SQL, puedes habilitar esta línea
-    $query = sqlsrv_query( $mysqli,$sql);
+    $query = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     return $query;
 }
 
@@ -1835,7 +1846,7 @@ global $mysqli;
     
     $Query = "SELECT " . $campo1 . ", " . $campo2 . " FROM " . $Tabla . " " . $condicion . " ORDER BY " . $campo_order;
     $Combo = "";
-    $Result = sqlsrv_query( $mysqli,$Query);
+    $Result = sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
     if ($Result) {
         if (isset($_GET['ver'])) {
             $desabilitado = " disabled ";
@@ -1863,7 +1874,7 @@ function traenombrecampo($Tabla, $campo1, $campo2, $campo_order, $condicion){
     global $mysqli;
     
     $Query = "SELECT " . $campo2 . " FROM " . $Tabla . " WHERE " . $campo1 . " = " . $condicion;
-    $Result = sqlsrv_query( $mysqli,$Query);
+    $Result = sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
 
     if ($Result) {
         $columnas = $Result->fetch_row();
@@ -1885,7 +1896,7 @@ function Sindatos($val){
 	function DatosCiudadano($doc){
 	        global $mysqli;
 	$sql = "SELECT * FROM ciudadanos WHERE numero_documento='$doc'";
-	$query = sqlsrv_query( $mysqli,$sql);
+	$query = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 	$row_query = sqlsrv_fetch_array( $query, SQLSRV_FETCH_ASSOC);
 	return $row_query;
 }
@@ -1895,7 +1906,7 @@ function TipoDocumento($id){
     
     global $mysqli;
 	$query_doc = "SELECT * FROM tipo_identificacion WHERE id='$id'";
-	$doc = sqlsrv_query( $mysqli,$query_doc);
+	$doc = sqlsrv_query( $mysqli,$query_doc, array(), array('Scrollable' => 'buffered'));
 	$row_doc = sqlsrv_fetch_array( $doc, SQLSRV_FETCH_ASSOC);
 
 	return $row_doc['nombre'];

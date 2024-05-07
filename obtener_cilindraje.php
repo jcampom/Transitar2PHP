@@ -4,6 +4,7 @@
 
 <!-- JS de Bootstrap Select -->
 <!--script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/js/bootstrap-select.min.js"></script-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
 
 
 <?php

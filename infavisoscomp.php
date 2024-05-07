@@ -15,7 +15,7 @@ if (isset($_GET['generar'])) {
         $andwhere .= " AND Tcomparendos_idinfractor = '{$_GET['infractor']}'";
     }
 
-    $query = "SELECT ressan_comparendo AS comparendo, ressan_archivo AS resolucion, ressan_id AS resId,
+    $query = "SELECT TOP 1000 ressan_comparendo AS comparendo, ressan_archivo AS resolucion, ressan_id AS resId,
                 N.Tnotifica_notificaf AS fnotifica, NE.nombre AS estado, A.desfijar, A.archivo AS aviso,
                 CAST(A.fecha AS DATE) AS faviso, A.id AS avisoId, RT.sigla AS sigla, 
                 R.ressan_ano AS anio, R.ressan_numero AS numres, A.numero, A.indmasiv, ValorCompSMLV(Tcomparendos_ID) AS COMVALOR
@@ -27,8 +27,7 @@ if (isset($_GET['generar'])) {
                 INNER JOIN Tnotifica_estados NE ON N.Tnotifica_estado = NE.id
                 INNER JOIN comparendos C ON C.Tcomparendos_ID = N.Tnotifica_compid
             WHERE CAST(A.fecha AS DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere
-            ORDER BY fecha DESC, R.ressan_id DESC
-            LIMIT 1000"; // Emula TOP 1000 en MySQL
+            ORDER BY fecha DESC, R.ressan_id DESC"; // Emula TOP 1000 en MySQL
 
 // echo $query;
     $registros = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));

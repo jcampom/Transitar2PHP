@@ -16,7 +16,7 @@ if (isset($_GET['generar'])) {
         $andwhere .= " AND Tcomparendos_idinfractor = '{$_GET['infractor']}'";
     }
 
-    $query = "SELECT Tcomparendos_comparendo as comparendo, Tcomparendos_fecha AS fechacomp, N.id AS notId,
+    $query = "SELECT TOP 1000 Tcomparendos_comparendo as comparendo, Tcomparendos_fecha AS fechacomp, N.id AS notId,
                 C1.numero_documento AS newdoc, (C1.nombres + ' ' + C1.apellidos) AS newnomb,
                 C2.numero_documento AS antdoc, (C2.nombres + ' ' + C2.apellidos) AS antnomb, 
                 Tcomparendos_origen AS origen, archivo, documento, CAST(N.fecha AS DATE) as fecha, nauto, N.username AS usuario,
@@ -26,7 +26,7 @@ if (isset($_GET['generar'])) {
             INNER JOIN ciudadanos C1 ON C1.id = infnew
             INNER JOIN ciudadanos C2 ON C2.id = infant
             WHERE CAST(N.fecha AS DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere
-            ORDER BY N.fecha DESC LIMIT 1000";
+            ORDER BY N.fecha DESC";
 // echo $query;
     $registros = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 }

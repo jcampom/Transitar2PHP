@@ -52,21 +52,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
         echo '<div class="alert alert-danger"><strong>¡Ups!</strong> El formulario con ese nombre ya existe.</div>';
     } else {
         // Insertar el registro en la tabla "formularios"
-   $menuID = $_POST["menu"];
+		$menuID = $_POST["menu"];
 
-$query = "INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, empresa, menu_id, tipo, usuario) VALUES ('$nombreFormulario', '$tabla', '$fecha', '$fechaHora', '" . implode(",", $camposSeleccionados) . "','$empresa', '$menuID' ,'".$_POST["tipo"]."','$idusuario')";
+		$query = "SET NOCOUNT ON;INSERT INTO formularios (nombre, tabla, fecha, fecha_hora, campos, empresa, menu_id, tipo, usuario) VALUES ('$nombreFormulario', '$tabla', '$fecha', '$fechaHora', '" . implode(",", $camposSeleccionados) . "','$empresa', '$menuID' ,'".$_POST["tipo"]."','$idusuario');SELECT scope_identity() as lastid";
+        $resultado_query = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
+		while ($row = sqlsrv_fetch_array( $resultado_query, SQLSRV_FETCH_ASSOC)) {
+			$formularioID = $row['lastid']; // Obtener el ID del registro insertado en la tabla "tablas"
+		}
 
-        if (sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'))===TRUE){
-            $formularioID = mysqli_insert_id($mysqli); // Obtener el ID del formulario creado
 
-   // Insertar el nuevo menú en la tabla "menu_items"
+		// Insertar el nuevo menú en la tabla "menu_items"
    
    
-   if(!empty($menuID)){
-            $queryMenu = "INSERT INTO menu_items (nombre, padre_id,enlace,empresa, fecha,fechayhora, usuario, icono) VALUES ('$nombreFormulario', '$menuID','formulario_dinamico_datos.php?id=$formularioID','$empresa','$fecha','$fechayhora','$idusuario','".$_POST["icono"]."')";
-            sqlsrv_query( $mysqli,$queryMenu, array(), array('Scrollable' => 'buffered'));
-            
-   }
+	   if(!empty($menuID)){
+				$queryMenu = "INSERT INTO menu_items (nombre, padre_id,enlace,empresa, fecha,fechayhora, usuario, icono) VALUES ('$nombreFormulario', '$menuID','formulario_dinamico_datos.php?id=$formularioID','$empresa','$fecha','$fechayhora','$idusuario','".$_POST["icono"]."')";
+				sqlsrv_query( $mysqli,$queryMenu, array(), array('Scrollable' => 'buffered'));
+				
+	   }
 
             // Insertar los campos seleccionados en la tabla "detalle_formularios"
             foreach ($camposSeleccionados as $campo) {

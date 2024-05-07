@@ -1,7 +1,9 @@
 <?php
 include 'conexion.php';
 include 'sessiones/seguridadempresa.php';
-
+// die('JLCM : menu.php : #0 : ' );
+// print_r($opcionesPerfil);
+// die('\nJLCM : menu.php : #1 : ' );
 //Establecemos zona horaria por defecto
 
 ?>
@@ -14,7 +16,7 @@ include 'sessiones/seguridadempresa.php';
     <title>Transitar2 </title>
     <!-- Favicon-->
     <link rel="icon" href="logo_transitar.png" type="image/x-icon">
- <!-- Google Fonts -->
+	<!-- Google Fonts -->
     <!--link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css" />
 
@@ -38,8 +40,9 @@ include 'sessiones/seguridadempresa.php';
 
     <!-- Custom Css -->
     <link href="interno/css/style.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/css/bootstrap-select.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/css/bootstrap-select.min.css">-->
+	<link rel="stylesheet" href="interno/ajax/libs/bootstrap-select/1.14.0/css/bootstrap-select.min.css">
     <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
     <link href="interno/css/themes/all-themes.css" rel="stylesheet" />
 
@@ -63,13 +66,14 @@ include 'sessiones/seguridadempresa.php';
     <link href="interno/fontawesome/css/solid.css" rel="stylesheet">
     <!-- noUISlider Css -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js" defer></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
+	
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
 
-    
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+	
     <script>
         $(document).ready(function() {
             $(".cargar").click();
@@ -338,8 +342,8 @@ input[type=number]::-webkit-outer-spin-button {
                         </a>
                     </li>
                    
-                   <?php
-                   // Función recursiva para generar los menús y submenús
+<?php
+// Función recursiva para generar los menús y submenús
 function generarMenu($items, $padre = 0) {
     $html = '';
     foreach ($items as $item) {
@@ -376,16 +380,19 @@ function generarMenu($items, $padre = 0) {
 
 // Consulta a la base de datos para obtener los elementos del menú
 $sql = "SELECT * FROM menu_items";
-$result = sqlsrv_query($mysqli,$sql);
+$result = sqlsrv_query($mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 $menuItems = array();
 if (sqlsrv_num_rows($result) > 0) {
-    
-    while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
-  if (in_array($row['id'], $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {       
-        $menuItems[] = $row;
-        //  $menuItems[] = $row['padre_id'];
-  }
-    }
+    // echo "JLCM : menu.php : #3 --> opcionesPerfil = ";
+	// print_r($opcionesPerfil);
+	// die("JLCM : menu.php : #4");
+	
+	while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+		if (in_array($row['id'], $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {       
+			$menuItems[] = $row;
+			//  $menuItems[] = $row['padre_id'];
+		}
+	}
 }
 
 // Generar el menú principal

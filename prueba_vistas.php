@@ -26,7 +26,7 @@ SELECT
          WHEN A.TAcuerdop_ID IS NOT NULL THEN 4
          WHEN S.ressan_id IS NOT NULL THEN 3
          ELSE 1 END AS RECTIPOREC,
-    (SELECT TRIM(Tsedes_divipo) FROM dbo.Tsedes LIMIT 1) AS RECSECRET,
+    (SELECT TOP 1 TRIM(Tsedes_divipo) FROM dbo.Tsedes) AS RECSECRET,
     V.liq AS RECNUM,
     ISNULL(A.TAcuerdop_cuota, 0) AS NUMERO_CUTOAS,
     TI.Ttipoidentificacion_simit AS ID_TIPO_DOC,

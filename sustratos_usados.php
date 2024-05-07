@@ -11,7 +11,7 @@ if (isset($_POST['generar'])) {
 if($_POST['tipo_liquidacion'] == 1){ //RNA
     
   
-    $query = "SELECT t.liquidacion, t.fecha, tr.nombre as tramite, t.sustrato, t.fecha_tramite,t.sustrato,t.usuario, l.tipo_tramite
+    $query = "SELECT TOP 1000 t.liquidacion, t.fecha, tr.nombre as tramite, t.sustrato, t.fecha_tramite,t.sustrato,t.usuario, l.tipo_tramite
             FROM tramites_vehiculos t 
                 LEFT JOIN liquidaciones l ON l.id = t.liquidacion
                 LEFT JOIN detalle_liquidaciones d ON d.liquidacion = l.id
@@ -23,7 +23,7 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
 }elseif($_POST['tipo_liquidacion'] == 2){ //RNC
     
  
-    $query = "SELECT t.liquidacion, t.fecha, tr.nombre as tramite, t.sustrato, t.fecha,t.sustrato,t.usuario, l.tipo_tramite
+    $query = "SELECT TOP 1000 t.liquidacion, t.fecha, tr.nombre as tramite, t.sustrato, t.fecha,t.sustrato,t.usuario, l.tipo_tramite
             FROM tramites_realizados t 
                 LEFT JOIN liquidaciones l ON l.id = t.liquidacion
                 LEFT JOIN detalle_liquidaciones d ON d.liquidacion = l.id
@@ -52,8 +52,7 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
              $query .= " and ev.factura = '".$_POST['factura']."' ";  
             }
             
-            $query .= "ORDER BY t.fecha DESC
-            LIMIT 1000";
+            $query .= "ORDER BY t.fecha DESC";
 
     $registros = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
     //   echo $query;

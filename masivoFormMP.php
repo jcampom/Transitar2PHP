@@ -49,7 +49,8 @@ while ($rowdata = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
     $group = substr($rowdata['fechasancion'], 0, 7);
     $avisos[$group][] = $rowdata;
 }
-$result1->free_result();
+sqlsrv_free_stmt( $result1);
+
 // unset($result1);
 
 	

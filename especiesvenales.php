@@ -9,7 +9,7 @@ if (isset($_POST['generar'])) {
 
 
 
-    $query = "SELECT evd.id, eve.nombre as estado, evd.fecha_creacion, ev.usuario,evd.fecha_actualizacion
+    $query = "SELECT TOP 1000 evd.id, eve.nombre as estado, evd.fecha_creacion, ev.usuario,evd.fecha_actualizacion
             FROM especies_venales ev 
                 INNER JOIN especies_venales_detalle evd ON ev.id = evd.id_admin
                 LEFT JOIN especies_venales_estados eve ON eve.id = evd.estado
@@ -33,8 +33,7 @@ if (isset($_POST['generar'])) {
              $query .= " and ev.factura = '".$_POST['factura']."' ";  
             }
             
-            $query .= "ORDER BY evd.fecha_creacion DESC
-            LIMIT 1000";
+            $query .= "ORDER BY evd.fecha_creacion DESC";
 
     $registros = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
     //  echo $query;

@@ -1,5 +1,12 @@
 <?php
+die('\nJLCM:crear_usuarios.php : 	Hola#1');
 include 'menu.php';
+
+echo '\nJLCM:crear_usuarios.php : _GET["activo"]  = '. $_GET["activo"];
+echo '\nJLCM:crear_usuarios.php : _GET["eliminar"] = '. $_GET["eliminar"];
+print_r($_POST);
+die();
+
 if(!empty($_GET["activo"])){
     $editar="UPDATE usuarios SET estado = '".$_GET['cambio']."' where id = '".$_GET['activo']."' and empresa = '$empresa'";
       $resultadoedit=sqlsrv_query( $mysqli,$editar, array(), array('Scrollable' => 'buffered'));

@@ -187,7 +187,7 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
 	// Confirmar la transacción
     sqlsrv_commit( $mysqli );
     
-         $notifica = sqlsrv_query( $mysqli,"SELECT id FROM notificaciones N WHERE N.compId = $compid AND N.tipo = $tipo ORDER BY id DESC LIMIT 1", array(), array('Scrollable' => 'buffered'));
+         $notifica = sqlsrv_query( $mysqli,"SELECT TOP 1 id FROM notificaciones N WHERE N.compId = $compid AND N.tipo = $tipo ORDER BY id DESC", array(), array('Scrollable' => 'buffered'));
         $rownot = sqlsrv_fetch_array($notifica, SQLSRV_FETCH_ASSOC);
         
         $result = ""; 
