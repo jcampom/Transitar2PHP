@@ -877,7 +877,7 @@ function obtenerTramitesSeleccionados2() {
 <?php if($tipo_tramite == 1 or $tipo_tramite == 2 or $tipo_tramite == 9){ ?>
 $('#guardar-liquidacion').click(function() {
   // Obtener los valores des los campos
-  alert('guardar-liquidacion #2');
+  //alert('guardar-liquidacion #2');
   var tipoTramite = <?php echo $tipo_tramite; ?>;
   var ciudadano = $('#numero_documento').val();
   var placa = $('#placa').val();
@@ -950,7 +950,7 @@ $('#guardar-liquidacion').click(function() {
 		//   location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
 		
 		// Abrir la URL en una nueva pestaña
-		alert(response);
+		//alert(response);
 		window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
 		location.href = './liquidaciones.php';
     },
