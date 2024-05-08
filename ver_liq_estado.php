@@ -30,7 +30,10 @@ if($noLiquidacion!=null && $estado!=null){
 	$resultado_ciudadano=sqlsrv_query( $mysqli,$sql_ciudadano, array(), array('Scrollable' => 'buffered'));
 	$row_ciudadano = sqlsrv_fetch_array($resultado_ciudadano, SQLSRV_FETCH_ASSOC);
 
-	$vigencia = date("Y-m-d", strtotime($row_liquidacion['fecha'] . "+60 days"));
+	$row_liquidacion_fecha = date_format($row_liquidacion['fecha'],'Y-m-d');
+	$vigencia = date("Y-m-d", strtotime($row_liquidacion_fecha . "+60 days"));
+	
+	$row_liquidacion_fechayhora = date_format($row_liquidacion['fechayhora'],'Y/m/d H:i'); 
 
 	$sql_detalle_liquidacion = "SELECT * FROM detalle_liquidaciones where liquidacion = '$noLiquidacion'";
 	$resultado_detalle_liquidacion=sqlsrv_query( $mysqli,$sql_detalle_liquidacion, array(), array('Scrollable' => 'buffered'));
@@ -65,7 +68,7 @@ $html .= '<form action="ver_liq_estado.php" method="POST">
 $html .= '<table style="border-collapse: collapse;width:100%">
 
 <th style="border: 2px solid black;">FECHA : </th>
-<th style="border: 2px solid black;">'.$row_liquidacion['fechayhora'].'</th>
+<th style="border: 2px solid black;">'.$row_liquidacion_fechayhora.'</th>
 <th style="border: 2px solid black;">FUNCIONARIO :</th>
 <td style="border: 2px solid black;">'.strtoupper($nombre_usuario).'</td>
 </tr>

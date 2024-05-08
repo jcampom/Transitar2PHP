@@ -1037,7 +1037,7 @@ $(document).ready(function() {
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
     // Obtener los valores de los campos
-	alert('guardar-liquidacion #3');
+	//alert('guardar-liquidacion #3'); - COMPARENDOS
     var tipoTramite = <?php echo $tipo_tramite; ?>;
     var ciudadano = $('#numero_documento').val();
     var placa = $('#placa').val();
@@ -1077,15 +1077,6 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
 
 	var valor_nota = $('#valor_nota').val();
 	  // Enviar los campos y tramites seleccionados al archivo PHP
-	  
-	console.log('guardar_liquidacion.php::1057::tipoTramite:  ' + tipoTramite);
-	console.log('guardar_liquidacion.php::1057::ciudadano:' + ciudadano);
-	console.log('guardar_liquidacion.php::1057::placa:' + placa);
-	console.log('guardar_liquidacion.php::1057::tipoServicio:' + tipoServicio);
-	console.log('guardar_liquidacion.php::1057::claseVehiculo:' + claseVehiculo);
-	console.log('guardar_liquidacion.php::1057::clasificacionVehiculo:' + clasificacionVehiculo);
-	console.log('guardar_liquidacion.php::1057::tramitesSeleccionados:' + comparendos);
-	console.log('guardar_liquidacion.php::1057::valor_nota:' + valor_nota);
 
   $.ajax({
     url: 'guardar_liquidacion.php',
@@ -1101,11 +1092,11 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
       valor_nota: valor_nota
     },
     success: function(response) {
-      // Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
-     // location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
-     
-      // Abrir la URL en una nueva pestaña
-		console.log("OK insercion --> " + response);
+		// Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
+		// location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
+
+		// Abrir la URL en una nueva pestaña
+		//alert(response);
 		window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
 		location.href = './liquidaciones.php';
     },

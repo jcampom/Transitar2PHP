@@ -1,5 +1,7 @@
 <?php
 include 'conexion.php';
+include 'logTransitar.php';
+
 // Obtener los valores enviados por AJAX
 $tipoTramite           = $_POST['tipoTramite'];
 $ciudadano             = $_POST['ciudadano'];
@@ -12,35 +14,27 @@ $tramitesSeleccionados = $_POST['tramitesSeleccionados'];
 
 if (empty($claseVehiculo)) {
     $consulta_vehiculo = "SELECT * FROM vehiculos where numero_placa = '$placa'";
-    
-    $resultado_vehiculo = sqlsrv_query($mysqli, $consulta_vehiculo, array(), array(
-        'Scrollable' => 'buffered'
-    ));
-    
+	$resultado_vehiculo = sqlsrv_query($mysqli, $consulta_vehiculo, array(), array( 'Scrollable' => 'buffered' ));
     $row_vehiculo = sqlsrv_fetch_array($resultado_vehiculo, SQLSRV_FETCH_ASSOC);
-    
     $claseVehiculo = $row_vehiculo['clase'];
-    
     $tipoServicio = $row_vehiculo['tipo_servicio'];
 }
 
 if ($tipoTramite == 4) {
-    // Realizar el guardado en la tabla 'liquidaciones'
-    
-    // Realizar la inserción en la tabla liquidaciones
-    $consulta = "SET NOCOUNT ON;INSERT INTO liquidaciones (tipo_tramite, ciudadano, placa, tipo_servicio, clase_vehiculo, clasificacion_vehiculo, usuario, fecha, fechayhora, empresa,nota_credito)
-               VALUES ('$tipoTramite', '$ciudadano', '$placa', '$tipoServicio', '$claseVehiculo', '$clasificacionVehiculo', '$idusuario', '$fecha', '$fechayhora', '$empresa', '$nota_credito');SELECT scope_identity() as lastid";
-	$resultado_consulta = sqlsrv_query($mysqli, $consulta, array(), array('Scrollable' => 'buffered')); 
-	while ($row = sqlsrv_fetch_array( $resultado_consulta, SQLSRV_FETCH_ASSOC)) {
-		$liquidacionId = $row['lastid'];
-	}
-    
-    // Realizar el guardado en la tabla 'detalle_liquidaciones' para cada trámite seleccionado
-    
     
     $sistematizacion = 0;
     // Recorrer los tramites seleccionados y guardarlos en la tabla detalle_liquidaciones
     foreach ($tramitesSeleccionados as $comparendos) {
+		
+		
+		// Realizar la inserción en la tabla liquidaciones
+		$consulta = "SET NOCOUNT ON;INSERT INTO liquidaciones (tipo_tramite, ciudadano, placa, tipo_servicio, clase_vehiculo, clasificacion_vehiculo, usuario, fecha, fechayhora, empresa,nota_credito,comparendo) VALUES ('$tipoTramite', '$ciudadano', '$placa', '$tipoServicio', '$claseVehiculo', '$clasificacionVehiculo', '$idusuario', '$fecha', '$fechayhora', '$empresa', '$nota_credito','$comparendos');SELECT scope_identity() as lastid";		   
+
+		$resultado_consulta = sqlsrv_query($mysqli, $consulta, array(), array('Scrollable' => 'buffered')); 
+		$row = sqlsrv_fetch_array( $resultado_consulta, SQLSRV_FETCH_ASSOC);
+		$liquidacionId = $row['lastid'];
+		
+		
         // Realizar la inserción en la tabla detalle_liquidaciones
         $consultaDetalle = "INSERT INTO detalle_liquidaciones (liquidacion, tramite,comparendo) VALUES ('$liquidacionId', '39','$comparendos')";
         
@@ -53,30 +47,25 @@ if ($tipoTramite == 4) {
         
         // Consulta a la tabla comparendos
         $sql    = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$comparendos'";
-        $result = sqlsrv_query($mysqli, $sql, array(), array(
-            'Scrollable' => 'buffered'
-        ));
+		$result = sqlsrv_query($mysqli, $sql, array(), array( 'Scrollable' => 'buffered' ));
         
         $row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
         
         // obtenemos el valor en smlv del comparendo
         $consulta_valor = "SELECT * FROM comparendos_codigos where	TTcomparendoscodigos_codigo = '" . $row['Tcomparendos_codinfraccion'] . "'";
         
-        $resultado_valor = sqlsrv_query($mysqli, $consulta_valor, array(), array(
-            'Scrollable' => 'buffered'
-        ));
+		$resultado_valor = sqlsrv_query($mysqli, $consulta_valor, array(), array( 'Scrollable' => 'buffered' ));
         
         $row_valor = sqlsrv_fetch_array($resultado_valor, SQLSRV_FETCH_ASSOC);
         
         // obtenemos el valor del smlv del año
+		$row_Tcomparendos_fecha = date_format($row['Tcomparendos_fecha'],"Y-m-d");
         
-        $ano_comparendo = substr($row['Tcomparendos_fecha'], 0, 4);
+        $ano_comparendo = substr($row_Tcomparendos_fecha, 0, 4);
         
         $consulta_smlv = "SELECT * FROM smlv where ano = '$ano_comparendo'";
         
-        $resultado_smlv = sqlsrv_query($mysqli, $consulta_smlv, array(), array(
-            'Scrollable' => 'buffered'
-        ));
+		$resultado_smlv = sqlsrv_query($mysqli, $consulta_smlv, array(), array( 'Scrollable' => 'buffered' ));
         
         $row_smlv = sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
         
@@ -124,220 +113,179 @@ if ($tipoTramite == 4) {
         }
         
         
-        
-        $fechini = date('Y-m-d', strtotime($row['Tcomparendos_fecha']));
-        
-        $fechfin = date('Y-m-d', strtotime($fecha));
-        
-        
-        
+        $fechini = date_format($row['Tcomparendos_fecha'],"Y-m-d");
+        $fechfin = $fecha; //date_format($fecha,"Y-m-d");
         $datos = calcularInteresCompa($valor, $fechini, $fecha, $diasint, $parametros_economicos['Tparameconomicos_porctInt']);
-        
         $valor_mora = $datos['valor'];
-        
         
         // Realizar la consulta para obtener los conceptos asociados al trámite
         $sql_tramite       = "SELECT * FROM detalle_tramites WHERE tramite_id = '39'";
-        $resultado_tramite = sqlsrv_query($mysqli, $sql_tramite, array(), array(
-            'Scrollable' => 'buffered'
-        ));
+		$resultado_tramite = sqlsrv_query($mysqli, $sql_tramite, array(), array( 'Scrollable' => 'buffered' ));
         
         if (sqlsrv_num_rows($resultado_tramite) > 0) {
             while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
-                
-                
                 
                 $consulta_concepto = "SELECT * FROM conceptos where id = '" . $row_tramite['concepto_id'] . "'";
                 
                 if ($sistematizacion > 0) {
                     $consulta_concepto .= " and id != '1000000166'";
-                    
                 }
                 
-                $resultado_concepto = sqlsrv_query($mysqli, $consulta_concepto, array(), array(
-                    'Scrollable' => 'buffered'
-                ));
+				$resultado_concepto = sqlsrv_query($mysqli, $consulta_concepto, array(), array( 'Scrollable' => 'buffered' ));
                 
-                $row_concepto = sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
+				if (sqlsrv_num_rows($resultado_concepto)>0){
+				
+					$row_concepto = sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
+					
+					$row_concepto_fecha_vigencia_final = date_format($row_concepto['fecha_vigencia_final'],'Y-m-d');
+					$row_concepto_fecha_vigencia_inicial = date_format($row_concepto['fecha_vigencia_inicial'],'Y-m-d');
                 
-                
-                if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
-                    
-                    $rango = $row_concepto['fecha_vigencia_final'];
-                } else {
-                    $rango = "2900-01-01";
-                }
-                
-                if ($row_concepto['id'] > 0 && $fecha >= $row_concepto['fecha_vigencia_inicial'] && $fecha <= $rango) {
-                    
-                    if ($row_concepto['id'] == '1000000166') {
-                        $sistematizacion += 1;
-                    }
-                    
-                    $consulta_smlv = "SELECT * FROM smlv where ano = '$ano'";
-                    
-                    $resultado_smlv = sqlsrv_query($mysqli, $consulta_smlv, array(), array(
-                        'Scrollable' => 'buffered'
-                    ));
-                    
-                    $row_smlv = sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
-                    
-                    if ($row_concepto['valor_SMLV_UVT'] == 0) {
-                        $valor_concepto = $row_concepto['valor_concepto'];
-                    } else if ($row_concepto['valor_SMLV_UVT'] == 1) {
-                        $valor_concepto = ($row_concepto['valor_concepto']) * round($row_smlv['smlv'] / 30);
-                    } else if ($row_concepto['valor_SMLV_UVT'] == 2) {
-                        $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
-                    }
-                    
-                    if ($row_concepto['id'] == 1000000022) {
-                        $valor_concepto = $valor;
-                    }
-                }
-                if ($valor_concepto > 0 or $valor_concepto < 0) {
-                    
-                    if ($row_concepto['operacion'] == 2) {
-                        $valor_concepto = -$valor_concepto;
-                    }
-                    
-                    if ($row_concepto['id'] == 1000004526) {
-                        
-                        
-                        $sqlCM       = "SELECT * FROM medcautcomp WHERE mcestado = 1 and compid ='" . $row['Tcomparendos_ID'] . "'";
-                        $queryConcep = sqlsrv_query($mysqli, $sqlCM, array(), array(
-                            'Scrollable' => 'buffered'
-                        ));
-                        
-                        
-                        if (sqlsrv_num_rows($queryConcep) > 0) {
-                            
-                            
-                            $valor_concepto = $valor_concepto;
-                        } else {
-                            $valor_concepto = 0;
-                        }
-                    }
-                    if ($valor_concepto > 0 or $valor_concepto < 0) {
-                        // Realizar la inserción en la tabla liquidaciones
-                        $consulta_conceptos = "INSERT INTO detalle_conceptos_liquidaciones (liquidacion, tramite, concepto,valor,mora, comparendo,honorario,cobranza,terceros)
-               VALUES ('$liquidacionId', '39', '" . $row_concepto['id'] . "','$valor_concepto','$valor_mora','$comparendos','$valor_honorario','$valor_cobranza','" . $row_concepto['terceros'] . "')";
-                        
-                        // Ejecutar la consulta
-                        if (sqlsrv_query($mysqli, $consulta_conceptos, array(), array(
-                            'Scrollable' => 'buffered'
-                        )) === TRUE) {
-                            
-                            
-                        }
-                        
-                    }
-                }
-            }
-        }
+					if ($row_concepto_fecha_vigencia_final >= $row_concepto_fecha_vigencia_inicial) {
+						$rango = $row_concepto_fecha_vigencia_final;
+					} else {
+						$rango = "2900-01-01";
+					}
+									
+					if ($row_concepto['id'] > 0 && $fecha >= $row_concepto_fecha_vigencia_inicial && $fecha <= $rango) {
+						
+						if ($row_concepto['id'] == '1000000166') {
+							$sistematizacion += 1;
+						}
+						
+						$consulta_smlv = "SELECT * FROM smlv where ano = '$ano'";
+						
+						$resultado_smlv = sqlsrv_query($mysqli, $consulta_smlv, array(), array( 'Scrollable' => 'buffered' ));
+						
+						$row_smlv = sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
+						
+						if ($row_concepto['valor_SMLV_UVT'] == 0) {
+							$valor_concepto = $row_concepto['valor_concepto'];
+						} else if ($row_concepto['valor_SMLV_UVT'] == 1) {
+							$valor_concepto = ($row_concepto['valor_concepto']) * round($row_smlv['smlv'] / 30);
+						} else if ($row_concepto['valor_SMLV_UVT'] == 2) {
+							$valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
+						}
+						
+						if ($row_concepto['id'] == 1000000022) {
+							$valor_concepto = $valor;
+						}
+					}
+					
+					if ($valor_concepto > 0 or $valor_concepto < 0) {
+						
+						if ($row_concepto['operacion'] == 2) {
+							$valor_concepto = -$valor_concepto;
+						}
+						
+						if ($row_concepto['id'] == 1000004526) {
+						
+							$sqlCM       = "SELECT * FROM medcautcomp WHERE mcestado = 1 and compid ='" . $row['Tcomparendos_ID'] . "'";
+							$queryconcep = sqlsrv_query($mysqli, $sqlCM, array(), array( 'scrollable' => 'buffered' ));
+							
+							if (sqlsrv_num_rows($queryconcep) > 0) {
+								$valor_concepto = $valor_concepto;
+							} else {
+								$valor_concepto = 0;
+							}
+						}
+						
+						
+						if ($valor_concepto > 0 or $valor_concepto < 0) {
+							// Realizar la inserción en la tabla liquidaciones
+							$valor_concepto = round($valor_concepto,0);
+							$valor_mora     = round($valor_mora,0);
+							$valor_honorario= round($valor_honorario,0);
+							$valor_cobranza = round($valor_cobranza,0);
+							
+							$ins_det_conc_liqs = "INSERT INTO detalle_conceptos_liquidaciones (liquidacion, tramite, concepto,valor,mora, comparendo,honorario,cobranza,terceros) VALUES ('$liquidacionId', '39', '" . $row_concepto['id'] . "','$valor_concepto','$valor_mora','$comparendos','$valor_honorario','$valor_cobranza','" . $row_concepto['terceros'] . "')";
+						
+							// Ejecutar la consulta
+							sqlsrv_query($mysqli, $ins_det_conc_liqs, array(), array( 'Scrollable' => 'buffered' ));
+								
+						}
+					}
+				}
+			}
+		}
+	}
         
-        
-        // Realizar la consulta para obtener los conceptos asociados al ammnistias
-        $sql_tramite       = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
-        $resultado_tramite = sqlsrv_query($mysqli, $sql_tramite, array(), array(
-            'Scrollable' => 'buffered'
-        ));
-        $total2            = 0;
-        if (sqlsrv_num_rows($resultado_tramite) > 0) {
-            while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
-                
-                
-                
-                $consulta_concepto = "SELECT * FROM conceptos where id = '" . $row_tramite['concepto_id'] . "'";
-                
-                
-                
-                $resultado_concepto = sqlsrv_query($mysqli, $consulta_concepto, array(), array(
-                    'Scrollable' => 'buffered'
-                ));
-                
-                $row_concepto = sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
-                
-                
-                
-                
-                if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
-                    
-                    $rango = $row_concepto['fecha_vigencia_final'];
-                } else {
-                    $rango = "2900-01-01";
-                }
-                
-                if ($row_concepto['id'] > 0 && $fecha >= $row_concepto['fecha_vigencia_inicial'] && $fecha <= $rango) {
-                    
-                    
-                    
-                    $consulta_smlv = "SELECT * FROM smlv where ano = '$ano'";
-                    
-                    
-                    $resultado_smlv = sqlsrv_query($mysqli, $consulta_smlv, array(), array(
-                        'Scrollable' => 'buffered'
-                    ));
-                    
-                    $row_smlv = sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
-                    
-                    if ($row_concepto['porcentaje'] > 0) {
-                        
-                        $valor_concepto = ($valor * $row_concepto['porcentaje']) / 100;
-                        
-                    } else if ($row_concepto['valor_SMLV_UVT'] == 0) {
-                        $valor_concepto = $row_concepto['valor_concepto'];
-                    } else if ($row_concepto['valor_SMLV_UVT'] == 1) {
-                        $valor_concepto = ($row_concepto['valor_concepto'] / 30) * $row_smlv['smlv'];
-                    } else if ($row_concepto['valor_SMLV_UVT'] == 2) {
-                        $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
-                    }
-                    
-                    if ($row_concepto['operacion'] == 2) {
-                        $valor_concepto = -$valor_concepto;
-                    }
-                    
-                }
-                
-                
-                $fecha5 = date('Y-m-d', strtotime($fechini . ' +13 days'));
-                
-                $fecha15 = date('Y-m-d', strtotime($fechini . ' +29 days'));
-                
-                
-                if ($row_concepto['id'] == 54 && $fecha <= $fecha5) {
-                    
-                    $valor_concepto = $valor_concepto;
-                    
-                    
-                    
-                } elseif ($row_concepto['id'] == 134 && $fecha > $fecha5 && $fecha <= $fecha15) {
-                    
-                    $valor_concepto = $valor_concepto;
-                    
-                } else {
-                    $valor_concepto = 0;
-                }
-                if ($valor_concepto > 0 or $valor_concepto < 0) {
-                    // Realizar la inserción en la tabla liquidaciones
-                    $consulta_conceptos = "INSERT INTO detalle_conceptos_liquidaciones (liquidacion, tramite, concepto,valor,mora, comparendo,terceros)
-               VALUES ('$liquidacionId', '59', '" . $row_concepto['id'] . "','$valor_concepto','$valor_mora','$comparendos','" . $row_concepto['terceros'] . "')";
-                    
-                    // Ejecutar la consulta
-                    if (sqlsrv_query($mysqli, $consulta_conceptos, array(), array(
-                        'Scrollable' => 'buffered'
-                    )) === TRUE) {
-                        
-                        
-                    }
-                }
-                $total2 += $valor_concepto;
-            }
-        }
-        
-        
-        
-        //termina de guardar concepto del comparendo
-    }
+	// Realizar la consulta para obtener los conceptos asociados al ammnistias
+	$sql_tramite       = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
+	$resultado_tramite = sqlsrv_query($mysqli, $sql_tramite, array(), array( 'Scrollable' => 'buffered' ));
+	$total2            = 0;
+	if (sqlsrv_num_rows($resultado_tramite) > 0) {
+		while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
+			$consulta_concepto = "SELECT * FROM conceptos where id = '" . $row_tramite['concepto_id'] . "'";
+			$resultado_concepto = sqlsrv_query($mysqli, $consulta_concepto, array(), array( 'Scrollable' => 'buffered' ));
+			
+		
+			if (sqlsrv_num_rows($resultado_concepto)>0){
+				$row_concepto = sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
+				
+				$row_concepto_fecha_vigencia_final = date_format($row_concepto['fecha_vigencia_final'],'Y-m-d');
+				$row_concepto_fecha_vigencia_inicial = date_format($row_concepto['fecha_vigencia_inicial'],'Y-m-d');
+
+				if ($row_concepto_fecha_vigencia_final >= $row_concepto_fecha_vigencia_inicial) {
+					$rango = $row_concepto_fecha_vigencia_final;
+				} else {
+					$rango = "2900-01-01";
+				}
+				
+				if ($row_concepto['id'] > 0 && $fecha >= $row_concepto_fecha_vigencia_inicial && $fecha <= $rango) {
+					$consulta_smlv = "SELECT * FROM smlv where ano = '$ano'";
+					
+					$resultado_smlv = sqlsrv_query($mysqli, $consulta_smlv, array(), array(
+						'Scrollable' => 'buffered'
+					));
+					
+					$row_smlv = sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
+					
+					if ($row_concepto['porcentaje'] > 0) {
+						$valor_concepto = ($valor * $row_concepto['porcentaje']) / 100;
+					} else if ($row_concepto['valor_SMLV_UVT'] == 0) {
+						$valor_concepto = $row_concepto['valor_concepto'];
+					} else if ($row_concepto['valor_SMLV_UVT'] == 1) {
+						$valor_concepto = ($row_concepto['valor_concepto'] / 30) * $row_smlv['smlv'];
+					} else if ($row_concepto['valor_SMLV_UVT'] == 2) {
+						$valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
+					}
+					
+					if ($row_concepto['operacion'] == 2) {
+						$valor_concepto = -$valor_concepto;
+					}
+				}
+				
+				$fecha5 = date('Y-m-d', strtotime($fechini . ' +13 days'));
+				$fecha15 = date('Y-m-d', strtotime($fechini . ' +29 days'));
+				
+				if ($row_concepto['id'] == 54 && $fecha <= $fecha5) {
+					
+					$valor_concepto = $valor_concepto;
+					
+				} elseif ($row_concepto['id'] == 134 && $fecha > $fecha5 && $fecha <= $fecha15) {
+					
+					$valor_concepto = $valor_concepto;
+					
+				} else {
+					$valor_concepto = 0;
+				}
+
+				if ($valor_concepto > 0 or $valor_concepto < 0) {
+					// Realizar la inserción en la tabla liquidaciones
+
+					$valor_concepto = round($valor_concepto,0);
+					$valor_mora     = round($valor_mora,0);
+				
+					$ins_det_conc_liqs = "INSERT INTO detalle_conceptos_liquidaciones (liquidacion, tramite, concepto,valor,mora, comparendo,terceros) VALUES ('$liquidacionId', '59', '" . $row_concepto['id'] . "','$valor_concepto','$valor_mora','$comparendos','" . $row_concepto['terceros'] . "')";
+			
+					// Ejecutar la consulta 
+					sqlsrv_query($mysqli, $ins_det_conc_liqs);
+				}
+				$total2 += $valor_concepto;
+			}
+		}
+	}
+	//termina de guardar concepto del comparendo
 } else if ($tipoTramite == 6) {
     
     // Realizar el guardado en la tabla 'liquidaciones'
@@ -418,11 +366,6 @@ if ($tipoTramite == 4) {
         
         $fechfin = date('Y-m-d', strtotime($fecha));
         ;
-        
-        
-        
-        
-        
         
         // Realizar la consulta para obtener los conceptos asociados al trámite
         $sql_tramite       = "SELECT * FROM detalle_tramites WHERE tramite_id = '" . $row['TDT_tramite'] . "'";
@@ -764,10 +707,7 @@ if ($tipoTramite == 4) {
 					$sistematizacion += 1;
 				}
 				
-				$arrLOG = array( str_replace("'","~",$sql_concepto) );	
-				$SQLLOG = "INSERT INTO logJLCM(origen,texto) values ('guardar_liquidacion.php','".join("|",$arrLOG)."')";
-				$resultadoLOG = sqlsrv_query($mysqli, $SQLLOG);
-				
+			
 				$fecha_vigencia_inicial = date_format($row_concepto['fecha_vigencia_inicial'], 'Y/m/d');
 				$fecha_vigencia_final   = date_format($row_concepto['fecha_vigencia_final'], 'Y/m/d');			
 				
@@ -792,39 +732,25 @@ if ($tipoTramite == 4) {
 							// Asignar el valor modificado a la variable $valor
 							$valor = $_POST['valoresModificados'][$conceptoKey];
 						}
-						$arrLOG = array(1,$_POST['valoresModificados'][$conceptoKey],$valor);
 					} else if ($row_concepto['porcentaje'] > 0) {
-						$valor = ($valor_total * $row_concepto['porcentaje']) / 100;
-						$arrLOG = array(2,$row_concepto['porcentaje'],$valor);
-						
+						$valor = ($valor_total * $row_concepto['porcentaje']) / 100;					
 					} else if ($row_concepto['valor_SMLV_UVT'] == 0) {
 						$valor = $row_concepto['valor_concepto'];
-						$arrLOG = array(3,$row_concepto['valor_SMLV_UVT'],$row_concepto['valor_concepto'],$valor);
-						
 					} else if ($row_concepto['valor_SMLV_UVT'] == 1) {
 						$valor = $row_concepto['valor_concepto'] * $row_smlv['smlv_original'];
-						$arrLOG = array(4,$row_concepto['valor_SMLV_UVT'],$row_concepto['valor_concepto'],$row_smlv['smlv_original'],$valor);
-						
 					} else if ($row_concepto['valor_SMLV_UVT'] == 2) {
 						$valor = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
-						$arrLOG = array(5,$row_concepto['valor_SMLV_UVT'],$row_concepto['valor_concepto'],$row_smlv['uvt_original'],$valor);
 					}
 					
 					if ($row_concepto['operacion'] == 2) {
 						$valor = -$valor;
 					}
 					
-					$SQLLOG = "INSERT INTO logJLCM(origen,texto) values ('guardar_liquidacion.php','".join("|",$arrLOG)."')";
-					$resultadoLOG = sqlsrv_query($mysqli, $SQLLOG);				
-					
 					$valor_total += $valor;
 					// Realizar la inserción en la tabla liquidaciones
 					$ins_det_conc_liq = "INSERT INTO detalle_conceptos_liquidaciones (liquidacion, tramite, concepto,valor,terceros) 
 					VALUES ('$liquidacionId', '$tramiteId', '" . $row_detalle_tramite['concepto_id'] . "',".$valor.",'" . $row_concepto['terceros'] . "')";
 					
-					$SQLLOG = "INSERT INTO logJLCM(origen,texto) values ('guardar_liquidacion.php','".join("|",$arrLOG)."')";
-					$resultadoLOG = sqlsrv_query($mysqli, $SQLLOG);
-				
 					// Ejecutar la consulta			
 					$resultado_ins_det_conc_liq= sqlsrv_query($mysqli, $ins_det_conc_liq, array(), array('Scrollable' => 'buffered'));
 					

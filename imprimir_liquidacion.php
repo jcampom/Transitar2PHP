@@ -155,7 +155,7 @@ while($row_detalle_liquidacion2 = sqlsrv_fetch_array($resultado_detalle_liquidac
 
             $valor = $row_detalle_tramite['valor'];
 
-            $total += $valor;
+            $total += ceil($valor);
             $total_tramite += $valor;
             $mora = $row_detalle_tramite['mora'];
             if ($valor > 0 or $valor < 0){

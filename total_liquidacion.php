@@ -1,6 +1,5 @@
 <?php
 include 'conexion.php';
-
 // Obtener los tramites seleccionados enviados por AJAX
 $tramitesSeleccionados = isset($_POST['tramitesSeleccionados'])? $_POST['tramitesSeleccionados'] : null;
 if(!isset($fecha)){ $fecha = date("Y-m-d"); }
@@ -8,7 +7,6 @@ if(!isset($ano)){ $ano = date("Y"); }
 $valor_nota = $_POST['valor_nota']?? 0 ;
 
 // Calcular el total de liquidación
-//echo "[TOTAL LIQUIDACION.php]";
 $total = 0;
 $sistematizacion = 0;
 $repetidos = array();
@@ -55,13 +53,13 @@ if(!empty($tramitesSeleccionados)) {
 					
 					$consulta_concepto="SELECT * FROM conceptos where id = '".$row['concepto_id']."' and clase_vehiculo = '$clase' and servicio_vehiculo = '$tipo_servicio' ";
 					
-					if($sistematizacion != 1){
-						$consulta_concepto .= " and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
-					}
-					$consulta_concepto.=" or id = '".$row['concepto_id']."' and clase_vehiculo = '0' ";
-					if($sistematizacion != 1){
-						$consulta_concepto .= "  and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
-					} 
+					//if($sistematizacion != 1){
+					//	$consulta_concepto .= " and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
+					//}
+					//$consulta_concepto.=" or id = '".$row['concepto_id']."' and clase_vehiculo = '0' ";
+					//if($sistematizacion != 1){
+					//	$consulta_concepto .= "  and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
+					//} 
 				}
 
 				$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
@@ -99,10 +97,9 @@ if(!empty($tramitesSeleccionados)) {
 						if($row_concepto['operacion'] == 2){  
 							$valor = -$valor;    
 						}
+						//$total += ceil($valor);
 						$total += ceil($valor);
-						
-						//echo "[".$row_concepto['id']."|".$row_concepto['porcentaje']."|".$row_concepto['valor_SMLV_UVT']."|".$row_concepto['valor_concepto']."|".$row_smlv['uvt_original']."|".$valor."|".$total."]";
-						
+
 						if($row_concepto['repetir'] == 0){
 							$repetidos[] = $row_concepto['id'];
 						}
