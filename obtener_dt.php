@@ -1,25 +1,21 @@
 <?php
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
 include 'conexion.php';
-
-
+include 'logTransitar.php';
 
 // Obtener el número de documento enviado desde la solicitud AJAX
 $numeroDocumento = $_POST['numeroDocumento'];
 
-
-
 // Consulta a la tabla Derecho de transito
 $sql = "SELECT dt.TDT_ID, dt.TDT_placa, dt.TDT_ano, dt.TDT_estado, dt.TDT_tramite, dt.TDT_honorarios, dt.TDT_cobranza, dt.TDT_fecha, dt.TDT_user, dt.TDT_archivo, dt.TDT_doccobro,
-       v.id, v.tipo_documento, v.numero_documento, v.nombres, v.apellidos, v.numero_placa, v.chasis, v.motor, v.marca, v.linea, v.clase, v.carroceria, v.color, v.tipo_servicio, v.modalidad, v.capacidad_pasajeros, v.capacidad_carga, v.cilindraje, v.modelo, v.chasis_independiente, v.serie, v.vin, v.numero_puertas, v.combustible, v.ejes, v.peso, v.concesionario, v.potencia, v.clasificacion, v.ano_fabricacion, v.origen, v.acta_importacion, v.declaracion, v.fecha_declaracion, v.pais_origen, v.fecha_propiedad, v.factura, v.fecha_factura, v.soat, v.fecha_vence_soat, v.tecnomecanica, v.fecha_vence_tecnomecanica, v.licencia_transito, v.sustrato, v.usuario, v.empresa, v.fechayhora
+       v.id,  v.numero_documento, v.numero_placa, v.chasis, v.motor, v.marca, v.linea, v.clase, v.carroceria, v.color, v.tipo_servicio, v.modalidad, v.capacidad_pasajeros, v.capacidad_carga, v.cilindraje, v.modelo, v.chasis_independiente, v.serie, v.vin, v.numero_puertas, v.combustible, v.ejes, v.peso, v.concesionario, v.potencia, v.clasificacion, v.ano_fabricacion, v.origen, v.acta_importacion, v.declaracion, v.fecha_declaracion, v.pais_origen, v.fecha_propiedad, v.factura, v.fecha_factura, v.soat, v.fecha_vence_soat, v.tecnomecanica, v.fecha_vence_tecnomecanica, v.licencia_transito, v.sustrato, v.usuario 
 FROM derechos_transito dt
 INNER JOIN vehiculos v ON dt.TDT_placa = v.numero_placa
 where dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '1' or dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '8' or dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '5' 
 ";
+
+registrarLogTransitar($mysqli,basename(__FILE__), array('1',$sql));
+
 $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 $response = "<table class='table table-striped'>
 <tr>
@@ -33,196 +29,161 @@ $response = "<table class='table table-striped'>
 $total_dt = 0;
 if (sqlsrv_num_rows($result) > 0) {
     while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+		
+		$ano_dt = $row['TDT_ano'];
 
-  
-$ano_dt = $row['TDT_ano'];
+		// Consultamos si es el primero que debe
+		$sql_primer = "SELECT MIN(TDT_ano) as primer FROM derechos_transito WHERE TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 1 or TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 8 or TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 5";
 
+		$result_primer=sqlsrv_query( $mysqli,$sql_primer, array(), array('Scrollable' => 'buffered'));
 
-// Consultamos si es el primero que debe
-$sql_primer = "SELECT MIN(TDT_ano) as primer FROM derechos_transito WHERE TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 1 or TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 8 or TDT_placa = '".$row['TDT_placa']."' and TDT_estado = 5";
-$result_primer=sqlsrv_query( $mysqli,$sql_primer, array(), array('Scrollable' => 'buffered'));
+		$row_primer = sqlsrv_fetch_array($result_primer, SQLSRV_FETCH_ASSOC);
 
-$row_primer = sqlsrv_fetch_array($result_primer, SQLSRV_FETCH_ASSOC);
+		$primero = $row_primer['primer'];
 
-$primero = $row_primer['primer'];
+		// Realizar la consulta para obtener los conceptos asociados al trámite
+		$sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '".$row['TDT_tramite']."'";
+		$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
+		$total = 0;
+		if (sqlsrv_num_rows($resultado_tramite) > 0) {
+			while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
 
-// Realizar la consulta para obtener los conceptos asociados al trámite
-$sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '".$row['TDT_tramite']."'";
-$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
-$total = 0;
-if (sqlsrv_num_rows($resultado_tramite) > 0) {
-    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
-        
-  
-            
-  if($row_tramite['concepto_id'] == '1000000132' && $primero == $ano_dt){
-                
-            $consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."' "; 
-            
-            }else{
-                 $consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."' and clase_vehiculo = '".$row['clase']."' and servicio_vehiculo = '".$row['tipo_servicio']."'";    
-            }
-           
-    
-        $ano_actual = substr($fecha, 0, 4);
-        $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
-         if (sqlsrv_num_rows($resultado_concepto) > 0) {
-             
-               $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
-               
-             $id_concepto = $row_concepto['id'];
-            
-       if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
-          
-                $rango = $row_concepto['fecha_vigencia_final'];
-             }else{
-                $rango = "2900-01-01"; 
-             }
-            
-        if($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango ){
-         
-            
-        
-    if($row_tramite['concepto_id'] != '1000000132'){
-            $consulta_smlv="SELECT * FROM smlv where ano = '$ano_dt'";
-        }else{
-          $consulta_smlv="SELECT * FROM smlv where ano = '$ano_actual'";   
-        }
-           
+				if($row_tramite['concepto_id'] == '1000000132' && $primero == $ano_dt){
+					$consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."' "; 
+				}else{
+					$consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."' and clase_vehiculo = '".$row['clase']."' and servicio_vehiculo = '".$row['tipo_servicio']."'";    
+				}
 
-            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
+				$ano_actual = substr($fecha, 0, 4);
+				$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
+				if (sqlsrv_num_rows($resultado_concepto) > 0) {
 
-            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
-            
-           if($row_concepto['valor_SMLV_UVT'] == 0){
-             $valor_concepto = $row_concepto['valor_concepto'];  
-            }else if($row_concepto['valor_SMLV_UVT'] == 1){
-                if($row['TDT_ano'] > 2019){
-             $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv_original'] / 30);  
-                }else{
-                $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv'] / 30);       
-                }
-            }else if($row_concepto['valor_SMLV_UVT'] == 2){
-             $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];  
-            }
-            
-if($row_concepto['operacion'] == 2){
-   $valor_concepto = -$valor_concepto;  
- }  
- 
- 
-if($row_tramite['concepto_id'] != '1000000132'){
-    
-$valor = $valor_concepto; 
-}
+					$row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
 
-        if($row_concepto['id'] == 1000004526 && $row['TDT_estado'] == 6){
-           $valor_concepto = $valor_concepto;  
-        }elseif($row_concepto['id'] == 1000004526 && $row['TDT_estado'] != 6){
-           $valor_concepto = 0;  
-        }
-        
-        $total += $valor_concepto;
-        }
-  
-        
-           }  
-          
-    }
-}
+					$id_concepto = $row_concepto['id'];
 
-$ano_siguiente = $row['TDT_ano'] + 1;
-     $fechini = ("$ano_siguiente-01-01");
-                  
-                  $fechfin = $fecha;
-                  
+					if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
+						$rango = $row_concepto['fecha_vigencia_final'];
+					}else{
+						$rango = "2900-01-01"; 
+					}
+					if($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango ){
+						if($row_tramite['concepto_id'] != '1000000132'){
+							$consulta_smlv="SELECT * FROM smlv where ano = '$ano_dt'";
+						}else{
+							$consulta_smlv="SELECT * FROM smlv where ano = '$ano_actual'";   
+						}
+						
+						$resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
+
+						$row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
+
+						if($row_concepto['valor_SMLV_UVT'] == 0){
+							$valor_concepto = $row_concepto['valor_concepto'];  
+						}else if($row_concepto['valor_SMLV_UVT'] == 1){
+							if($row['TDT_ano'] > 2019){
+								$valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv_original'] / 30);  
+							}else{
+								$valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv'] / 30);       
+							}
+						}else if($row_concepto['valor_SMLV_UVT'] == 2){
+							$valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];  
+						}
+
+						if($row_concepto['operacion'] == 2){
+							$valor_concepto = -$valor_concepto;  
+						}  
+
+						if($row_tramite['concepto_id'] != '1000000132'){
+							$valor = $valor_concepto; 
+						}
+
+						if($row_concepto['id'] == 1000004526 && $row['TDT_estado'] == 6){
+							$valor_concepto = $valor_concepto;  
+						}elseif($row_concepto['id'] == 1000004526 && $row['TDT_estado'] != 6){
+							$valor_concepto = 0;  
+						}
+
+						$total += $valor_concepto;
+					}
+				}
+			}
+		}
+
+		$ano_siguiente = $row['TDT_ano'] + 1;
+		$fechini = ("$ano_siguiente-01-01");
+		$fechfin = $fecha;
                  
         if($fecha > "$ano_siguiente-01-01"){          
-        $valor_mora = ValorInteresMora($fechini,$fechfin,$valor);   
+			$valor_mora = ValorInteresMora($fechini,$fechfin,$valor);
         }else{
-         $valor_mora =0;   
+			$valor_mora =0;
         }
 
         $liElement = "
-<tr>
-<td> <a class='dt-link' href='#' data-dt='".$row['TDT_ID']."'>".$row['TDT_placa']."</a></td>	
-<td>".$row['TDT_ano']."</td>	
-<td>".number_format($valor)."</td>	
+		<tr>
+		<td> <a class='dt-link' href='#' data-dt='".$row['TDT_ID']."'>".$row['TDT_placa']."</a></td>	
+		<td>".$row['TDT_ano']."</td>	
+		<td>".number_format($valor)."</td>	
 
 
-<td>
-<div class='form-check'>
-  <input class='form-check-input dt-checkbox' type='checkbox' data-dt='".($total + $valor_mora)."' data-tramite='".$row['TDT_tramite']."' value='".$row['TDT_ano']."' data-year='".$row['TDT_ano']."'  data-id='".$row['TDT_ano']."' id='pago".$row['TDT_ano']."'>
-  <label class='form-check-label' for='pago".$row['TDT_ano']."'>
+		<td>
+		<div class='form-check'>
+		  <input class='form-check-input dt-checkbox' type='checkbox' data-dt='".($total + $valor_mora)."' data-tramite='".$row['TDT_tramite']."' value='".$row['TDT_ano']."' data-year='".$row['TDT_ano']."'  data-id='".$row['TDT_ano']."' id='pago".$row['TDT_ano']."'>
+		  <label class='form-check-label' for='pago".$row['TDT_ano']."'>
 
-  </label>
-</div>
-  </label>
-</td>
-<tr>";
+		  </label>
+		</div>
+		  </label>
+		</td>
+		<tr>";
 
-     // Realizar la consulta para obtener los conceptos asociados al honorarios
-$sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '50'";
-$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
-$total2 = 0;
-if (sqlsrv_num_rows($resultado_tramite) > 0) {
-    while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
-         $consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."'";  
-         $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
-            $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
+		// Realizar la consulta para obtener los conceptos asociados al honorarios
+		$sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '50'";
+		$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
+		$total2 = 0;
+		if (sqlsrv_num_rows($resultado_tramite) > 0) {
+			while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
+				$consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."'";  
+				$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
+				$row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
     
-     if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
-          
-                $rango = $row_concepto['fecha_vigencia_final'];
-             }else{
-                $rango = "2900-01-01"; 
-             }
+				if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
+					$rango = $row_concepto['fecha_vigencia_final'];
+				}else{
+					$rango = "2900-01-01"; 
+				}
             
-        if($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango ){
-         
+				if($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango ){
+					$consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
+					$resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
+					$row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
             
-        
-            $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
-           
-
-            $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
-
-            $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
+					if($row_concepto['porcentaje'] > 0){
+						$valor_concepto = $valor + (($valor * $row_concepto['porcentaje']) / 100);
+					}else if($row_concepto['valor_SMLV_UVT'] == 0){
+						$valor_concepto = ($valor * $row_concepto['valor_concepto']) / 100;
+					}else if($row_concepto['valor_SMLV_UVT'] == 1){
+						$valor_concepto = ($row_concepto['valor_concepto'] / 30) * $row_smlv['smlv'];  
+					}else if($row_concepto['valor_SMLV_UVT'] == 2){
+						$valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];  
+					}
             
-            if($row_concepto['porcentaje'] > 0){
-                
-             $valor_concepto = $valor + (($valor * $row_concepto['porcentaje']) / 100);  
-       
-            }else if($row_concepto['valor_SMLV_UVT'] == 0){
-             $valor_concepto = ($valor * $row_concepto['valor_concepto']) / 100;
-            }else if($row_concepto['valor_SMLV_UVT'] == 1){
-             $valor_concepto = ($row_concepto['valor_concepto'] / 30) * $row_smlv['smlv'];  
-            }else if($row_concepto['valor_SMLV_UVT'] == 2){
-             $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];  
-            }
-            
-if($row_concepto['operacion'] == 2){
-   $valor_concepto = -$valor_concepto;  
- }  
- 
- 
-   if($row_concepto['id'] == 1000000016 && $row['TDT_honorarios'] == 1){
-           $valor_concepto = $valor_concepto;  
-        }else{
-           $valor_concepto = 0;  
-        }
-    
+					if($row_concepto['operacion'] == 2){
+						$valor_concepto = -$valor_concepto;  
+					}
 
-        }
-        
-        
-     
-        $total += $valor_concepto;
-    }
-}
-$liElement .= "<th colspan='8' style='text-align: right;'>Total Derecho ".$row['TDT_ano'].": $ ".number_format($total + $valor_mora)."</th>
-
-";
+					if($row_concepto['id'] == 1000000016 && $row['TDT_honorarios'] == 1){
+						$valor_concepto = $valor_concepto;  
+					}else{
+						$valor_concepto = 0;  
+					}
+				}
+				
+				$total += $valor_concepto;
+			}
+		}
+		$liElement .= "<th colspan='8' style='text-align: right;'>Total Derecho ".$row['TDT_ano'].": $ ".number_format($total + $valor_mora)."</th>";
 
         // Agregar el elemento de lista al resultado final
         $response .= $liElement;

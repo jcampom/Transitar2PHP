@@ -73,10 +73,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
             // Insertar los campos seleccionados en la tabla "detalle_formularios"
             foreach ($camposSeleccionados as $campo) {
                 // Obtener el tipo de campo de la tabla seleccionada
-                $queryTipoCampo = "SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = '$tabla' AND COLUMN_NAME = '$campo'";
+                $queryTipoCampo = "SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = '$tabla' AND COLUMN_NAME = '$campo'";
                 $resultTipoCampo=sqlsrv_query( $mysqli,$queryTipoCampo, array(), array('Scrollable' => 'buffered'));
                 $rowTipoCampo = sqlsrv_fetch_array($resultTipoCampo, SQLSRV_FETCH_ASSOC);
-                $tipoCampo = $rowTipoCampo['COLUMN_TYPE'];
+                $tipoCampo = $rowTipoCampo['DATA_TYPE'];
+                $precisionCampo = $rowTipoCampo['NUMERIC_PRECISION'];
+                $escalaCampo = $rowTipoCampo['NUMERIC_SCALE'];
+                $charMaxLenCampo = $rowTipoCampo['CHARACTER_MAXIMUM_LENGTH'];			
+				
+				//tipos de dato identificados
+				$tipoDatoN="|bigint|int|smallint|tinyint|";
+				$tipoDatoR="|real|float|";
+				$tipoDatoT="|bit|date|datetime|datetime2|text|";
+				$tipoDatoX="|char|nchar|nvarchar|varchar|";
+
+				$buscar = "|".$tipoCampo."|";
+				$posicionN = strpos($tipoDatoN, $buscar); //buscar tipo de dato en arreglo de datatypes NUMERICO
+				$posicionR = strpos($tipoDatoR, $buscar); //buscar tipo de dato en arreglo de datatypes REAL/FLOAT
+				$posicionT = strpos($tipoDatoT, $buscar); //buscar tipo de dato en arreglo de datatypes OTROS
+				$posicionX = strpos($tipoDatoX, $buscar); //buscar tipo de dato en arreglo de datatypes ALFANUMERICO
+				
+				if ($posicionN!=false){$tipoCampo = $tipoCampo."(".$precisionCampo.")";}
+				if ($posicionR!=false){$tipoCampo = $tipoCampo."(18,2)";}
+				if ($posicionT!=false){/*dejar el valor de tipo de campo*/}
+				if ($posicionX!=false){$tipoCampo = $tipoCampo."(".$charMaxLenCampo.")";}
 
                 $queryDetalle = "INSERT INTO detalle_formularios (formulario, campo, tipo, requerido, usuario, fecha, fechayhora) VALUES ('$formularioID', '$campo', '$tipoCampo', '0', '$idusuario', '$fecha', '$fechaHora')";
                 sqlsrv_query( $mysqli,$queryDetalle, array(), array('Scrollable' => 'buffered'));
