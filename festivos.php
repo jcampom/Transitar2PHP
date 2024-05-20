@@ -47,34 +47,33 @@ if($_POST['eliminar'] == 1){
 </head>
 <body>
 <div class="card container-fluid">
-    <form method="POST" action="festivos.php">
-            <div class="col-md-3">
-            <div class="form-group form-float">
-                <div class="form-line">
-                    <label for="numero_documento">Fecha</label>
-                    <input type="date" id="fecha" required name="fecha" class="form-control">
-                </div>
-            </div>
-        </div>
-                    <div class="col-md-3">
-            <div class="form-group form-float">
-                <div class="form-line">
-                    <label for="numero_documento">Comentario:</label>
-                    <input type="text" id="comentario"  name="Comentario" class="form-control">
-                </div>
-            </div>
-        </div>
-                 
-                    <div class="col-md-3">
-            <div class="form-group form-float">
- <br>
-                          <button type="submit" value="1" style="margin-right:30px" name="guardar" class="btn btn-success waves-effect"><i class="fa fa-plus"></i></button>
-                                                 <button  type="submit" value="1" name="eliminar" class="btn btn-danger waves-effect"><i class="fa fa-times"></i></button>
-   
-            </div>
-        </div>
-     </form>
-        </div>
+	<form method="POST" action="festivos.php">
+		<div class="col-md-3">
+			<div class="form-group form-float">
+				<div class="form-line">
+				<label for="numero_documento">Fecha</label>
+				<input type="date" id="fecha" required name="fecha" class="form-control">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="form-group form-float">
+				<div class="form-line">
+					<label for="numero_documento">Comentario:</label>
+					<input type="text" id="comentario"  name="comentario" class="form-control">
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			<div class="form-group form-float">
+				<br>
+				<button type="submit" value="1" style="margin-right:30px" name="guardar" class="btn btn-success waves-effect"><i class="fa fa-plus"></i></button>
+				<button  type="submit" value="1" name="eliminar" class="btn btn-danger waves-effect"><i class="fa fa-times"></i></button>
+			</div>
+		</div>
+	</form>
+</div>
 <div id="calendars-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -117,30 +116,30 @@ if($_POST['eliminar'] == 1){
         inline: true,
         onReady: function (selectedDates, dateStr, instance) {
             
-               // Desmarca el día 1 si está seleccionad
-    const defaultDate2 = new Date(currentYear, index, 1);
-    instance.clear(defaultDate2);
-    
-    
-          fetch('obtener_festivos.php?mes=' + (index + 1))
-            .then(response => response.json())
-            .then(data => {
-              data.forEach(fecha => {
-                const dateObj = new Date(fecha);
-                
- 
-    
-                if (dateObj.getFullYear() === currentYear && dateObj.getMonth() === index) {
-                    
-                  instance.jumpToDate(dateObj);
-                  instance.selectedDates.push(dateObj);
-                  instance.redraw();
-                //  alert('Día festivo encontrado: ' + dateObj.toDateString());
-                }
-              });
-            })
-            .catch(error => console.error('Error:', error));
-        },
+			// Desmarca el día 1 si está seleccionad
+			const defaultDate2 = new Date(currentYear, index, 1);
+			instance.clear(defaultDate2);
+		
+		
+			fetch('obtener_festivos.php?mes=' + (index + 1))
+			.then(response => response.json())
+			.then(data => {
+				  data.forEach(fecha => {
+					const dateObj = new Date(fecha);
+					
+	 
+		
+					if (dateObj.getFullYear() === currentYear && dateObj.getMonth() === index) {
+						
+					  instance.jumpToDate(dateObj);
+					  instance.selectedDates.push(dateObj);
+					  instance.redraw();
+					//  alert('Día festivo encontrado: ' + dateObj.toDateString());
+					}
+				  });
+			})
+			.catch(error => console.error('Error:', error));
+		},
       };
 
       flatpickr(calendarElement, flatpickrConfig);

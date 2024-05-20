@@ -795,7 +795,7 @@ function BuscarNotaCredito($nn,$nd){
 	}
 ### Buscar los dias festivos entre dos fechas ###
 function DiasFestivos($fechaini,$fechafin, $tipo = 1){
-	$sql=("SELECT * FROM Tfestivos WHERE Tfestivos_fecha BETWEEN '$fechaini' AND '$fechafin' AND DATEPART(DW,Tfestivos_fecha) NOT IN (1,7) AND Tfestivos_tipo = $tipo");
+	$sql=("SELECT * FROM festivos WHERE Tfestivos_fecha BETWEEN '$fechaini' AND '$fechafin' AND DATEPART(DW,Tfestivos_fecha) NOT IN (1,7) AND Tfestivos_tipo = $tipo");
 	$diasf=mssql_query($sql);
 	$row_diasf = mssql_fetch_assoc($diasf);
 	$totalRows_diasf = mssql_num_rows($diasf);
@@ -836,7 +836,7 @@ function SumarDiaFecha($fecha,$ndias){
 function ValDiaFecha($fecha, $suma = true, $tipo = 0){
 	$oper = $suma ? '+' : '-';
 	$where = ($tipo) ? " IN (1,$tipo)" : " = 1";
-	$sql=("SELECT * FROM Tfestivos WHERE Tfestivos_fecha = '$fecha' AND Tfestivos_tipo $where");
+	$sql=("SELECT * FROM festivos WHERE Tfestivos_fecha = '$fecha' AND Tfestivos_tipo $where");
 	$diasf=mssql_query($sql);
 	$row_diasf = mssql_fetch_assoc($diasf);
 	$numRows_diasf = mssql_num_rows($diasf);
@@ -859,7 +859,7 @@ function ValDiaFecha($fecha, $suma = true, $tipo = 0){
 ### Valida que el dia sea habil ###
 function ValDiaHabil($fecha, $tipo = 0){
 	$where = ($tipo) ? " IN (1,$tipo)" : " = 1";
-	$sql=("SELECT * FROM Tfestivos WHERE Tfestivos_fecha = '$fecha' AND Tfestivos_tipo $where");
+	$sql=("SELECT * FROM festivos WHERE Tfestivos_fecha = '$fecha' AND Tfestivos_tipo $where");
 	$diasf=mssql_query($sql);
 	$numRows_diasf = mssql_num_rows($diasf);
 	if ($numRows_diasf > 0){
@@ -3023,7 +3023,7 @@ function buscarResAntMP($comparendo){
 
 ####  Trae las marcas de vehiculos y las muestra en una lista/menu  ####
 function FestivosTipo(){
-	$query_doc = "SELECT Tfestivostipo_id, Tfestivostipo_nombre FROM Tfestivos_tipo ORDER BY Tfestivostipo_nombre ASC";
+	$query_doc = "SELECT Tfestivostipo_id, Tfestivostipo_nombre FROM festivos_tipo ORDER BY Tfestivostipo_nombre ASC";
 	$doc = mssql_query($query_doc);
 	$row_doc = mssql_fetch_assoc($doc);
 	$totalRows_doc = mssql_num_rows($doc);
