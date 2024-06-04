@@ -1,0 +1,18 @@
+<?php
+
+$serverName = "myServerAddress";  
+$uid = "myUsername";
+$pwd = "myPassword";
+$bd = "u859387114_transitar";
+$connectionInfo = array( "UID"=>$uid,  "PWD"=>$pwd,  "Database"=>$bd);  
+  
+/* Connect using SQL Server Authentication. */  
+$mysqli = sqlsrv_connect( $serverName, $connectionInfo);
+
+if (!( $mysqli )) {
+     echo "Conexion Fallida.<br />";
+     die( print_r( sqlsrv_errors(), true));
+}
+echo "Conexión establecida";
+sqlsrv_close($mysqli);
+?>
