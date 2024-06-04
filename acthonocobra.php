@@ -13,9 +13,9 @@ if (isset($_POST['generar'])) {
             if ($_POST['tipodeuda'] == 4) {
                 // echo "$cobroId<br>";
                 $gen = "UPDATE comparendos SET Tcomparendos_honorarios='$cobroSet' WHERE Tcomparendos_ID='$cobroId'";
-                
+
                 sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
-                
+
                 $mensp .= generateTR($_POST['numero' . $k], 'Honorarios', $cobroSet);
             } elseif ($_POST['tipodeuda'] == 6) {
                 $gen = "UPDATE acuerdos_pagos  SET TAcuerdop_honorarios='$cobroSet' WHERE TAcuerdop_ID='$cobroId'";
@@ -28,7 +28,7 @@ if (isset($_POST['generar'])) {
             }
              $gen = "INSERT INTO THonoCobra (THonoCobra_deudaID, THonoCobra_deudaTipo, THonoCobra_cobroTipo, THonoCobra_tercero, THonoCobra_fecha, THonoCobra_user) VALUES('$cobroId', '" . $_POST['tipodeuda'] . "', '$cobroTipo', '" . $_POST['tercero'] . "', '$fechaini', '" . $_SESSION['MM_Username'] . "');";
               sqlsrv_query( $mysqli,$gen, array(), array('Scrollable' => 'buffered'));
-             
+
         }
         if ($_POST['cobra' . $k] || $_POST['cobrad' . $k]) {
             $cobroId = $_POST['cobrad' . $k] ? $_POST['cobrad' . $k] : $_POST['cobra' . $k];
@@ -100,19 +100,19 @@ function generateTR($detalle, $tipo, $coactivo){
 		<td colspan='2' align='center' class='Recaudada'>$tipo $persuade</td>
 		<td colspan='2' align='center' class='Recaudada'>$detalle</td>
 		<td align='center' class='Recaudada'>Correcto</td>
-	</tr>";	
+	</tr>";
 	return $tr;
 }
 
-?>  
+?>
 <div class="card container-fluid">
     <div class="header">
         <h2>Inscripcion de Medidas Cautelar de Comparendos</h2>
     </div>
     <br>
 <table width="800" class="table" border="0" align="center" bgcolor="#FFFFFF">
-<?php 
-if($info=='OK'){?>
+<?php
+if(isset($info)=='OK'){?>
     <tr>
       <td colspan="10" align="center" class="t_normal_n">Informe detalle Honorarios / Cobranza</td>
     </tr>

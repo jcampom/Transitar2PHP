@@ -58,7 +58,7 @@ if ($placa != "") {
                                 <label>Placa: </label>
                                 <input type="text" class="form-control" size="10" name="placa" required="required" value="<?php echo $placa; ?>"/>
                                             </div></div></div>
-                                            
+
 <div class="col-md-6">
     <div class="form-group form-float">
         <div class="form-line">
@@ -72,7 +72,7 @@ if ($placa != "") {
                                         <legend class="t_normal_n" align="right" id="datliquidacion">| Historico de Propietarios |</legend>
                                         <?php
                                         $html = "";
-                                        $html .= '<table width="100%"> 
+                                        $html .= '<table width="100%">
                                         <tr>
                                             <td class="tnoticia" align="center">DOCUMENTO</td>
                                             <td class="tnoticia align="center">NOMBRE / RAZ&Oacute;N SOCIAL</td>
@@ -83,7 +83,7 @@ $sql = "SELECT * FROM tramites_vehiculos WHERE tramite='5' ORDER BY fecha";
 $tras=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 if (sqlsrv_num_rows($tras) > 0) {
     while ($row_tras = sqlsrv_fetch_array($tras, SQLSRV_FETCH_ASSOC)) {
- 
+
                                              $datciuda = DatosCiudadano($row_tras["identificacion_propietario"]);
                                                 $tipodoc = TipoDocumento($datciuda['tipo_documento']);
                                                 $html .= '
@@ -100,7 +100,7 @@ if (sqlsrv_num_rows($tras) > 0) {
                                             <tr>
                                                 <td class="t_normal" align="left">' . Sindatos(TipoDocumento($row_datosciu["tipo_documento"])) . " ". $row_datosciu["numero_documento"].'</td>
                                                 <td class="t_normal" align="left">' . $row_datosciu["nombres"] . ' ' . $row_datosciu["apellidos"] . '</td>
-                                                <td class="t_normal" align="center">' . $hfecha . '</td>
+                                                <td class="t_normal" align="center">' . $hfecha -> format("Y-m-d") . '</td>
                                             </tr>
                                           <tr>
                                             <td colspan="12" class="t_normal" align="left">&nbsp;</td>
@@ -125,7 +125,7 @@ $tramites=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered')
 if (@sqlsrv_num_rows($tramites) > 0) {
     $historico = array();
     while ($row_tramites = sqlsrv_fetch_array($tramites, SQLSRV_FETCH_ASSOC)) {
-  
+
                 $tramite = array();
 
                 if ($tabla == 'Tcerttrad') {
@@ -139,7 +139,7 @@ if (@sqlsrv_num_rows($tramites) > 0) {
                         $tramite['nombre'] = $tipo . ' MEDIDA CAUTELAR';
                         $tramite['fecha'] = Sindatos($row_dattramite[$tabla . '_foj']);
                     } else {
-                        
+
 $consulta = "SELECT * FROM tramites WHERE id = '".$row_tramites['tramite']."'";
 $resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 $existe = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC);
@@ -175,9 +175,9 @@ $existe = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC);
                 }
 
                 array_push($historico, $tramite);
-            
+
         }
-    
+
 
     usort($historico, "filterDate");
     foreach ($historico as $tramite) {

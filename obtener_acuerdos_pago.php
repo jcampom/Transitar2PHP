@@ -11,14 +11,18 @@ $numeroDocumento = $_POST['numeroDocumento'];
 
 @$numero_acuerdo = $_POST['numero_acuerdo'];
 
-     $consulta_acuerdo="SELECT * FROM acuerdos_pagos where trim(TAcuerdop_identificacion) = '$numeroDocumento' and TAcuerdop_estado = '1' or trim(TAcuerdop_identificacion) = '$numeroDocumento' and TAcuerdop_estado = '3' group by TAcuerdop_numero";
+     $consulta_acuerdo="SELECT * FROM acuerdos_pagos where trim(TAcuerdop_identificacion) = '$numeroDocumento'
+     and TAcuerdop_estado = '1' or trim(TAcuerdop_identificacion) = '$numeroDocumento'
+     and TAcuerdop_estado = '3' group by TAcuerdop_numero";
+
+     
 
             $resultado_acuerdo=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
-            
+
             $resultado_acuerdo2=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
 
             $row_acuerdo=sqlsrv_fetch_array($resultado_acuerdo, SQLSRV_FETCH_ASSOC);
-            
+
             if($row_acuerdo['TAcuerdop_periodicidad'] == 1){
                 $periodo = "Semanal";
             }elseif($row_acuerdo['TAcuerdop_periodicidad'] == 2){
@@ -39,10 +43,10 @@ $select = "
                 while ($rowMenu = sqlsrv_fetch_array($resultado_acuerdo2, SQLSRV_FETCH_ASSOC)) {
 $select .= " <option style='margin-left: 15px;' value='".$rowMenu['TAcuerdop_numero']."'>" . $rowMenu['TAcuerdop_numero'] . "</option>";
                 }
-$select .= "        
+$select .= "
                     </select>
                     </div>";
-                    
+
                     echo $select;
 
 
@@ -53,14 +57,14 @@ $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 $response = "
 <br><br><br>
 <b>Tipo Acuerdo de Pago : Comparendo</b><br><br>
- 
+
 <b style='margin-right:60px'>Acuerdo No.	 ".$row_acuerdo['TAcuerdop_numero']."</b>	<b style='margin-right:60px'>Comparendo No. 	 ".$row_acuerdo['TAcuerdop_comparendo']."</b>	<b style='margin-right:60px'>Periodicidad : 	 ".$periodo."   </b><b style='margin-right:60px'>	Cuotas : 	 ".$row_acuerdo['TAcuerdop_cuotas']."</b><br>
 <table class='table table-striped'>
 <tr>
-<th>Cuota No</th>	
-<th>Fecha de pago</th>	
-<th>Estado</th>	
-<th>Valor</th>	
+<th>Cuota No</th>
+<th>Fecha de pago</th>
+<th>Estado</th>
+<th>Valor</th>
 <th></th>
 
 ";
@@ -84,36 +88,36 @@ if (sqlsrv_num_rows($result) > 0) {
             }elseif($row['TAcuerdop_periodicidad'] == 6){
                 $estado = "Incumplido";
             }
-     
-     //obtenemos valor del derecho de sistematizacion   
-         $consulta_concepto="SELECT * FROM conceptos where id = '1000000167'";  
+
+     //obtenemos valor del derecho de sistematizacion
+         $consulta_concepto="SELECT * FROM conceptos where id = '1000000167'";
          $resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
-         $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC); 
-         
-         
+         $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
+
+
          // obtenemos valores en smlv o uvt
             $consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
-           
+
 
             $resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 
             $row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
-            
-            
+
+
            if($row_concepto['valor_SMLV_UVT'] == 0){
-             $valor_concepto = $row_concepto['valor_concepto'];  
+             $valor_concepto = $row_concepto['valor_concepto'];
             }else if($row_concepto['valor_SMLV_UVT'] == 1){
-             $valor_concepto = ($row_concepto['valor_concepto'] / 30) * $row_smlv['smlv_original'];  
+             $valor_concepto = ($row_concepto['valor_concepto'] / 30) * $row_smlv['smlv_original'];
             }else if($row_concepto['valor_SMLV_UVT'] == 2){
-             $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];  
+             $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
             }
-            
+
         $liElement = "
 <tr>
-<td> <a class='ap-link' href='#' data-ap='".trim($row['TAcuerdop_numero'])."' data-cuota='".trim($row['TAcuerdop_cuota'])."'>".$row['TAcuerdop_cuota']."/".$row['TAcuerdop_cuotas']."</a></td>	
-<td>".$row['TAcuerdop_fechapago']."</td>	
-<td>".$estado."</td>	
+<td> <a class='ap-link' href='#' data-ap='".trim($row['TAcuerdop_numero'])."' data-cuota='".trim($row['TAcuerdop_cuota'])."'>".$row['TAcuerdop_cuota']."/".$row['TAcuerdop_cuotas']."</a></td>
+<td>".$row['TAcuerdop_fechapago']."</td>
+<td>".$estado."</td>
 <td>".number_format($row['TAcuerdop_valor'])."</td>
 
 <td>
@@ -132,7 +136,7 @@ $liElement .= "
 Concepto: ".$row_concepto['nombre']."<div style='text-align:right'> $  ".number_format($valor_concepto)." </div>";
 
 }else{
- $valor_concepto = 0;   
+ $valor_concepto = 0;
 }
 $liElement .= "
 Concepto : 	CUOTA ACUERDO DE PAGO <div style='text-align:right'> $  ".$row['TAcuerdop_valor']." </div>
@@ -145,15 +149,15 @@ Concepto : 	CUOTA ACUERDO DE PAGO <div style='text-align:right'> $  ".$row['TAcu
 
         // Agregar el elemento de lista al resultado final
         $response .= $liElement;
-        
+
         $sistematizacion +=1;
     }
 } else {
-    
+
 if (sqlsrv_num_rows($resultado_acuerdo2) == 0) {
     // En caso de que no se encuentren resultados
     $response = "<li>No se encontraron acuerdos de pago.</li>";
-    
+
 }
 }
 
@@ -170,7 +174,7 @@ echo "$response";
 
 <script>
 $(document).ready(function() {
-    
+
  // Manejador de eventos para el clic en el enlace con la clase "ap-link"
   $('.ap-link').click(function(e) {
     e.preventDefault(); // Evita que el enlace realice su acción por defecto (navegar a una nueva página)
@@ -181,20 +185,20 @@ $(document).ready(function() {
     // Usamos toggle() para alternar la visibilidad del elemento th específico
     $('#detalle' + apId).toggle();
   });
-  
-  
+
+
       // Obtén la lista de checkboxes con la clase "ap-checkbox"
   var apCheckboxes = $('.ap-checkbox');
-  
-  
-  
+
+
+
 
   // Deshabilitar todos los checkboxes excepto el primero
   apCheckboxes.prop('disabled', true);
   apCheckboxes.first().prop('disabled', false);
 
 
-   $('.ap-checkbox').click(function(e) {    
+   $('.ap-checkbox').click(function(e) {
   // Obtén la lista de checkboxes con la clase "ap-checkbox"
    var apCheckboxes = $('.ap-checkbox');
 
@@ -218,7 +222,7 @@ $(document).ready(function() {
    });
 
   });
-  
+
     $('#numero_acuerdo').change(function() {
   var numero_acuerdo = $(this).val();
   var numeroDocumento = <?php echo $numeroDocumento ?>;
@@ -227,14 +231,14 @@ $(document).ready(function() {
                     method: 'POST',
                     data: {numeroDocumento: numeroDocumento,numero_acuerdo:numero_acuerdo },
                     success: function(response) {
-               
+
                         $('#ap-seleccionados').html(response);
                     }
                 });
-  
+
     });
-  
-  
+
+
 });
 
 

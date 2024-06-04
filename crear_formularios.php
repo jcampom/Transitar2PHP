@@ -24,8 +24,8 @@ if (!$resultadoEliminar) {
 } else {
     echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El formulario se ha eliminado correctamente.</div>';
 }
-   
-   
+
+
    // Eliminar de la tabla formularios
 $queryEliminar = "DELETE FROM menu_items WHERE enlace = 'formulario_dinamico_datos.php?id=" . $_GET['id'] . "' ";
 
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
     $fecha = date("Y-m-d");
     $fechaHora = date("Y-m-d H:i:s");
     $camposSeleccionados = $_POST["campos"];
-    
+
 
     // Verificar si el formulario ya existe
     $query = "SELECT * FROM formularios WHERE nombre = '$nombreFormulario'";
@@ -62,12 +62,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
 
 
 		// Insertar el nuevo menú en la tabla "menu_items"
-   
-   
+
+
 	   if(!empty($menuID)){
 				$queryMenu = "INSERT INTO menu_items (nombre, padre_id,enlace,empresa, fecha,fechayhora, usuario, icono) VALUES ('$nombreFormulario', '$menuID','formulario_dinamico_datos.php?id=$formularioID','$empresa','$fecha','$fechayhora','$idusuario','".$_POST["icono"]."')";
 				sqlsrv_query( $mysqli,$queryMenu, array(), array('Scrollable' => 'buffered'));
-				
+
 	   }
 
             // Insertar los campos seleccionados en la tabla "detalle_formularios"
@@ -79,8 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
                 $tipoCampo = $rowTipoCampo['DATA_TYPE'];
                 $precisionCampo = $rowTipoCampo['NUMERIC_PRECISION'];
                 $escalaCampo = $rowTipoCampo['NUMERIC_SCALE'];
-                $charMaxLenCampo = $rowTipoCampo['CHARACTER_MAXIMUM_LENGTH'];			
-				
+                $charMaxLenCampo = $rowTipoCampo['CHARACTER_MAXIMUM_LENGTH'];
+
 				//tipos de dato identificados
 				$tipoDatoN="|bigint|int|smallint|tinyint|";
 				$tipoDatoR="|real|float|";
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
 				$posicionR = strpos($tipoDatoR, $buscar); //buscar tipo de dato en arreglo de datatypes REAL/FLOAT
 				$posicionT = strpos($tipoDatoT, $buscar); //buscar tipo de dato en arreglo de datatypes OTROS
 				$posicionX = strpos($tipoDatoX, $buscar); //buscar tipo de dato en arreglo de datatypes ALFANUMERICO
-				
+
 				if ($posicionN!=false){$tipoCampo = $tipoCampo."(".$precisionCampo.")";}
 				if ($posicionR!=false){$tipoCampo = $tipoCampo."(18,2)";}
 				if ($posicionT!=false){/*dejar el valor de tipo de campo*/}
@@ -100,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
 
                 $queryDetalle = "INSERT INTO detalle_formularios (formulario, campo, tipo, requerido, usuario, fecha, fechayhora) VALUES ('$formularioID', '$campo', '$tipoCampo', '0', '$idusuario', '$fecha', '$fechaHora')";
                 sqlsrv_query( $mysqli,$queryDetalle, array(), array('Scrollable' => 'buffered'));
-                
+
                 $camposRegistrados[] = $campo;
             }
 
@@ -131,19 +131,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
                         </div>';
                  foreach ($camposRegistrados as $campo) {
 
-          
+
             // Agregar campo dinamico
     echo '<div class="col-md-6">
             <div class="form-group form-float">
                 <div class="form-line">
                 <label for="' . $campo . '">' . $campo . ':</label>
               <label for="dinamico"><font color="red">Si es campo dinamico seleccione que tabla usar: </font></label>
-              
+
                 <select class="form-control" name="dinamico_' . $campo . '" id="dinamico_' . $campo . '" data-live-search="true">';
                    echo '<option style="margin-left: 15px;" value="">Seleccionar una opción</option>';
                         $tabla = $_POST["tabla"];
-                     
-                  
+
+
                         // Realizar una consulta a la base de datos para obtener la lista de tablas
                         $query = "SHOW TABLES ";
                         $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
@@ -152,15 +152,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
                             if ($row[0] != "$tabla")
                                 echo '<option style="margin-left: 15px;" value="' . $row[0] . '">' . $row[0] . '</option>';
                         }
-                        
+
                    echo'</select>
 
           </div>
           </div>
           </div>
           ';
-}          
-                        
+}
+
            echo '<button type="submit" class="btn btn-success">
                             <i class="fa fa-save" aria-hidden="true"></i> Guardar
                         </button>
@@ -168,13 +168,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['campos'])) {
                     </form>
                 </div>
             ';
-            
-       
-        } else {
-            echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al crear el formulario: ' . serialize(sqlsrv_errors()) . '</div>';
+
+
         }
-    }
-} elseif ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['requeridos'])) {
+        // else {
+        //     echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al crear el formulario: ' . serialize(sqlsrv_errors()) . '</div>';
+        // }
+
+} else if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['requeridos'])) {
     $formularioID = $_POST['formularioID'];
     $camposRequeridos = $_POST['requeridos'];
 
@@ -190,7 +191,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
     if (strpos($nombreCampo, 'dinamico_') === 0) {
         // Extraer el nombre del campo original eliminando "dinamico_"
         $campoOriginal = substr($nombreCampo, strlen('dinamico_'));
-        
+
         // Realizar la actualización en la tabla detalle_formularios
         $queryUpdate = "UPDATE detalle_formularios SET dinamico = '$valorCampo' WHERE formulario = '$formularioID' AND campo = '$campoOriginal'";
         sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'));
@@ -211,7 +212,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
             <div class="form-group form-float">
                 <div class="form-line">
                     <label for="nombre">Nombre del Formulario:</label>
-                    <input type="text" id="nombre" name="nombre" value="<?php echo $_POST['nombre']; ?>" class="form-control" required>
+                    <input type="text" id="nombre" name="nombre" value="<?php echo @$_POST['nombre']; ?>" class="form-control" required>
                 </div>
             </div>
         </div>
@@ -280,7 +281,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
                                               <label for="padre">Icono</label><br>
 
   <select class="form-control" name="icono"  data-live-search="true" data-live-search="true">
-      
+
        <option value="3d_rotation" data-content="<i class='material-icons' style='margin-left: 15px;'>3d_rotation</i> Rotación 3D">Rotación 3D</option>
 <option value="ac_unit" data-content="<i class='material-icons' style='margin-left: 15px;'>ac_unit</i> Unidad de Aire Acondicionado">Unidad de Aire Acondicionado</option>
 <option value="access_alarm" data-content="<i class='material-icons' style='margin-left: 15px;'>access_alarm</i> Acceso a Alarma">Acceso a Alarma</option>
@@ -637,7 +638,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
             </div>
               </div>
               </div>
-              
+
         <?php } ?>
 
         <button type="submit" class="btn btn-success">
@@ -706,20 +707,20 @@ echo '<tbody>';
 if (sqlsrv_num_rows($resultado) > 0) {
     while ($row = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)) {
         echo '<tr>'; ?>
-        
+
             <td>
                       <?php  if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
-                      
+
                       ?>  <a onclick="return confirm('Estas seguro de eliminar este registro?');" href="crear_formularios.php?id=<?php echo $row['id'] ?>&eliminar=1"> <button type="button" class="btn btn-danger" style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" ><i class="fa fa-times" style="margin:3px"></i></button></a>
-                      <?php } 
+                      <?php }
                        if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
                       ?>
                       <a  href="perfil_formularios.php?id=<?php echo $row['id'] ?>"> <button style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" type="button" class="btn btn-info" ><i class="fa fa-pencil-alt"></i></button></a>
                       <?php
                        }
                        ?>
-                      
-                    
+
+
                       </td>
                       <?php
         echo '<td>' . $row['nombre'] . '</td>';
@@ -727,9 +728,9 @@ if (sqlsrv_num_rows($resultado) > 0) {
         echo '<td>' . $row['campos'] . '</td>';
         echo '<td>' . $row['menu_id'] . '</td>';
         echo '<td>' . $row['tipo'] . '</td>';
-        
+
         ?>
-        
+
         <?php
         echo '</tr>';
     }

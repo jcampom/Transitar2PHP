@@ -1,4 +1,5 @@
 <?php
+session_start();
 include '../conexion.php' ;
 
 
@@ -29,9 +30,9 @@ if($row =sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC))
 
 		if($row["estado"] == '1' ){
 		//Creamos sesión
-			if(!isset( $_SESSION['usuario'])){
-				session_start();
-			}
+			// if(!isset( $_SESSION['usuario'])){
+			//
+			// }
 			//Almacenamos el nombre de usuario en una variable de sesión usuario
 			$idusuario = $row["id"];
 			$_SESSION['usuario'] = $idusuario;

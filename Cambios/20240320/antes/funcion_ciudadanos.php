@@ -233,7 +233,7 @@
                 </div>
             </div>
         </div>
-    
+
     </div>
 </div>
 <script>
@@ -244,23 +244,25 @@
         $.ajax({
             url: 'obtener_ciudadano.php',
             method: 'POST',
-            data: {numero_documento: numeroDocumento},
+            data: {
+                numero_documento: numeroDocumento
+            },
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
                     var datosCiudadano = response.datosCiudadano;
 
-             // Rellenar los campos <input> del formulario con los datos obtenidos
-$('#nombres').val(datosCiudadano.nombres);
-$('#apellidos').val(datosCiudadano.apellidos);
-$('#direccion').val(datosCiudadano.direccion);
-$('#telefono').val(datosCiudadano.telefono);
-$('#celular').val(datosCiudadano.celular);
-$('#email').val(datosCiudadano.email);
-$('#fecha_expedicion').val(datosCiudadano.fecha_expedicion);
-$('#fecha_nacimiento').val(datosCiudadano.fecha_nacimiento);
-$('#ciudadano').val(datosCiudadano.id);
-$('#numero_documento_actual').val(datosCiudadano.identificacion);
+                            // Rellenar los campos <input> del formulario con los datos obtenidos
+                    $('#nombres').val(datosCiudadano.nombres);
+                    $('#apellidos').val(datosCiudadano.apellidos);
+                    $('#direccion').val(datosCiudadano.direccion);
+                    $('#telefono').val(datosCiudadano.telefono);
+                    $('#celular').val(datosCiudadano.celular);
+                    $('#email').val(datosCiudadano.email);
+                    $('#fecha_expedicion').val(datosCiudadano.fecha_expedicion);
+                    $('#fecha_nacimiento').val(datosCiudadano.fecha_nacimiento);
+                    $('#ciudadano').val(datosCiudadano.id);
+                    $('#numero_documento_actual').val(datosCiudadano.identificacion);
 
 
 
@@ -331,7 +333,7 @@ $(document).ready(function() {
                             // Operación de actualización exitosa
                             console.log('Actualización realizada con éxito');
                  alert('Actualización realizada con éxito');
-                           
+
                         },
                         error: function() {
                             // Error en la petición de actualización
@@ -340,7 +342,7 @@ $(document).ready(function() {
                         }
                     });
                 } else {
-                    
+
                     // Obtener los valores de los campos
 var tipoDocumento = $('#tipo_documento').val();
 var nombres = $('#nombres').val();
@@ -350,7 +352,7 @@ var numeroDocumento = $('#numero_documento').val();
 // Verificar si los campos requeridos están vacíos
 if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocumento === "") {
     alert('Los campos tipo de documento, nombres, dirección y número de documento son obligatorios.');
-}else{ 
+}else{
                     // El número de documento no existe, realizar una operación de inserción (INSERT)
                     $.ajax({
                         url: 'insertar_ciudadano.php',
@@ -378,7 +380,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
                             // Operación de inserción exitosa
                             console.log('Inserción realizada con éxito');
                             alert('Inserción realizada con éxito');
-                  
+
                         },
                         error: function() {
                             // Error en la petición de inserción
@@ -411,7 +413,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
                     method: 'POST',
                     data: {numeroDocumento: numeroDocumento },
                     success: function(response) {
-               
+
                         $('#comparendos-seleccionados').html(response);
                     }
                 });
@@ -436,7 +438,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
                     method: 'POST',
                     data: {numeroDocumento: numeroDocumento },
                     success: function(response) {
-               
+
                         $('#dt-seleccionados').html(response);
                     }
                 });
@@ -462,7 +464,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
                     method: 'POST',
                     data: {numeroDocumento: numeroDocumento },
                     success: function(response) {
-               
+
                         $('#ap-seleccionados').html(response);
                     }
                 });
@@ -475,6 +477,6 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
     });
 </script>
 
-  
+
 
 

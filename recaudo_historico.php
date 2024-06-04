@@ -1,4 +1,4 @@
-<?php 
+<?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 include 'menu.php';
@@ -6,13 +6,13 @@ include 'menu.php';
 
 		$OK='';
 if (isset($_POST['buscar'])) {
-    if ($_POST['documento_tipo'] == "" && ($_POST['tiporecaudo'] <> 3 && $_POST['tiporecaudo'] != 4)) {
+    if (isset($_POST['documento_tipo']) == "" && (isset($_POST['tiporecaudo']) <> 3 && isset($_POST['tiporecaudo']) != 4)) {
         echo "<script>alert(\"El numero de documento no puede estar vacio.\");</script>";
     } else {
         if ($_POST['tiporecaudo'] == 1) {
             $query_ap = "SELECT TAcuerdop_comparendo, TAcuerdop_numero FROM acuerdos_pagos WHERE TAcuerdop_numero='" . trim($_POST['documento_tipo']) . "' OR TAcuerdop_identificacion= '" . trim($_POST['documento_tipo']) . "' GROUP BY TAcuerdop_comparendo, TAcuerdop_numero ORDER BY TAcuerdop_numero";
             $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
-            
+
             $result_ap= sqlsrv_num_rows($result_ap);
             if ($result_ap==0){echo "<script>alert(\"El Acuerdo de Pago no existe o la identificacion no tiene AP's.\");</script>";}
         } elseif ($_POST['tiporecaudo'] == 2) {
@@ -25,8 +25,8 @@ if (isset($_POST['buscar'])) {
     }
 }
 
-			
-					
+
+
 		if (@$_POST['guardar']){}//$_POST['guardar']
 ?>
 
@@ -34,7 +34,7 @@ if (isset($_POST['buscar'])) {
 <script type="text/javascript" src="comprobar_disponibilidad_de_apodo.js"></script>
 <script type="text/javascript" src="comprobar_disponibilidad_liquidacion.js"></script>
 
-<script languaje="javascript"> 
+<script languaje="javascript">
 
  function expandCollapseTable(tableObj)
 {
@@ -55,7 +55,7 @@ if 	(document.getElementById('134').value!=0 || document.getElementById('134').v
 
 if 	(document.getElementById('54').value!=0 || document.getElementById('54').value=="")//Desabilito pronto pago 15 dias si pronto pago 5 dias tiene valor
 		{document.getElementById('134').disabled=true;} else {document.getElementById('134').disabled=false;}
-			
+
 var comparendo = parseInt(document.getElementById('1000000022').value);
 var amn_int_mora= parseInt(document.getElementById('1000000050').value);
 var amn_comp_15= parseInt(document.getElementById('134').value);
@@ -66,7 +66,7 @@ var honorarios= parseInt(document.getElementById('1000000016').value);
 var int_mora= parseInt(document.getElementById('1000000021').value);
 
 document.form1.total.value=(comparendo+honorarios+int_mora+gastos_cobr)-(amn_int_mora+amn_comp_15+amn_comp_5+amn_hon_comp);//Sumo y resto valores en el campo total
-} 
+}
 
 function clicker(bot){
 document.getElementById(bot).dblclick();
@@ -119,37 +119,37 @@ body {
 
 
 
-  <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+  <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
 					<strong>Tipo y numero de documento <span class="style1">*</span>: </strong>
 					<br />
 				<select name="tiporecaudo" id="tiporecaudo"  class="form-control" OnChange="checarcombo(); document.form1.documento_tipo.focus();">
 								<option value="1" >Acuerdo de pago</option>
-								<option value="2" <?php if ($_POST['tiporecaudo']==2){echo " selected ";} ?>>Comparendos</option>
-								<option value="3" <?php if ($_POST['tiporecaudo']==3){echo " selected ";} ?>>Tramites RNA</option>
-								<option value="4" <?php if ($_POST['tiporecaudo']==4){echo " selected ";} ?> >Tramites RNC</option>
+								<option value="2" <?php if (isset($_POST['tiporecaudo'])==2){echo " selected ";} ?>>Comparendos</option>
+								<option value="3" <?php if (isset($_POST['tiporecaudo'])==3){echo " selected ";} ?>>Tramites RNA</option>
+								<option value="4" <?php if (isset($_POST['tiporecaudo'])==4){echo " selected ";} ?> >Tramites RNC</option>
 							</select>
-							
+
 							</div></div></div>
-							
-							
-							  <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+
+							  <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <br>
-					    <input class='form-control' name="documento_tipo"  class="form-control" placeholder="Numero de documento (Tambien lo buscara por Identificacion)" type="text" id="documento_tipo" size="15" maxlength="15" <?php if ($_POST['documento_tipo']){echo "value=\"".$_POST['documento_tipo']."\"";}?> >
-					    
+					    <input class='form-control' name="documento_tipo"  class="form-control" placeholder="Numero de documento (Tambien lo buscara por Identificacion)" type="text" id="documento_tipo" size="15" maxlength="15" <?php if (isset($_POST['documento_tipo'])){echo "value=\"".$_POST['documento_tipo']."\"";}?> >
+
 					    </div></div></div>
-					      <div class="col-md-12"> 
-					      <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+					      <div class="col-md-12">
+					      <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
 						<input  name="buscar" class="form-control btn btn-success" type="submit" value="Buscar" >
 						    </div></div></div></div>
-			
+
 			   <?php
-		
+
 							if (@$result_ap >= 1 && @$_POST['tiporecaudo'] == 1) {
     $query_linea = "SELECT TAcuerdop_comparendo, TAcuerdop_periodicidad, TAcuerdop_identificacion, TAcuerdop_cuota, TAcuerdop_valor, TAcuerdop_fechapago, TAcuerdop_estado FROM acuerdos_pagos WHERE TAcuerdop_numero='" . $_POST['documento_tipo'] . "'";
     $result_linea=sqlsrv_query( $mysqli,$query_linea, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
@@ -189,9 +189,9 @@ body {
         } else {
             $input_name = "fecha_recaudo_" . $row_linea[3];
             $button_name = "cal_fecha_AP_" . $row_linea[3];
-            
+
             echo "<td align='center'>";
- 
+
             echo "<input class='form-control' name=\"" . $input_name . "\" type=\"date\" id=\"" . $input_name . "\" size=\"10\" placeholder=\"YYYY-mm-dd\"  />";
             echo "</td>";
         }
@@ -204,13 +204,13 @@ body {
             echo "<td align='center'><span class='style1'>Recaudado</span></td>";
         } else {
 
-  
-            echo "    
+
+            echo "
             <td align='center'>
 <div class='form-check'>
 <input name='recaudar_cuota_" . $row_linea[3] . "' type='checkbox' value='1'  id='recaudar_cuota_" . $row_linea[3] . "' />
   <label class='form-check-label' for='recaudar_cuota_" . $row_linea[3] . "'>
- 
+
   </label>
 
 </div>
@@ -234,7 +234,7 @@ body {
     echo "</td></tr>";
 }
 
-if ($result_comp == 1 && $_POST['tiporecaudo'] == 2) {
+if (@$result_comp == 1 && isset($_POST['tiporecaudo']) == 2) {
     $query_linea = "SELECT Tcomparendos_comparendo, Tcomparendos_fecha,  Tcomparendos_placa, Tcomparendos_codinfraccion, Tcomparendos_estado, Tcomparendos_idinfractor, Tcomparendos_origen FROM comparendos WHERE Tcomparendos_comparendo='" . $_POST['documento_tipo'] . "' or Tcomparendos_idinfractor=" . $_POST['documento_tipo'] . " AND Tcomparendos_estado NOT IN (2, 3, 4)";
     $result_linea=sqlsrv_query( $mysqli,$query_linea, array(), array('Scrollable' => 'buffered'));
     echo "<table class='table'><tr><td colspan=7></br><strong>1. Los campos: Valor recaudo y Fecha Recaudo, son obligatorios.</br>2. El comparendo quedara en estado recaudado.</br></strong></p></td></tr>";
@@ -320,7 +320,7 @@ if ($result_comp == 1 && $_POST['tiporecaudo'] == 2) {
         <td colspan=2  align='center'><input class='form-control' name="total" type="text" id="total" size="10" readonly /></td>
     </tr>
     <?php
-} elseif ($result_comp >= 2 && $_POST['tiporecaudo'] == 2) { // si tiene algun resultado 
+} elseif (@$result_comp >= 2 && isset($_POST['tiporecaudo']) == 2) { // si tiene algun resultado
     $query_comp = "SELECT Tcomparendos_comparendo FROM comparendos WHERE Tcomparendos_comparendo='" . $_POST['documento_tipo'] . "' or Tcomparendos_idinfractor=" . $_POST['documento_tipo'] . " AND Tcomparendos_estado NOT IN (2, 3, 4) GROUP BY Tcomparendos_comparendo ORDER BY Tcomparendos_comparendo";
     $result_comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffered')) or die(guardar_error(__LINE__));
     echo "<tr><td align='center' colspan=7></p><strong>Se encontraron varios comparendos para el ciudadano,</br>seleccione uno para realizar el recaudo:</strong></p>"; //Imprime AP
@@ -332,11 +332,11 @@ if ($result_comp == 1 && $_POST['tiporecaudo'] == 2) {
     echo "</td></tr>";
 }
 
-if ($_POST['tiporecaudo'] == 3 || $_POST['tiporecaudo'] == 4) {
+if (isset($_POST['tiporecaudo']) == 3 || isset($_POST['tiporecaudo']) == 4) {
     echo "</tr>";
     echo "<tr><td colspan=2><label><strong>Ciudadano:<span class='style1'>* (debe existir)</span>:</strong></label></td>";
     echo "<td colspan=4>";
-    include('../funciones/find/comprobar_disponibilidad_de_apodo.php');
+    //include('../funciones/find/comprobar_disponibilidad_de_apodo.php');
     echo "</td>/<tr>";
     echo "<tr><td colspan=2><label><strong>Liquidacion<span class='style1'>* (no debe existir)</span>:</strong></label></td>";
 
@@ -352,13 +352,14 @@ if ($_POST['tiporecaudo'] == 3 || $_POST['tiporecaudo'] == 4) {
     <?php
 }
 
-if ($_POST['tiporecaudo'] == 3) {
+if (isset($_POST['tiporecaudo']) == 3) {
     echo "<tr><td colspan=5 align='right'> <strong>Doble click para Contraer/Expandir</strong>";
     $query_rna = "SELECT id, nombre FROM tramites WHERE tipo_documento =1 order by nombre";
     $result_rna=sqlsrv_query( $mysqli,$query_rna, array(), array('Scrollable' => 'buffered'));
     $posicion = 0;
     $array = array();
-    while ($row_rna = mysqli_fetch_array($result_rna)) {
+    if($result_rna) {
+        while ($row_rna = sqlsrv_fetch_array($result_rna, SQLSRV_FETCH_ASSOC)) {
         ?>
         <table width="100%" border="0" id="myTable" ondblclick="expandCollapseTable(this)">
             <tr id="tr1" bordercolor="#FFFFFF">
@@ -367,17 +368,18 @@ if ($_POST['tiporecaudo'] == 3) {
             </tr>
             <?php
 
-            $array[$posicion] = $row_rna['Ttramites_ID'];
+            $array[$posicion] = $row_rna['id'];
             $posicion++;
             $query_rnc = "SELECT id, nombre FROM conceptos WHERE id IN (SELECT concepto_id FROM detalle_tramites WHERE tramite_id=" . $row_rna['id'] . ")";
             $result_rnc=sqlsrv_query( $mysqli,$query_rnc, array(), array('Scrollable' => 'buffered'));
 
-            while ($row_rnc = mysqli_fetch_array($result_rnc)) {
+            while ($row_rnc = sqlsrv_fetch_array($result_rnc, SQLSRV_FETCH_ASSOC)) {
                 echo "<tr class='gradient'><td colspan=2>&nbsp;&nbsp;&nbsp;&nbsp;" . $row_rnc['nombre'] . "</td><td><input class='form-control' name='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' id='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' type='text' size=5></td></tr>";
             }
             ?>
         </table>
         <?php
+        }
     }
     foreach ($array as $valor) {
         ?>
@@ -389,17 +391,18 @@ if ($_POST['tiporecaudo'] == 3) {
     echo "</td></tr>";
 }
 
-if ($_POST['tiporecaudo'] == 4) {
+if (isset($_POST['tiporecaudo']) == 4) {
     echo "<tr><td colspan=5 align='right'> <strong>Doble click para Contraer/Expandir</strong>";
     $query_rna = "SELECT id, nombre FROM tramites WHERE tipo_documento=2 order by nombre";
     $result_rna=sqlsrv_query( $mysqli,$query_rna, array(), array('Scrollable' => 'buffered'));
     $posicion = 0;
     $array = array();
-    while ($row_rna = mysqli_fetch_array($result_rna)) {
+    if($result_rna) {
+        while ($row_rna = sqlsrv_fetch_array($result_rna, SQLSRV_FETCH_ASSOC)) {
         ?>
         <table width="100%" border="0" id="myTable" ondblclick="expandCollapseTable(this)">
             <tr id="tr1" bordercolor="#FFFFFF">
-                <th colspan="2" width="95%" align="left"><?php echo $row_rna['Ttramites_nombre']; ?></th>
+                <th colspan="2" width="95%" align="left"><?php echo $row_rna['nombre']; ?></th>
                 <th align="right"><input class='form-control' align="right" id="<?php echo $row_rna['id']; ?>" type="button" value="[-] [+] " ondblclick="expandCollapseTable(this);"></th>
             </tr>
             <?php
@@ -407,12 +410,13 @@ if ($_POST['tiporecaudo'] == 4) {
             $posicion++;
             $query_rnc = "SELECT id, nombre FROM conceptos WHERE id IN (SELECT concepto_id FROM detalle_tramites WHERE tramite_id=" . $row_rna['id'] . ")";
             $result_rnc=sqlsrv_query( $mysqli,$query_rnc, array(), array('Scrollable' => 'buffered'));
-            while ($row_rnc = mysqli_fetch_array($result_rnc)) {
+            while ($row_rnc = sqlsrv_fetch_array($result_rnc, SQLSRV_FETCH_ASSOC)) {
                 echo "<tr class='gradient'><td colspan=2>&nbsp;&nbsp;&nbsp;&nbsp;" . $row_rnc['nombre'] . "</td><td><input class='form-control' name='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' id='" . $row_rna['id'] . "_" . $row_rnc['id'] . "' type='text' size=5></td></tr>";
             }
             ?>
         </table>
         <?php
+        }
     }
     foreach ($array as $valor) {
         ?>
@@ -423,18 +427,18 @@ if ($_POST['tiporecaudo'] == 4) {
     }
     echo "</td></tr>";
 }
-							
-														
+
+
 							if ((@$result_comp==1 or @$result_ap==1) and $_POST[buscar] or (@$_POST['tiporecaudo']==3 or @$_POST['tiporecaudo']==4)) //Imprime el boton Guardar y la consulta es exitosa.
 							{
 								echo "<tr><td colspan='7' align='center'><input class='form-control' name='guardar' type='submit' value='Guardar' /></td></tr>";
 							}
-			   	?>		
-				 
+			   	?>
 
-              			  
-			  				
-              
+
+
+
+
         </table>
 		</form>
       </div>

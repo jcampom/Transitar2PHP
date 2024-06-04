@@ -81,22 +81,24 @@ $query_base = "SELECT ROW_NUMBER() OVER (ORDER BY Tnotifica_notificaf) AS fila,
         WHERE Tcomparendos_estado IN (15) $filter ";
 
 if ($paginar == 1) {
-    $sql = "SELECT Tcomparendos_ID  
+    $sql = "SELECT Tcomparendos_ID
 		FROM comparendos
             INNER JOIN Tnotifica ON Tnotifica_compid = Tcomparendos_ID
 		WHERE comparendos_estados IN (15) $filter
 		ORDER BY Tcomparendos_comparendo, Tnotifica_notificaf";
     $comp1=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
-    $total_registros = sqlsrv_num_rows($comp1);
-    $total_paginas = ceil($total_registros / $registros);
-    $query_comp = "SELECT * FROM ($query_base) T WHERE T.fila BETWEEN $inicio AND $fin";
+    if($comp1) {
+        $total_registros = sqlsrv_num_rows($comp1);
+        $total_paginas = ceil($total_registros / $registros);
+        $query_comp = "SELECT * FROM ($query_base) T WHERE T.fila BETWEEN $inicio AND $fin";
+    }
 } else {
     $query_comp = $query_base;
 }
 // echo $query_comp;
-$comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffered'));
+$comp=sqlsrv_query( $mysqli,@$query_comp, array(), array('Scrollable' => 'buffered'));
 
-if ($_POST['webservice']) {
+if (isset($_POST['webservice'])) {
     ini_set("memory_limit", "256M");
     set_time_limit(0);
     $registrosCorrectos = "";
@@ -160,8 +162,8 @@ LEFT JOIN (
 SET C.Tcomparendos_estado = ISNULL(N.estadoant, 1)
 WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15;
 ";
-				
-				
+
+
         $rsql2=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
     }
     $afectacionBD .= "<tr>
@@ -174,7 +176,7 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15;
 }
 
 
-if ($_POST['generar']) {
+if (isset($_POST['generar'])) {
     ini_set("memory_limit", "256M");
     set_time_limit(0);
     $rs2=sqlsrv_query( $mysqli,"SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch", array(), array('Scrollable' => 'buffered'));
@@ -261,25 +263,25 @@ if ($_POST['generar']) {
         $id = trim($row[0]);
         $sql2 = " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Texportplano', 'INSERT', '" . $id . "', '$mensp', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
             $result2=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
-            
+
         $sql2 = " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Trecaudos_arch', 'INSERT', '" . $id . "', '$mensp', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        
+
         $result2=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
-        
+
         $sql2 = " INSERT INTO Trecaudos_ec (Trecaudos_ec_numcuenta, Trecaudos_ec_fechadesde, Trecaudos_ec_fechahasta, Trecaudos_ec_divipo, Trecaudos_ec_tiporecaudo, Trecaudos_ec_numrec, Trecaudos_ec_sumrec, Trecaudos_ec_oficio, Trecaudos_ec_codchequeo, Trecaudos_ec_idarch, Trecaudos_ec_pdf, Trecaudos_ec_expimp, Trecaudos_ec_user, Trecaudos_ec_fecha) VALUES ('', '', '', '', '', '" . ($consec - 1) . "', '$valortotal', " . $_POST['oficio'] . ", '" . $rsumaascii . "', '" . $id . "', '$mensp', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        
+
         $result2=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
-        
+
         $idscomp = implode(',', $idcomp);
-        
-        
-        // $sql2 = "  UPDATE C SET Tcomparendos_estado = ISNULL(N.estadoant, 1) 
-        //     FROM comparendos C 
-        //         LEFT JOIN (SELECT compId, MAX(estadoant) AS estadoant FROM notificaciones 
-        //         WHERE estadoant != 15 
+
+
+        // $sql2 = "  UPDATE C SET Tcomparendos_estado = ISNULL(N.estadoant, 1)
+        //     FROM comparendos C
+        //         LEFT JOIN (SELECT compId, MAX(estadoant) AS estadoant FROM notificaciones
+        //         WHERE estadoant != 15
         //         GROUP BY compId, estadoant) N ON C.Tcomparendos_ID = N.compId
         //     WHERE Tcomparendos_ID IN ($idscomp) AND Tcomparendos_estado = 15";
-            
+
            $sql2 = " UPDATE comparendos C
 LEFT JOIN (
     SELECT compId, MAX(estadoant) AS estadoant
@@ -311,7 +313,7 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
     //strlen($texto) nos da la longitud de la cadena del archivo
 }
 
-?>    
+?>
 
         <script type="text/javascript" src="funciones.js"></script>
 
@@ -324,53 +326,53 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
 
 
                     <?php if (isset($_POST['generar']) == false) : ?>
-        
+
                                 <form name="form" id="form" action="expplanotifica.php" method="POST">
-        
-                          <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                          <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Identificaci&oacute;n Infractor</strong>
-                                 <input class="form-control"name='identificacion' type='text' id='identificacion' size="15"  value='<?php echo $sespos['identificacion']; ?>' />
-                                 </div></div></div>               
-                                                
-                                                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                                 <input class="form-control"name='identificacion' type='text' id='identificacion' size="15"  value='<?php echo @$sespos['identificacion']; ?>' />
+                                 </div></div></div>
+
+                                                                <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Placa</strong>
-                                 <input class="form-control"name='placa' type='text' id='placa' size="15"  value='<?php echo $sespos['placa']; ?>' />
-                                          </div></div></div>               
-                                                
-                                                
-                                                
-                                                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                                 <input class="form-control"name='placa' type='text' id='placa' size="15"  value='<?php echo @$sespos['placa']; ?>' />
+                                          </div></div></div>
+
+
+
+                                                                <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>No. de comparendo</strong>
-                                                
-                            <input class="form-control"name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo $sespos['comparendo']; ?>' />
-                                    </div></div></div> 
-                            
-                                              <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                            <input class="form-control"name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo @$sespos['comparendo']; ?>' />
+                                    </div></div></div>
+
+                                              <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
-                                 
+
                                  <strong>Fecha inicial</strong>
-                            <input class="form-control"name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo $sespos['fechainicial']; ?>" />
-                                       </div></div></div>                
-                                           
-                                                
-                                                
-                                                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                            <input class="form-control"name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo @$sespos['fechainicial']; ?>" />
+                                       </div></div></div>
+
+
+
+                                                                <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Fecha final</strong>
-                           <input class="form-control"name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo $sespos['fechafinal']; ?>" />
-                                     </div></div></div>                  
-                                            
-                                                
-                                                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                           <input class="form-control"name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$sespos['fechafinal']; ?>" />
+                                     </div></div></div>
+
+
+                                                                <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Paginar</strong>
                                                 <select class="form-control" name="paginar" id="paginar" style="vertical-align:middle">
@@ -382,14 +384,14 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
                                                         <option value="0" selected>No</option>
                                                     <?php endif; ?>
                                                 </select>
-                                                  </div></div></div> 
-                                                
-                                                
-                                                
-                                                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                                                  </div></div></div>
+
+
+
+                                                                <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
-                                 
+
                                  <strong>Registros por Pagina</strong>
                                                 <select class="form-control" name="nregistros" id="nregistros" style="vertical-align:middle">
                                                     <?php for ($k = 100; $k <= 2000; $k += 100) : ?>
@@ -400,16 +402,16 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
                                                         <?php endif; ?>
                                                     <?php endfor; ?>
                                                 </select>
-                                                  </div></div></div> 
-                             <div class="col-md-12"> 
-                          <input class="form-control"name="Comprobar" class="btn btn-success" type="submit" id="Comprobar" value="Generar"/><br /><?php echo $mesliq; ?></div>
-                                
+                                                  </div></div></div>
+                             <div class="col-md-12">
+                          <input class="form-control"name="Comprobar" class="btn btn-success" type="submit" id="Comprobar" value="Generar"/><br /><?php echo @$mesliq; ?></div>
+
                                 </form>
                             </td>
                         </tr>
-                    <?php endif; ?>    
+                    <?php endif; ?>
                 <table class="table">
-                    <?php if ($_POST['webservice']) : ?>
+                    <?php if (isset($_POST['webservice'])) : ?>
                         <tr>
                             <td colspan="10" align="center" class="t_normal_n">Detalle registros enviado a SIMIT</td>
                         </tr>
@@ -461,7 +463,7 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
                         <tr>
                             <td colspan="10">&nbsp;</td>
                         </tr>
-                    <?php elseif ($_POST['generar']) : ?>
+                    <?php elseif (isset($_POST['generar'])) : ?>
                         <tr>
                             <td colspan="10" align="center" class="t_normal_n">Detalle archivo plano SIMIT</td>
                         </tr>
@@ -526,9 +528,9 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
                                 <th align="center">Estado</th>
                                 <th align="center">
                    <div class="form-check">
-    <input class="form-check-input" name="todos" type="checkbox" id="todos" 
-           onmouseover="Tip('Marca o desmarca todos los registros del listado')" 
-           onmouseout="UnTip()" checked 
+    <input class="form-check-input" name="todos" type="checkbox" id="todos"
+           onmouseover="Tip('Marca o desmarca todos los registros del listado')"
+           onmouseout="UnTip()" checked
            onclick="CheckOnCheck()" />
     <label class="form-check-label" for="todos"></label>
 </div>
@@ -556,12 +558,12 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
                             </tr>
                             <?php if ($paginar == 1): ?>
                                 <tr>
-                                    <td colspan="10" align="center">   
-                                        <?php if ($total_registros): ?>                            
+                                    <td colspan="10" align="center">
+                                        <?php if ($total_registros): ?>
                                             <?php if (($pagina - 1) > 0): ?>
                                                 <a class="Recaudada" href="expplanotifica.php?pagina=<?php echo ($pagina - 1); ?>&nregistros=<?php echo $registros; ?>">< Anterior&nbsp;</a>
-                                            <?php endif; ?>		
-                                            <?php for ($i = 1; $i <= $total_paginas; $i++): ?>		
+                                            <?php endif; ?>
+                                            <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
                                                 <?php if ($pagina == $i) : ?>
                                                     <b class='highlight2'>&nbsp;<?php echo $pagina ?>&nbsp;</b>
                                                 <?php else: ?>
@@ -608,7 +610,7 @@ WHERE C.Tcomparendos_ID IN ($idscomp) AND C.Tcomparendos_estado = 15";
                                     </td>
                                 </tr>
                             <?php endif; ?>
-                        </form>		
+                        </form>
                     <?php else : ?>
                         <tr>
                             <td colspan="10" align="left" style="text-align: center">No hay datos para mostrar</td>

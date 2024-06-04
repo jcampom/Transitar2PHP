@@ -1,7 +1,13 @@
 <?php
 include 'conexion.php';
 // Obtener los tramites seleccionados enviados por AJAX
+
+if(!isset($_POST['tramitesSeleccionados'])) {
+	return;
+}
+
 $tramitesSeleccionados = isset($_POST['tramitesSeleccionados'])? $_POST['tramitesSeleccionados'] : null;
+
 if(!isset($fecha)){ $fecha = date("Y-m-d"); }
 if(!isset($ano)){ $ano = date("Y"); }
 $valor_nota = $_POST['valor_nota']?? 0 ;
@@ -14,10 +20,10 @@ if(!empty($tramitesSeleccionados)) {
 	foreach ($tramitesSeleccionados as $tramite) {
 		// Acceder a los IDs y clases de cada tramite
 		$tramiteId = $tramite['tramiteId'];
-		
+
 
 		if(empty($tramite['claseVehiculo'])){
-		  if(isset($_POST['placa'])){ 
+		  if(isset($_POST['placa'])){
 				$placa = $_POST['placa'];
 				$consulta_vehiculo="SELECT * FROM vehiculos where numero_placa = '$placa'";
 				$resultado_vehiculo=sqlsrv_query( $mysqli,$consulta_vehiculo, array(), array('Scrollable' => 'buffered'));
@@ -35,7 +41,7 @@ if(!empty($tramitesSeleccionados)) {
 			$tipo_servicio = $tramite['tipoVehiculo'];
 			//echo "3.tramiteID = ".$tramiteId."|".$claseVehiculo."|".$tipo_servicio."|".$placa;
 		}
-		
+
 
 		// Realizar la consulta para obtener los conceptos asociados al trámite
 		$sql = "SELECT * FROM detalle_tramites WHERE tramite_id = '$tramiteId'";
@@ -43,31 +49,35 @@ if(!empty($tramitesSeleccionados)) {
 
 		// Crear un array para almacenar los conceptos
 		$conceptos = array();
+		echo '<script type="text/javascript">console.log("El numero de conceptos es '.sqlsrv_num_rows($resultado).'")</script>';
 
 		if (sqlsrv_num_rows($resultado) > 0) {
 			while ($row = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)) {
-				
+
 				if($tramiteId == 1){
 					$consulta_concepto="SELECT * FROM conceptos where ((id = '".$row['concepto_id']."' and clase_vehiculo = '$claseVehiculo'  and servicio_vehiculo = '$tipo_servicio') or (id = '".$row['concepto_id']."' and clase_vehiculo = '0' )) ";
 				}else{
-					
-					$consulta_concepto="SELECT * FROM conceptos where id = '".$row['concepto_id']."' and clase_vehiculo = '$clase' and servicio_vehiculo = '$tipo_servicio' ";
-					
+
+					$consulta_concepto="SELECT * FROM conceptos where id = '".$row['concepto_id']."' and clase_vehiculo = '$claseVehiculo' and servicio_vehiculo = '$tipo_servicio' ";
+
 					//if($sistematizacion != 1){
 					//	$consulta_concepto .= " and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
 					//}
 					//$consulta_concepto.=" or id = '".$row['concepto_id']."' and clase_vehiculo = '0' ";
 					//if($sistematizacion != 1){
 					//	$consulta_concepto .= "  and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
-					//} 
+					//}
 				}
 
 				$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
 
+				echo '<script type="text/javascript">console.log("Concepto consulta: '.$consulta_concepto.'")</script>';
+				echo '<script type="text/javascript">console.log("El el detalle del concepto es '.sqlsrv_num_rows($resultado_concepto).'")</script>';
+
 				if (sqlsrv_num_rows($resultado_concepto)>0){
-					
+
 					$row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
-					
+
 					if($row_concepto['id'] == '1000001549'){
 						 $sistematizacion += 1;
 					}
@@ -78,27 +88,27 @@ if(!empty($tramitesSeleccionados)) {
 					}else{
 						$rango = "2900-01-01";
 					}
-					
+
 					if($row_concepto['id'] > 0 && $fecha >=  $fecha_vigencia_inicial && $fecha <=  $rango && !in_array($row_concepto['id'], $repetidos)){
 						$consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
 						$resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
 						$row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
-						
+
 						if($row_concepto['porcentaje'] > 0){
 							$valor = ($total * $row_concepto['porcentaje']) / 100;
 						}elseif($row_concepto['valor_SMLV_UVT'] == 0){
-							$valor = $row_concepto['valor_concepto'];  
+							$valor = $row_concepto['valor_concepto'];
 						}else if($row_concepto['valor_SMLV_UVT'] == 1){
-							$valor = $row_concepto['valor_concepto'] * $row_smlv['smlv']; // $row_smlv['smlv_original'];  
+							$valor = $row_concepto['valor_concepto'] * $row_smlv['smlv']; // $row_smlv['smlv_original'];
 						}else if($row_concepto['valor_SMLV_UVT'] == 2){
-							$valor = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];  
+							$valor = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
 						}
 
-						if($row_concepto['operacion'] == 2){  
-							$valor = -$valor;    
+						if($row_concepto['operacion'] == 2){
+							$valor = -$valor;
 						}
 						//$total += ceil($valor);
-						$total += ceil($valor);
+						$total += round($valor);
 
 						if($row_concepto['repetir'] == 0){
 							$repetidos[] = $row_concepto['id'];
@@ -107,11 +117,11 @@ if(!empty($tramitesSeleccionados)) {
 						if (strpos($row_concepto['nombre'], "DERECHO DE SISTEMATIZACION") !== false) {
 							$repetidos[] = "1000001549";
 						}
-				
+
 					}
-				} 
-			} 
-		} 
+				}
+			}
+		}
 	}
 }
 
@@ -120,5 +130,5 @@ if($valor_nota > 0){
 }
 
 // Imprimir el total como respuesta
-echo "<b>".number_format(ceil($total))."</b>";
+echo "<b>".number_format(round($total))."</b>";
 ?>

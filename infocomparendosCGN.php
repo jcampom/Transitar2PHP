@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-include 'conexion.php';
+include 'menu.php';
 $fechhoy = date('Ymd');
 set_time_limit(0);
 $OK = "";
@@ -14,17 +14,19 @@ if (isset($_POST['Generar'])) {
     	$qry1="SELECT MAX(creado) AS creado, DATEDIFF(CAST('".$_POST['fechainicial']."' AS DATE), MAX(creado)) AS diffecha FROM morososCGN_semestral WHERE borrado IS NULL";
         $sqldiffecha=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
 
-        if (sqlsrv_num_rows($sqldiffecha) > 0) {
-            $filam = sqlsrv_fetch_array($sqldiffecha, SQLSRV_FETCH_ASSOC);
+        if($sqldiffecha) {
+            if (sqlsrv_num_rows($sqldiffecha) > 0) {
+                $filam = sqlsrv_fetch_array($sqldiffecha, SQLSRV_FETCH_ASSOC);
 
-            if (intval($filam['diffecha']) >= 6) {
-                $OK = "OK";
+                if (intval($filam['diffecha']) >= 6) {
+                    $OK = "OK";
+                } else {
+                    echo "<script>alert('No se puede generar nuevo archivo antes de ".$filam['diffecha']." meses desde ".$filam['creado'].", valor ".$_POST['fechainicial']." no es valido!');</script>";
+                    $OK = "";
+                }
             } else {
-                echo "<script>alert('No se puede generar nuevo archivo antes de ".$filam['diffecha']." meses desde ".$filam['creado'].", valor ".$_POST['fechainicial']." no es valido!');</script>";
-                $OK = "";
+                $OK = "OK";
             }
-        } else {
-            $OK = "OK";
         }
     }
 }
@@ -40,7 +42,7 @@ if (isset($_POST['registrosguardar']) && $_POST['registrosguardar'] != null) {
                 $insert = "INSERT INTO morososCGN_semestral (tipo_deudor, numero_obligacion, ciudadano_identificacion, ciudadano_tipo, ciudadano_nombrecompleto, sumaobligaciones, creado, creado_por, actualizado, cantidadobligaciones, detalleobligaciones) VALUES ('".
                 $arreglo2[$i]['tipo']."','".$arreglo2[$i]['num_obligacion']."','".$arreglo2[$i]['tcomparendos_idinfractor'].
                 "','".$arreglo2[$i]['nombre']."','".$arreglo2[$i]['razon_social']."',".$arreglo2[$i]['sumavalores'].",'".$_POST['fechainicial']."','".$_SESSION['MM_Username']."','".date("Y-m-d H:i:s")."',".$arreglo2[$i]['cantidadobligaciones'].",'".$arreglo2[$i]['detalleobligaciones']."')";
-                
+
                 $exito=sqlsrv_query( $mysqli,$insert, array(), array('Scrollable' => 'buffered'));
             }
         }
@@ -60,23 +62,23 @@ if (isset($_POST['registrosguardar']) && $_POST['registrosguardar'] != null) {
         <h2>INFORME SEMESTRAL PARA LA CGN<br />MOROSOS POR PAGAR</h2>
     </div>
     <br>
-      
+
             <form name="form" id="form" method="POST">
-                
-                 
+
+
                         <td align="left"><b>Fecha del Reporte</b></td>
                         <td align="left"><input name="fechainicial" type="date" id="fechainicial" size="15"
                                 style="vertical-align:middle"
-                                value="<?php echo $_POST['fechainicial']; ?>" /></td>
-                        
+                                value="<?php echo @$_POST['fechainicial']; ?>" /></td>
+
                     </tr>
-                    
+
                     <tr>
                         <td align="center" colspan="4">&nbsp;</td>
                     </tr>
                     <tr>
                         <td align="center" colspan="4"><input name="Generar" type="submit" id="Generar"
-                                value="Generar" /><br /><?php echo $mesliq; ?></td>
+                                value="Generar" /><br /><?php echo @$mesliq; ?></td>
                     </tr>
                 </table>
             </form>
@@ -120,78 +122,78 @@ if (sqlsrv_num_rows($sqldatos) > 0) {
 					<input type="hidden" name="salida1" value="<?php echo $salida0; ?>" />
 					<input type='submit' value="Exportar Ultima Corrida" name="mostrar">
 				</td></tr></table>
-				
-			</form>	
+
+			</form>
 			<?php }  ?>
             <table width="800" align="center" bgcolor="#FFFFFF">
                 <tr>
                     <td align='center' colspan='4'>
                         <?php
 							$salida="";
-                            if ($_POST['Generar'] and $OK == "OK") {
-                                
-    $sql_totconc1 = "IF Object_ID('infoCGN') IS NOT NULL BEGIN DROP TABLE infoCGN END; 
+                            if (isset($_POST['Generar']) and $OK == "OK") {
+
+    $sql_totconc1 = "IF Object_ID('infoCGN') IS NOT NULL BEGIN DROP TABLE infoCGN END;
     SELECT 'DEUDOR PRINCIPAL' AS concepto,
     CASE c.tipo_documento WHEN 1 THEN 'PERSONA NATURAL' WHEN 2 THEN 'PERSONA JURIDICA' END AS tipo,
     CAST(g2.tcomparendos_idinfractor AS varchar(20))+'-CMP' AS num_obligacion,
     g2.tcomparendos_idinfractor, ti.nombre,
     c.nombres + ' '+ c.apellidos  AS razon_social, g2.sumavalores, 'SIN LEYENDA' AS estado
-    INTO infoCGN 
+    INTO infoCGN
     FROM  (
         SELECT g1.tcomparendos_idinfractor,
         SUM(g1.cantidad) AS cant, SUM(g1.suma) AS sumavalores
         FROM  (
-            SELECT 
-            tcomparendos_idinfractor, 
+            SELECT
+            tcomparendos_idinfractor,
             COUNT(*) AS cantidad, SUM((s.smlv /30) * cc.TTcomparendoscodigos_valorSMLV) AS suma
-            FROM comparendos tc 
+            FROM comparendos tc
             INNER JOIN [Tnotifica] TNO ON tno.Tnotifica_comparendo=tc.Tcomparendos_comparendo
             INNER JOIN [comparendos_codigos] cc ON tc.Tcomparendos_codinfraccion = cc.TTcomparendoscodigos_codigo
             INNER JOIN [smlv] s ON s.ano = YEAR(tno.Tnotifica_notificaf)
             LEFT JOIN  acuerdos_pagos tap ON tap.TAcuerdop_comparendo=tc.Tcomparendos_comparendo AND TAcuerdop_cuota=1
             WHERE DATEDIFF(MONTH, tno.Tnotifica_notificaf, CAST('" . $_POST['fechainicial'] . "' AS DATE)) >= 6
-            AND ((tc.Tcomparendos_estado IN (3) AND TAcuerdop_comparendo IS NULL) 
-                OR EXISTS(SELECT * FROM  acuerdos_pagos WHERE TAcuerdop_comparendo=tc.Tcomparendos_comparendo 
-                    AND TAcuerdop_estado IN(1,3,4,6) AND DATEDIFF(MONTH,TAcuerdop_fecha, CAST('2022-05-31' AS DATE)) >= 6)  
-                OR tc.Tcomparendos_estado NOT IN (2,3,7,9,12,13,14))  
+            AND ((tc.Tcomparendos_estado IN (3) AND TAcuerdop_comparendo IS NULL)
+                OR EXISTS(SELECT * FROM  acuerdos_pagos WHERE TAcuerdop_comparendo=tc.Tcomparendos_comparendo
+                    AND TAcuerdop_estado IN(1,3,4,6) AND DATEDIFF(MONTH,TAcuerdop_fecha, CAST('2022-05-31' AS DATE)) >= 6)
+                OR tc.Tcomparendos_estado NOT IN (2,3,7,9,12,13,14))
             GROUP BY tcomparendos_idinfractor
-            HAVING SUM((s.smlv /30) * cc.TTcomparendoscodigos_valorSMLV) >= 
+            HAVING SUM((s.smlv /30) * cc.TTcomparendoscodigos_valorSMLV) >=
             (SELECT ISNULL(Ts2.smlvoriginal, Ts2.smlv) * 5 FROM [smlv] Ts2 WHERE Ts2.ano=YEAR(CAST('" . $_POST['fechainicial'] . "' AS DATE)))
-        ) AS g1  
+        ) AS g1
         GROUP BY g1.tcomparendos_idinfractor
     ) AS g2
-    INNER JOIN ciudadanos c ON CONVERT(nvarchar(20), g2.Tcomparendos_idinfractor) = LTRIM(RTRIM(c.numero_documento)) 
+    INNER JOIN ciudadanos c ON CONVERT(nvarchar(20), g2.Tcomparendos_idinfractor) = LTRIM(RTRIM(c.numero_documento))
     INNER JOIN tipo_identificacion ti ON c.tipo_documento = ti.id;";
 
-$sql_totconc2 = "IF Object_ID('infoCGN2') IS NOT NULL BEGIN DROP TABLE infoCGN2 END; 
+$sql_totconc2 = "IF Object_ID('infoCGN2') IS NOT NULL BEGIN DROP TABLE infoCGN2 END;
     SELECT 'DEUDOR PRINCIPAL' AS concepto,
     CASE c.tipo_documento WHEN 1 THEN 'PERSONA NATURAL' WHEN 2 THEN 'PERSONA JURIDICA' END AS tipo,
-    RTRIM(LTRIM(c.numero_documento)) + '-DT'  AS num_obligacion, 
+    RTRIM(LTRIM(c.numero_documento)) + '-DT'  AS num_obligacion,
     RTRIM(LTRIM(c.numero_documento)) AS tcomparendos_idinfractor,
-    ti.nombre AS nombre, 
+    ti.nombre AS nombre,
     REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.nombres,'#',''),'$',''),'@',''),'%',''),'&',''),'/',''),'(',''),')',''),'=',''),'?',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9',''),'0',''),'+',''),'´',''),'{',''),'}','')
-    + ' '+ 
+    + ' '+
     REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.apellidos,'#',''),'$',''),'@',''),'%',''),'&',''),'/',''),'(',''),')',''),'=',''),'?',''),'1',''),'2',''),'3',''),'4',''),'5',''),'6',''),'7',''),'8',''),'9',''),'0',''),'+',''),'´',''),'{',''),'}','') AS razon_social,
-    ROUND(SUM(dbo.CalValSMLV(tc.Tconceptos_valor, tc.tconceptos_smlv, td.TDT_ano) ),0) AS sumavalores,  
+    ROUND(SUM(dbo.CalValSMLV(tc.Tconceptos_valor, tc.tconceptos_smlv, td.TDT_ano) ),0) AS sumavalores,
     'SIN LEYENDA' AS estado
-    INTO infoCGN2 
+    INTO infoCGN2
     FROM [TDT] td
     INNER JOIN vehiculos v ON td.TDT_placa = v.numero_placa
-    INNER JOIN tramites ttra ON ttra.ttramites_id=td.TDT_tramite 
-    INNER JOIN detalle_tramites ttc ON ttra.Ttramites_ID = ttc.Ttramites_conceptos_T 
-    INNER JOIN conceptos tc ON tc.Tconceptos_ID = ttc.Ttramites_conceptos_C AND tc.Tconceptos_clase = v.clase AND tc.Tconceptos_servicioVeh=v.tipo_servicio 
-    INNER JOIN ciudadanos c ON v.numero_documento = c.numero_documento   
-    INNER JOIN tipo_identificacion ti ON c.tipo_documento = ti.id 
+    INNER JOIN tramites ttra ON ttra.ttramites_id=td.TDT_tramite
+    INNER JOIN detalle_tramites ttc ON ttra.Ttramites_ID = ttc.Ttramites_conceptos_T
+    INNER JOIN conceptos tc ON tc.Tconceptos_ID = ttc.Ttramites_conceptos_C AND tc.Tconceptos_clase = v.clase AND tc.Tconceptos_servicioVeh=v.tipo_servicio
+    INNER JOIN ciudadanos c ON v.numero_documento = c.numero_documento
+    INNER JOIN tipo_identificacion ti ON c.tipo_documento = ti.id
     LEFT JOIN smlv ts ON ts.ano = td.TDT_ano
-    WHERE TDT_estado IN (5,8)  
-    AND LEN(LTRIM(RTRIM(td.TDT_placa))) >= 5 AND LTRIM(RTRIM(c.numero_documento)) <> '0' 
+    WHERE TDT_estado IN (5,8)
+    AND LEN(LTRIM(RTRIM(td.TDT_placa))) >= 5 AND LTRIM(RTRIM(c.numero_documento)) <> '0'
     AND LTRIM(RTRIM(c.numero_documento)) <> '0000000000000' AND LTRIM(RTRIM(c.nombres)) <> 'PERSONA INDETERMINADA'
-    AND ts.ano >= 1996 
+    AND ts.ano >= 1996
     GROUP BY c.tipo_documento, c.numero_documento, ti.nombre, c.nombres, c.apellidos
-    HAVING ROUND(SUM(dbo.CalValSMLV(tc.Tconceptos_valor, tc.tconceptos_smlv, td.TDT_ano) ),0) > 
+    HAVING ROUND(SUM(dbo.CalValSMLV(tc.Tconceptos_valor, tc.tconceptos_smlv, td.TDT_ano) ),0) >
     (SELECT (CASE Ts2.smlvorginal WHEN NULL THEN Ts2.smlv ELSE Ts2.smlvorginal END) * 5 FROM [smlv] Ts2 WHERE Ts2.ano=YEAR(CAST('" . $_POST['fechainicial'] . "' AS DATE)))
     ORDER BY RTRIM(LTRIM(c.numero_documento))";
-	
+
 $sql_totconc3 = "SELECT * FROM infoCGN UNION SELECT * FROM infoCGN2";
 
 ini_set('memory_limit', '1024M');
@@ -201,7 +203,7 @@ $query_totconc1=sqlsrv_query( $mysqli,$sql_totconc1, array(), array('Scrollable'
 $query_totconc2=sqlsrv_query( $mysqli,$sql_totconc2, array(), array('Scrollable' => 'buffered'));
 $query_totconc=sqlsrv_query( $mysqli,$sql_totconc3, array(), array('Scrollable' => 'buffered'));
 
-if (sqlsrv_num_rows($query_totconc) > 0) {
+if($query_totconc){if (sqlsrv_num_rows($query_totconc) > 0) {
     $salida .= "<table width='100%' bgcolor='#FFFFFF' border='0.5' bordercolor='#0000CC'>";
     $salida .= "<tr class='header'>
                 <td align='center' width='25%'>CONCEPTO</td>
@@ -235,7 +237,7 @@ if (sqlsrv_num_rows($query_totconc) > 0) {
         $arreglo[$i]['razon_social'] = $row_totconc['razon_social'];
         $arreglo[$i]['sumavalores'] = $row_totconc['sumavalores'];
         $arreglo[$i]['estado'] = $row_totconc['estado'];
-										
+
 		$sql2 = "SELECT tcomparendos_idinfractor, tcomparendos_comparendo
         FROM comparendos tc
         INNER JOIN [Tnotifica] TNO ON tno.Tnotifica_comparendo=tc.Tcomparendos_comparendo
@@ -243,10 +245,10 @@ if (sqlsrv_num_rows($query_totconc) > 0) {
         INNER JOIN [smlv] s ON s.ano = YEAR(tno.Tnotifica_notificaf)
         LEFT JOIN  acuerdos_pagos tap ON tap.TAcuerdop_comparendo=tc.Tcomparendos_comparendo AND TAcuerdop_cuota=1
         WHERE DATEDIFF(MONTH, tno.Tnotifica_notificaf, CAST('" . $_POST['fechainicial'] . "' AS DATE)) >= 6
-        AND ((tc.Tcomparendos_estado IN (3) AND TAcuerdop_comparendo IS NULL) 
-            OR EXISTS(SELECT * FROM [cienaga].[dbo]. acuerdos_pagos WHERE TAcuerdop_comparendo=tc.Tcomparendos_comparendo 
-                AND TAcuerdop_estado IN(1,3,4,6) AND DATEDIFF(MONTH,TAcuerdop_fecha, CAST('" . $_POST['fechainicial'] . "' AS DATE)) >= 6)  
-            OR tc.Tcomparendos_estado NOT IN ( 2,3,7,9,12,13,14))  
+        AND ((tc.Tcomparendos_estado IN (3) AND TAcuerdop_comparendo IS NULL)
+            OR EXISTS(SELECT * FROM [cienaga].[dbo]. acuerdos_pagos WHERE TAcuerdop_comparendo=tc.Tcomparendos_comparendo
+                AND TAcuerdop_estado IN(1,3,4,6) AND DATEDIFF(MONTH,TAcuerdop_fecha, CAST('" . $_POST['fechainicial'] . "' AS DATE)) >= 6)
+            OR tc.Tcomparendos_estado NOT IN ( 2,3,7,9,12,13,14))
         AND tc.Tcomparendos_idinfractor=" . $row_totconc['tcomparendos_idinfractor'] . "
         GROUP BY tcomparendos_idinfractor, tcomparendos_comparendo";
 $query2=sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
@@ -275,17 +277,17 @@ $i++;
 											<!--td>&nbsp;</td-->
 											<td align="center" colspan=3>
 											  <form id="form2" method="post" target="_blank" >
-											    <input type="hidden" name="fechainicial" value="'.$_POST['fechainicial'].'" /> 
-												<input type="hidden" name="registrosguardar" value="'.base64_encode(serialize($arreglo)).'" /> 
+											    <input type="hidden" name="fechainicial" value="'.$_POST['fechainicial'].'" />
+												<input type="hidden" name="registrosguardar" value="'.base64_encode(serialize($arreglo)).'" />
 												<input type="button" value="Guardar en Registros Semestrales" onclick="iraform2();">
 												<br>
                                               </form>
                                             </td>
                                         </tr>';
                                 }
-							sqlsrv_free_stmt($query_totconc);
+							sqlsrv_free_stmt($query_totconc);}
 
-						/* */		
+						/* */
                             } elseif(isset($_POST['registrosguardar']) && $_POST['registrosguardar']!=null) {
 							if (count($arreglo2) > 0) {
     $salida .= "<table width='100%' bgcolor='#FFFFFF' border='0.5' bordercolor='#0000CC'>";
@@ -302,7 +304,7 @@ $i++;
     $grantotal = 0;
     $arreglo = null;
     $i = 0;
-    
+
     for ($i = 0; $i < count($arreglo2); $i++) {
 
         $salida .= "<tr>";
@@ -341,8 +343,8 @@ $i++;
             </td>
             <td align="center" colspan=3>
               <form id="form2" method="post" >
-                <input type="hidden" name="fechainicial" value="' . $_POST['fechainicial'] . '" /> 
-                <input type="hidden" name="registrosguardar" value="' . base64_encode(serialize($arreglo)) . '" /> 
+                <input type="hidden" name="fechainicial" value="' . $_POST['fechainicial'] . '" />
+                <input type="hidden" name="registrosguardar" value="' . base64_encode(serialize($arreglo)) . '" />
                 <input type="button" value="Guardar en Registros Semestrales" onclick="iraform2();">
                 <br>
               </form>
@@ -357,4 +359,6 @@ $i++;
             </table>
         </div>
     </div>
-<?php include 'conexion.php'; ?>
+<?php
+include 'scripts.php';
+?>

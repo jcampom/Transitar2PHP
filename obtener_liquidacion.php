@@ -26,7 +26,7 @@ $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered')
 
 $sql_mora = "SELECT mora
         FROM detalle_conceptos_liquidaciones
-        WHERE liquidacion = '$noLiquidacion' group by comparendo";
+        WHERE liquidacion = '$noLiquidacion'";
 
 $result_mora = sqlsrv_query( $mysqli,$sql_mora, array(), array('Scrollable' => 'buffered'));
 $mora = 0;
@@ -38,11 +38,11 @@ if (sqlsrv_num_rows($result) > 0) {
     // Si se encontraron registros, obtenemos los datos y realizamos los cálculos
     $row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
-    
+
     $valorResultado = $row['valor'] + $mora;
       $recaudado = 0;
     $pendiente= $valorResultado - $recaudado;
-  
+
 
     // Creamos un arreglo con los datos calculados para devolverlos en formato JSON
     $data = array(

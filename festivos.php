@@ -1,30 +1,30 @@
 <?php
 include 'menu.php';
 
-if($_POST['guardar'] == 1){
+if(isset($_POST['guardar']) == 1){
     $insertQuery = "INSERT INTO festivos (Tfestivos_fecha, Tfestivos_descripcion) VALUES ('".$_POST['fecha']."','".$_POST['comentario']."')";
 
     // Ejecutar la consulta de inserción
     if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))) {
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
- 
+
     } else {
    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
-    }    
-    
+    }
+
 }
 
-if($_POST['eliminar'] == 1){
+if(isset($_POST['eliminar']) == 1){
      $eliminarQuery = "DELETE FROM festivos where Tfestivos_fecha = '".$_POST['fecha']."' ";
 
     // Ejecutar la consulta de inserción
     if (sqlsrv_query( $mysqli,$eliminarQuery, array(), array('Scrollable' => 'buffered'))) {
         echo '<div class="alert alert-warning"><strong>¡Bien hecho!</strong> Los datos se han eliminado correctamente.</div>';
- 
+
     } else {
    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
-    } 
-    
+    }
+
 }
 
 ?>
@@ -101,7 +101,7 @@ if($_POST['eliminar'] == 1){
         mode: 'single',
         dateFormat: 'Y-m-d',
         defaultDate: new Date(currentYear, index),
-        
+
         locale: {
           firstDayOfWeek: 1,
           weekdays: {
@@ -115,22 +115,22 @@ if($_POST['eliminar'] == 1){
         },
         inline: true,
         onReady: function (selectedDates, dateStr, instance) {
-            
+
 			// Desmarca el día 1 si está seleccionad
 			const defaultDate2 = new Date(currentYear, index, 1);
 			instance.clear(defaultDate2);
-		
-		
+
+
 			fetch('obtener_festivos.php?mes=' + (index + 1))
 			.then(response => response.json())
 			.then(data => {
 				  data.forEach(fecha => {
 					const dateObj = new Date(fecha);
-					
-	 
-		
+
+
+
 					if (dateObj.getFullYear() === currentYear && dateObj.getMonth() === index) {
-						
+
 					  instance.jumpToDate(dateObj);
 					  instance.selectedDates.push(dateObj);
 					  instance.redraw();

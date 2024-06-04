@@ -131,7 +131,7 @@
      <div id="carroceria">
           <select  id="marca" name="marca" class="form-control">
                      <option  value="">Seleccione...</option>
-              
+
                 </select>
                 </div>
             </div>
@@ -202,7 +202,7 @@
   </div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
     <div class="form-group form-float">
         <div class="form-line">
@@ -215,7 +215,7 @@
     <div class="form-group form-float">
         <div class="form-line">
             <label for="cilindraje">Cilindraje:</label>
-		  <div class="selectorCilindraje">	
+		  <div class="selectorCilindraje">
             <select data-live-search="true" id="cilindraje" name="cilindraje" class="form-control">
                 <option style="margin-left: 15px;" value="">Seleccione...</option>
                          <?php
@@ -491,14 +491,14 @@
     </div>
 </div>
 
- 
+
              <button type="submit" id="submit" onclick="insertar()" class="btn btn-success">
             <i class="fa fa-save" aria-hidden="true"></i> Guardar
         </button>
     </div>
-    <script>
- 
- 
+
+<script>
+
  $(document).ready(function() {
   // Evento de cambio para el selector de marca
   $('#marca').change(function() {
@@ -519,11 +519,11 @@
       }
     });
   }	);
-  
+
   $('#clase').change(function() {
     var claseId = $(this).val();
 	var combo = document.getElementById("clase");
-	var clase = combo.options[combo.selectedIndex].text; 
+	var clase = combo.options[combo.selectedIndex].text;
     // Realizar la solicitud AJAX al servidor
     $.ajax({
       url: 'obtener_cilindraje.php',
@@ -537,11 +537,11 @@
         console.log('Error al obtener cilindraje de vehículos.');
       }
     });
-	
+
   });
 });
 
-  
+
 function verificarNumeroPlaca() {
   var numeroPlaca = $('#numero_placa').val();
 
@@ -567,71 +567,104 @@ function verificarNumeroPlaca() {
 
 
 
-function insertar() {      
+function insertar() {
+    var campos = ["tipo_documento", "numero_documento", "nombres", "apellidos", "numero_placa", "chasis", "motor", "marca", "linea", "clase", "carroceria", "color", "tipo_servicio", "modalidad", "capacidad_pasajeros", "capacidad_carga", "cilindraje", "modelo", "chasis_independiente", "serie", "vin", "numero_puertas", "combustible", "ejes", "peso", "concesionario", "potencia", "clasificacion", "ano_fabricacion", "origen", "acta_importacion", "declaracion", "fecha_declaracion", "pais_origen", "fecha_propiedad", "factura", "fecha_factura", "soat", "fecha_vence_soat", "tecnomecanica", "fecha_vence_tecnomecanica", "licencia_transito", "sustrato"];
+
+    var camposVacios = [];
+
+    // Verificar si algún campo está vacío
+    for (var i = 0; i < campos.length; i++) {
+        var campoVacio = campos[i];
+        var campo = document.getElementById(campoVacio);
+        var valorCampo = campo.value
+        if(valorCampo === undefined) {
+            camposVacios.push(campoVacio)
+        } else if (valorCampo.trim() === '') {
+            camposVacios.push(campoVacio)
+        }
+    }
+
+    campos.forEach( (campo) => {
+        document.getElementById(campo).focus(); // Enfocar el campo vacío
+        document.getElementById(campo).style.border = ""; // Cambiar el color del borde del campo vacío
+    })
+
+    if (camposVacios.length != 0) {
+        alert('Por favor completa todos los campos.');
+        camposVacios.forEach( (campo) => {
+            document.getElementById(campo).focus(); // Enfocar el campo vacío
+            document.getElementById(campo).style.border = "2px solid red"; // Cambiar el color del borde del campo vacío
+        })
+        return; // Detener la ejecución si hay campos vacíos
+    }
+
 
   // El número de documento no existe, realizar una operación de inserción (INSERT)
-                    $.ajax({
-                        url: 'insertar_vehiculo.php',
-                        method: 'POST',
-                        data: {
-                             // Obtener los valores de los campos de formulario
- tipo_documento : document.getElementById("tipo_documento").value,
- numero_documento : document.getElementById("numero_documento").value,
- nombres : document.getElementById("nombres").value,
- apellidos : document.getElementById("apellidos").value,
- numero_placa : document.getElementById("numero_placa").value,
- chasis : document.getElementById("chasis").value,
- motor : document.getElementById("motor").value,
- marca : document.getElementById("marca").value,
- linea : document.getElementById("linea").value,
- clase : document.getElementById("clase").value,
- carroceria : document.getElementById("carroceria").value,
- color : document.getElementById("color").value, 
- tipo_servicio : document.getElementById("tipo_servicio").value,
- modalidad : document.getElementById("modalidad").value,
- capacidad_pasajeros : document.getElementById("capacidad_pasajeros").value,
- capacidad_carga : document.getElementById("capacidad_carga").value,
- cilindraje : document.getElementById("cilindraje").value,
- modelo : document.getElementById("modelo").value,
- chasis_independiente : document.getElementById("chasis_independiente").value,
- serie : document.getElementById("serie").value,
- vin : document.getElementById("vin").value,
- numero_puertas : document.getElementById("numero_puertas").value,
- combustible : document.getElementById("combustible").value,
- ejes : document.getElementById("ejes").value,
- peso : document.getElementById("peso").value,
- concesionario : document.getElementById("concesionario").value,
- potencia : document.getElementById("potencia").value,
- clasificacion : document.getElementById("clasificacion").value,
- ano_fabricacion : document.getElementById("ano_fabricacion").value,
- origen : document.getElementById("origen").value,
- acta_importacion : document.getElementById("acta_importacion").value,
- declaracion : document.getElementById("declaracion").value,
- fecha_declaracion : document.getElementById("fecha_declaracion").value,
- pais_origen : document.getElementById("pais_origen").value,
- fecha_propiedad : document.getElementById("fecha_propiedad").value,
- factura : document.getElementById("factura").value,
- fecha_factura : document.getElementById("fecha_factura").value,
- soat : document.getElementById("soat").value,
- fecha_vence_soat : document.getElementById("fecha_vence_soat").value,
- tecnomecanica : document.getElementById("tecnomecanica").value,
- fecha_vence_tecnomecanica : document.getElementById("fecha_vence_tecnomecanica").value,
- licencia_transito : document.getElementById("licencia_transito").value,
- sustrato : document.getElementById("sustrato").value
-                        },
-                        success: function(response) {
-                            // Operación de inserción exitosa
-                            console.log('Inserción realizada con éxito');
-                            alert('Inserción realizada con éxito');
-                  
-                        },
-                        error: function() {
-                            // Error en la petición de inserción
-                            console.log('Error al realizar la inserción');
-                            alert('Error al realizar la inserción');
-                        }
-                    });
-                    
+    $.ajax({
+        url: 'insertar_vehiculo.php',
+        method: 'POST',
+        data: {
+            // Obtener los valores de los campos de formulario
+            tipo_documento : document.getElementById("tipo_documento").value,
+            numero_documento : document.getElementById("numero_documento").value,
+            nombres : document.getElementById("nombres").value,
+            apellidos : document.getElementById("apellidos").value,
+            numero_placa : document.getElementById("numero_placa").value,
+            chasis : document.getElementById("chasis").value,
+            motor : document.getElementById("motor").value,
+            marca : document.getElementById("marca").value,
+            linea : document.getElementById("linea").value,
+            clase : document.getElementById("clase").value,
+            carroceria : document.getElementById("carroceria").value,
+            color : document.getElementById("color").value,
+            tipo_servicio : document.getElementById("tipo_servicio").value,
+            modalidad : document.getElementById("modalidad").value,
+            capacidad_pasajeros : document.getElementById("capacidad_pasajeros").value,
+            capacidad_carga : document.getElementById("capacidad_carga").value,
+            cilindraje : document.getElementById("cilindraje").value,
+            modelo : document.getElementById("modelo").value,
+            chasis_independiente : document.getElementById("chasis_independiente").value,
+            serie : document.getElementById("serie").value,
+            vin : document.getElementById("vin").value,
+            numero_puertas : document.getElementById("numero_puertas").value,
+            combustible : document.getElementById("combustible").value,
+            ejes : document.getElementById("ejes").value,
+            peso : document.getElementById("peso").value,
+            concesionario : document.getElementById("concesionario").value,
+            potencia : document.getElementById("potencia").value,
+            clasificacion : document.getElementById("clasificacion").value,
+            ano_fabricacion : document.getElementById("ano_fabricacion").value,
+            origen : document.getElementById("origen").value,
+            acta_importacion : document.getElementById("acta_importacion").value,
+            declaracion : document.getElementById("declaracion").value,
+            fecha_declaracion : document.getElementById("fecha_declaracion").value,
+            pais_origen : document.getElementById("pais_origen").value,
+            fecha_propiedad : document.getElementById("fecha_propiedad").value,
+            factura : document.getElementById("factura").value,
+            fecha_factura : document.getElementById("fecha_factura").value,
+            soat : document.getElementById("soat").value,
+            fecha_vence_soat : document.getElementById("fecha_vence_soat").value,
+            tecnomecanica : document.getElementById("tecnomecanica").value,
+            fecha_vence_tecnomecanica : document.getElementById("fecha_vence_tecnomecanica").value,
+            licencia_transito : document.getElementById("licencia_transito").value,
+            sustrato : document.getElementById("sustrato").value
+        },
+        success: function(response) {
+            // Operación de inserción exitosa
+            if(response != "error") {
+                console.log('Inserción realizada con éxito');
+                alert('Inserción realizada con éxito');
+                return
+            }
 
+            alert('Se encontraron campos vacíos');
+
+        },
+        error: function() {
+            // Error en la petición de inserción
+            console.log('Error al realizar la inserción');
+            alert('Error al realizar la inserción');
+        }
+    });
 }
-    </script>
+</script>

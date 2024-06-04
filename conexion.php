@@ -1,9 +1,9 @@
 <?php
 
-$serverName = "JCAMPO\SQLEXPRESS"; //serverName\instanceName
+$serverName = "SERVERD_DATACEN"; //serverName\instanceName
 
 // Since UID and PWD are not specified in the $connectionInfo array, the connection will be attempted using Windows Authentication.
-$connectionInfo = array( "Database"=>"u859387114_transitar");
+$connectionInfo = array( "Database"=>"u859387114_transitar", "UID"=>"root", "PWD"=>"14092005_Ba1_***");
 $mysqli = sqlsrv_connect( $serverName, $connectionInfo);
 
 if (!( $mysqli )) {
@@ -25,25 +25,28 @@ if(isset($_SESSION['usuario'])){
 	$resultadoconsulta=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 	$rowconsulta = sqlsrv_fetch_array( $resultadoconsulta, SQLSRV_FETCH_ASSOC);
 	$_SESSION['MM_Username'] = $rowconsulta['usuario'];
-	
+
 	$nombre_usuario = $rowconsulta['nombre'];
 	$celular_usuario = $rowconsulta['celular'];
 	$empresa = $rowconsulta['empresa'];
 	$tipo = $rowconsulta['tipo'];
-	
+
 	// Obtener el perfil deseado (asumimos que tienes su ID)
 	$perfilId = $rowconsulta['perfil']; // ID del perfil que deseas obtener
 
 	// Consulta SQL para obtener las opciones del perfil
 	$sql = "SELECT opcion_id FROM detalle_perfiles WHERE perfil_id = $perfilId";
-	$resultado = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered')); 
-	
+	$resultado = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+
+    //echo $sql;
+
 	//die('JLCM:conexion.php:#1'.$sql);
 
 	// Verificar si se obtuvieron resultados
+    $opcionesPerfil = array();
+
 	if (sqlsrv_num_rows($resultado) > 0) {
 		// Variable para almacenar las opciones del perfil
-		$opcionesPerfil = array();
 
 		// Recorrer los resultados y almacenar las opciones en la variable de los permisos del perfil
 		while ($row = sqlsrv_fetch_array( $resultado, SQLSRV_FETCH_ASSOC)) {
@@ -69,7 +72,14 @@ if(isset($_SESSION['usuario'])){
 
 	// Consulta SQL para obtener los permisos especiales del usuario
 	$sql = "SELECT opcion_id FROM permisos_usuarios WHERE usuario = ". $idusuario;
+    //echo $sql;
+
 	$resultado = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+    $fecha = date("Y-m-d");
+    $hora = date('H:i:s');
+    $ano = date("Y", strtotime($fecha));
+
+    $fechayhora = date("Y-m-d H:i:s");
 	//die('JLCM:conexion.php:#4 --> '. $sql);
 	// Verificar si se obtuvieron resultados
 	//die('JLCM:conexion.php:#4.1 --> '. $sql . ' = '. sqlsrv_num_rows($resultado));
@@ -87,7 +97,7 @@ if(isset($_SESSION['usuario'])){
 				$opcionesPerfil[] = $parametros_padre['padre_id'];
 			}
 		}
-		
+
 
 		$consulta_parametros_liquidacion = "SELECT * FROM parametros_liquidacion where Tparametrosliq_ID = '1' ";
 
@@ -113,17 +123,10 @@ if(isset($_SESSION['usuario'])){
 		$honorarios = $parametros_economicos['Tparameconomicos_honorarios'];
 		$cobranza = $parametros_economicos['Tparameconomicos_cobranza'];
 
-
-		$fecha = date("Y-m-d");
-		$hora = date('H:i:s');
-		$ano = date("Y", strtotime($fecha));
-
-		$fechayhora = date("Y-m-d H:i:s");
-
 		$opcionesPerfil[] = $opcionId;
-		
-		
-		
+
+
+
 		//print_r($opcionesPerfil);die('JLCM:conexion.php:#6');
 
 	}
@@ -139,7 +142,7 @@ function ParamWebService(){
     $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     if (sqlsrv_num_rows($result) > 0) {
-        $row_parm = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC) ; 
+        $row_parm = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC) ;
         return $row_parm;
     } else {
         return null;
@@ -152,7 +155,7 @@ function ParamGen() {
     $query_param = "SELECT Tparamgenerales_img_logo, Tparamgenerales_img_fondo, Tparamgenerales_titulo_app, Tparamgenerales_nombre_app, Tparamgenerales_diasnotifica, Tparamgenerales_minutossesion, Tparamgenerales_favicon from parametros_generales WHERE Tparamgenerales_ID = 1";
 
     $result = sqlsrv_query( $mysqli,$query_param, array(), array('Scrollable' => 'buffered'));
-    $row_param = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC) ; 
+    $row_param = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC) ;
 	sqlsrv_free_stmt( $result);
     return $row_param;
 }
@@ -175,7 +178,7 @@ function ParamEcono() {
     $query_parame = "SELECT * FROM parametros_economicos WHERE Tparameconomicos_ID = 1";
 
     $result = sqlsrv_query( $mysqli,$query_parame, array(), array('Scrollable' => 'buffered'));
-    $row_parame =sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC); 
+    $row_parame =sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
     sqlsrv_free_stmt( $result);
 
     return $row_parame;
@@ -187,7 +190,7 @@ function ParamLiquida() {
     $sql = "SELECT * FROM parametros_liquidacion";
 
     $parmliq = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
-    $row_parmliq =sqlsrv_fetch_array( $parmliq, SQLSRV_FETCH_ASSOC); 
+    $row_parmliq =sqlsrv_fetch_array( $parmliq, SQLSRV_FETCH_ASSOC);
 	sqlsrv_free_stmt( $parmliq);
 
     return $row_parmliq;
@@ -284,7 +287,7 @@ function getCompDate($ncomparendo) {
 
     if ($query_fcomp) {
         if (sqlsrv_num_rows($query_fcomp) > 0) {
-            $row_fcomp =sqlsrv_fetch_array( $query_fcomp, SQLSRV_FETCH_ASSOC); 
+            $row_fcomp =sqlsrv_fetch_array( $query_fcomp, SQLSRV_FETCH_ASSOC);
             $fComp = $row_fcomp['compfecha'];
         } else {
             $fComp = "";
@@ -382,10 +385,10 @@ function BuscarSMLV($anio, $original = false) {
     global $mysqli;
 
     $original = $original ? 1 : 0;
-    
+
     $sqll = "SELECT * FROM smlv WHERE smlv =?";
 	$parameters = [$anio];
-	
+
     $queryl=sqlsrv_query( $mysqli,$sqll, $parameters, array('Scrollable' => 'buffered'));
     $totalRows_servl = sqlsrv_num_rows($queryl);
 
@@ -407,7 +410,7 @@ function BuscarUVT($anio) {
     $sqll = "SELECT uvt_original FROM smlv WHERE smlv=?";
 	$parameters = [$anio];
     $queryl=sqlsrv_query( $mysqli,$sqll, $parameters, array('Scrollable' => 'buffered'));
-	
+
     $totalRows_servl = sqlsrv_num_rows($queryl);
 
     if ($totalRows_servl == 0) {
@@ -488,31 +491,31 @@ function DiasDomingos($startDate, $endDate, $oper = true){
 
 // #### Buscar las tasas efectivas anuales por el rango de fecha enviado ####
 // function BuscarTasaEA($fechaini, $fechafin){
-// global $mysqli; 
-    
+// global $mysqli;
+
 //     // if (!$mysqli) {
 //     //     die("Error de conexión: " . serialize(sqlsrv_errors()));
 //     // }
-    
+
 //     $query_tasa = "SELECT * FROM Tinteresesm WHERE '$fechaini' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal OR "
 //                 . " '$fechafin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal OR "
 //                 . " Tinteresesm_finicial BETWEEN '$fechaini' AND '$fechafin' OR "
 //                 . " Tinteresesm_ffinal BETWEEN '$fechaini' AND '$fechafin' ORDER BY Tinteresesm_ffinal ASC";
 //     $result=sqlsrv_query( $mysqli,$query_tasa, array(), array('Scrollable' => 'buffered'));
-    
 
-    
+
+
 //     return $result;
 // }
 
 // #### Buscar los acuerdos de pago pendientes por el id enviado ####
 // function ValorInteresMora($fechini, $fechfin, $valor){
 // global $mysqli;
-    
+
 //     // if (!$mysqli) {
 //     //     die("Error de conexión: " . serialize(sqlsrv_errors()));
 //     // }
-    
+
 //     // $sql = "SELECT Tinteresesm_ID FROM Tinteresesm WHERE '$fechfin' BETWEEN Tinteresesm_finicial AND Tinteresesm_ffinal";
 //     //$queryval=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 //     // $rows_toval = sqlsrv_num_rows($queryval);
@@ -526,18 +529,18 @@ function DiasDomingos($startDate, $endDate, $oper = true){
 // //$rowconsulta = sqlsrv_fetch_array($resultadoconsulta, SQLSRV_FETCH_ASSOC);
 //     // $totalRows_result = sqlsrv_num_rows($result);
 //     $ttotal = 0;
-    
+
 //     if (1==1) {
 //         while ($row_tasa = sqlsrv_fetch_array($resultado_tasa, SQLSRV_FETCH_ASSOC)) {
 //          $ftini = ($row_tasa['Tinteresesm_finicial'] < $fechini) ? $fechini : $row_tasa['Tinteresesm_finicial'];
 //         $ftfin = ($row_tasa['Tinteresesm_ffinal'] > $fechfin) ? $fechfin : $row_tasa['Tinteresesm_ffinal'];
 //         $vtead = $row_tasa['Tinteresesm_TEAD'];
 //         $ndias = DiasEntreFechas($ftini, $ftfin);
-        
+
 //  $vtotal = (($valor * ($vtead / 100)) * $ndias);
 //             $ttotal += $vtotal;
-               
-               
+
+
 //         }
 //         $vttotal = round($ttotal);
 // //        $vttotal = $row_tasa['nombre'];
@@ -545,9 +548,9 @@ function DiasDomingos($startDate, $endDate, $oper = true){
 //         $_SESSION['validaInteres'] = "No existe una tasa de interés moratorio para el periodo seleccionado";
 //         $vttotal = 1;
 //     }
-    
 
-    
+
+
 //     return $vttotal;
 // }
 
@@ -580,7 +583,7 @@ $rows_toval = sqlsrv_num_rows($queryval);
         while ($row_tasa=sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)){
             $ftini = ($row_tasa['Tinteresesm_finicial'] < $fechini) ? $fechini : $row_tasa['Tinteresesm_finicial'];
             $ftfin = ($row_tasa['Tinteresesm_ffinal'] > $fechfin) ? $fechfin : $row_tasa['Tinteresesm_ffinal'];
-      
+
             $vtead = $row_tasa['Tinteresesm_TEAD'];
             $ndias = DiasEntreFechas($ftini, $ftfin);
             /*if ($gracia && $row_tasa['Tinteresesm_graini'] != '1900-01-01' && $row_tasa['Tinteresesm_grafin'] != '1900-01-01') {
@@ -691,7 +694,7 @@ function BuscarDerechoTran($id){
     $query_placa = "SELECT * FROM derechos_transito WHERE TDT_ID='$id'";
     $placa = sqlsrv_query( $mysqli,$query_placa, array(), array('Scrollable' => 'buffered'));
     $row_placa =sqlsrv_fetch_array( $placa, SQLSRV_FETCH_ASSOC);
-    
+
     return $row_placa;
 }
 
@@ -701,7 +704,7 @@ function BuscarTramConceptos($tramite){
 
     $query_conceptos = "SELECT * FROM detalle_tramites WHERE tramite_id='$tramite'";
     $conceptos = sqlsrv_query( $mysqli,$query_conceptos, array(), array('Scrollable' => 'buffered'));
-    
+
     return $conceptos;
 }
 
@@ -983,7 +986,7 @@ function generarFormulario($campos) {
      </div>
      </div>
      </div>
-        
+
         ';
     }
 
@@ -994,7 +997,7 @@ function generarFormulario($campos) {
 
 function generar_formulario($formularioId) {
     global $mysqli;
-    
+
     // Consultar la tabla "formularios" para obtener los detalles del formulario
 $consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
 $resultado = sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
@@ -1137,119 +1140,119 @@ function fecha_letras($fecha) {
  $meses = array(
         'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
     );
-    
+
     $partes = explode(' ', $fecha);
-    
+
 
     $fechaPartes = explode('-', $partes[0]);
-    
+
     if (count($fechaPartes) != 3) {
         return 'Fecha inválida';
     }
-    
+
     $dia = intval($fechaPartes[2]);
     $mes = strtolower($meses[intval($fechaPartes[1]) - 1]);
     $ano = intval($fechaPartes[0]);
-    
+
     if ($dia < 1 || $dia > 31 || !in_array($mes, $meses) || $ano < 0) {
         return 'Fecha inválida';
     }
-    
+
     $mesEnLetras = ucfirst($mes);
-    
+
     return $dia . ' de ' . $mesEnLetras . ' de ' . $ano;
 }
 
 function obtener_comparendo($numeroDocumento,$totales = 0) {
-    
+
     global $mysqli;
     global $diasint;
     global $fecha;
     global $ano;
     global $parametros_economicos;
-    
+
     $fecha_notifica = getFnotifica($numeroDocumento);
-    
+
     $ano_comparendo = substr($fecha_notifica, 0, 4);
-    
+
     $html = '';
-    
+
     // Consulta a la tabla comparendos
     $sql = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$numeroDocumento'";
     $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     $row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
-    
+
     // Obtenemos el valor en SMLV del comparendo
     $consulta_valor = "SELECT * FROM comparendos_codigos WHERE TTcomparendoscodigos_codigo = '" . $row['Tcomparendos_codinfraccion'] . "'";
     $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
     $row_valor = sqlsrv_fetch_array( $resultado_valor, SQLSRV_FETCH_ASSOC);
-    
+
     // Obtenemos el valor del SMLV del año
-    
+
     $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
     $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
     $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
-    
+
     if ($ano_comparendo > 2019) {
         $smlv_diario = round(($row_smlv['smlv']) / 30);
     } else {
         $smlv_diario = round(($row_smlv['smlv']) / 30);
     }
     $valor = ceil($smlv_diario * $row_valor['TTcomparendoscodigos_valorSMLV']);
-    
+
     $fechini = date('Y-m-d', strtotime($fecha_notifica));
     $datos = calcularInteresCompa($valor, $row['Tcomparendos_fecha'], $fecha, $diasint, $parametros_economicos['Tparameconomicos_porctInt']);
     $valor_mora = $datos['valor'];
-    
+
     // Realizar la consulta para obtener los conceptos asociados al comparendo
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '39'";
     $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total = 0;
-    
+
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
             $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
-            
+
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
                 $rango = $row_concepto['fecha_vigencia_final'];
             } else {
                 $rango = "2900-01-01";
             }
-            
+
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano'";
                 $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
-                
+
                 if ($row_concepto['valor_SMLV_UVT'] == 0) {
                     $valor_concepto = $row_concepto['valor_concepto'];
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 1) {
                      if ($ano_comparendo > 2019) {
                     $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv_original'] / 30);
-                    
+
                      }else{
-                     $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv'] / 30);    
+                     $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv'] / 30);
                      }
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 2) {
                     $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
                 }
-                
+
                 if ($row_concepto['operacion'] == 2) {
                     $valor_concepto = -$valor_concepto;
                 }
-                
+
                 if ($row_concepto['id'] == 1000000022) {
                     $valor_concepto = $valor;
                 }
-                
+
                 if ($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] == 1) {
                     $valor_concepto = $valor_concepto;
                 } elseif ($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] != 1) {
                     $valor_concepto = 0;
                 }
-                
+
                 if ($valor_concepto > 0 || $valor_concepto < 0) {
                     $html .= "<strong>" . $row_concepto['nombre'] . ": </strong>$ " . number_format($valor_concepto) . " <br>";
                     $total += $valor_concepto;
@@ -1257,29 +1260,29 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
             }
         }
     }
-    
+
     // Realizar la consulta para obtener los conceptos asociados al amnistías
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
     $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total2 = 0;
-    
+
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
             $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
-            
+
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
                 $rango = $row_concepto['fecha_vigencia_final'];
             } else {
                 $rango = "2900-01-01";
             }
-            
+
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
                 $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
-                
+
                 if ($row_concepto['porcentaje'] > 0) {
                     $valor_concepto = ($valor * $row_concepto['porcentaje']) / 100;
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 0) {
@@ -1289,14 +1292,14 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 2) {
                     $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
                 }
-                
+
                 if ($row_concepto['operacion'] == 2) {
                     $valor_concepto = -$valor_concepto;
                 }
-                
+
                 $fecha5 = date('Y-m-d', strtotime($fechini . ' +13 days'));
                 $fecha15 = date('Y-m-d', strtotime($fechini . ' +29 days'));
-                
+
                 if ($row_concepto['id'] == 54 && $fecha <= $fecha5) {
                     $valor_concepto = $valor_concepto;
                 } elseif ($row_concepto['id'] == 134 && $fecha > $fecha5 && $fecha <= $fecha15) {
@@ -1304,7 +1307,7 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
                 } else {
                     $valor_concepto = 0;
                 }
-                
+
                 if ($valor_concepto > 0 || $valor_concepto < 0) {
                     $html .= "<font color='blue'><strong>" . $row_concepto['nombre'] . "</strong> $ " . number_format($valor_concepto) . " </b>";
                     $total2 += $valor_concepto;
@@ -1312,7 +1315,7 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
             }
         }
     }
-    
+
     if ($valor_mora > 0) {
         $html .= "<b>" . $datos['nombre'] . " : </b> $  " . number_format(ceil($valor_mora)) . " </b>";
     }
@@ -1327,129 +1330,129 @@ function obtener_comparendo($numeroDocumento,$totales = 0) {
 
 
 function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_cuotas = 1,$totales = 0) {
-    
+
     global $mysqli;
     global $diasint;
     global $fecha;
     global $ano;
     global $parametros_economicos;
-    
+
     $fecha_notifica = getFnotifica($numeroDocumento);
-    
+
     $ano_comparendo = substr($fecha_notifica, 0, 4);
-    
+
     $html = '';
-    
+
     // Consulta a la tabla comparendos
     $sql = "SELECT * FROM comparendos WHERE Tcomparendos_comparendo = '$numeroDocumento'";
     $result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     $row = sqlsrv_fetch_array( $result, SQLSRV_FETCH_ASSOC);
-    
+
     // Obtenemos el valor en SMLV del comparendo
     $consulta_valor = "SELECT * FROM comparendos_codigos WHERE TTcomparendoscodigos_codigo = '" . $row['Tcomparendos_codinfraccion'] . "'";
     $resultado_valor = sqlsrv_query( $mysqli,$consulta_valor, array(), array('Scrollable' => 'buffered'));
     $row_valor = sqlsrv_fetch_array( $resultado_valor, SQLSRV_FETCH_ASSOC);
-    
+
     // Obtenemos el valor del SMLV del año
-    
+
     $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
     $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
     $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
-    
+
     if ($ano_comparendo > 2019) {
         $smlv_diario = round(($row_smlv['smlv']) / 30);
     } else {
         $smlv_diario = round(($row_smlv['smlv']) / 30);
     }
     $valor = ceil($smlv_diario * $row_valor['TTcomparendoscodigos_valorSMLV']);
-    
+
     $fechini = date('Y-m-d', strtotime($fecha_notifica));
     $datos = calcularInteresCompa($valor, $row['Tcomparendos_fecha'], $fecha, $diasint, $parametros_economicos['Tparameconomicos_porctInt']);
     $valor_mora = $datos['valor'];
-    
+
     // Realizar la consulta para obtener los conceptos asociados al comparendo
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '39'";
     $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total = 0;
-    
+
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
             $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
-            
+
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
                 $rango = $row_concepto['fecha_vigencia_final'];
             } else {
                 $rango = "2900-01-01";
             }
-            
+
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano'";
                 $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
-                
+
                 if ($row_concepto['valor_SMLV_UVT'] == 0) {
                     $valor_concepto = $row_concepto['valor_concepto'];
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 1) {
                      if ($ano_comparendo > 2019) {
                     $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv_original'] / 30);
-                    
+
                      }else{
-                     $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv'] / 30);    
+                     $valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv'] / 30);
                      }
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 2) {
                     $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
                 }
-                
+
                 if ($row_concepto['operacion'] == 2) {
                     $valor_concepto = -$valor_concepto;
                 }
-                
+
                 if ($row_concepto['id'] == 1000000022) {
                     $valor_concepto = $valor;
                 }
-                
+
                 if ($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] == 1) {
                     $valor_concepto = $valor_concepto;
                 } elseif ($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] != 1) {
                     $valor_concepto = 0;
                 }
-                
+
                 if ($valor_concepto > 0 || $valor_concepto < 0) {
                     if($cantidad_cuotas == 1){
                     $html .= "$ " . number_format(($valor_concepto * ($porcentaje/100))  / $cantidad_cuotas)  . " <br>";
                     }else{
-                     $html .= "$ " . number_format(($valor_concepto - ($valor_concepto * ($porcentaje/100)) ) / $cantidad_cuotas)  . " <br>";   
+                     $html .= "$ " . number_format(($valor_concepto - ($valor_concepto * ($porcentaje/100)) ) / $cantidad_cuotas)  . " <br>";
                     }
                     $total += $valor_concepto;
                 }
             }
         }
     }
-    
+
     // Realizar la consulta para obtener los conceptos asociados al amnistías
     $sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
     $resultado_tramite = sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
     $total2 = 0;
-    
+
     if (sqlsrv_num_rows($resultado_tramite) > 0) {
         while ($row_tramite = sqlsrv_fetch_array( $resultado_tramite, SQLSRV_FETCH_ASSOC)) {
             $consulta_concepto = "SELECT * FROM conceptos WHERE id = '" . $row_tramite['concepto_id'] . "'";
             $resultado_concepto = sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
             $row_concepto = sqlsrv_fetch_array( $resultado_concepto, SQLSRV_FETCH_ASSOC);
-            
+
             if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {
                 $rango = $row_concepto['fecha_vigencia_final'];
             } else {
                 $rango = "2900-01-01";
             }
-            
+
             if ($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango) {
                 $consulta_smlv = "SELECT * FROM smlv WHERE ano = '$ano_comparendo'";
                 $resultado_smlv = sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
                 $row_smlv = sqlsrv_fetch_array( $resultado_smlv, SQLSRV_FETCH_ASSOC);
-                
+
                 if ($row_concepto['porcentaje'] > 0) {
                     $valor_concepto = ($valor * $row_concepto['porcentaje']) / 100;
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 0) {
@@ -1459,14 +1462,14 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
                 } elseif ($row_concepto['valor_SMLV_UVT'] == 2) {
                     $valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
                 }
-                
+
                 if ($row_concepto['operacion'] == 2) {
                     $valor_concepto = -$valor_concepto;
                 }
-                
+
                 $fecha5 = date('Y-m-d', strtotime($fechini . ' +13 days'));
                 $fecha15 = date('Y-m-d', strtotime($fechini . ' +29 days'));
-                
+
                 if ($row_concepto['id'] == 54 && $fecha <= $fecha5) {
                     $valor_concepto = $valor_concepto;
                 } elseif ($row_concepto['id'] == 134 && $fecha > $fecha5 && $fecha <= $fecha15) {
@@ -1474,7 +1477,7 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
                 } else {
                     $valor_concepto = 0;
                 }
-                
+
                 if ($valor_concepto > 0 || $valor_concepto < 0) {
                     $html .= " $ " . number_format(($valor_concepto - ($valor_concepto * ($porcentaje/100)) )/ $cantidad_cuotas)  . " </b>";
                     $total2 += $valor_concepto;
@@ -1482,12 +1485,12 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
             }
         }
     }
-    
+
     if ($valor_mora > 0) {
         if($cantidad_cuotas == 1){
         $html .= " $  " . number_format(ceil((($valor_mora * ($porcentaje/100)) )/ $cantidad_cuotas) ) . " </b>";
         }else{
-         $html .= " $  " . number_format(ceil(($valor_mora - ($valor_mora * ($porcentaje/100)) )/ $cantidad_cuotas) ) . " </b>";           
+         $html .= " $  " . number_format(ceil(($valor_mora - ($valor_mora * ($porcentaje/100)) )/ $cantidad_cuotas) ) . " </b>";
         }
     }
     if($totales == 0){
@@ -1501,16 +1504,16 @@ function obtener_disgregacion_comparendo($numeroDocumento,$porcentaje,$cantidad_
 function sumar_dias_habiles($fechaInicial, $dias = 30) {
     global $fecha;
     $fecha2 = new DateTime($fechaInicial);
-    
+
     for ($i = 0; $i < $dias; $i++) {
         $fecha2->add(new DateInterval('P1D')); // Agregar un día
-        
+
         // Verificar si la fecha es un día hábil (lunes a viernes)
         while ($fecha2->format('N') >= 6) {
             $fecha2->add(new DateInterval('P1D')); // Si es fin de semana, sumar un día adicional
         }
     }
-    
+
     return $fecha2->format('Y-m-d'); // Formato de fecha 'YYYY-MM-DD'
 }
 
@@ -1518,8 +1521,8 @@ function generar_resolucion($comparendo, $plantilla,$tipo = 9999999999999999) {
     global $mysqli;
     global $fecha;
     global $ano;
-  
-  //obtenemos informacion de plantilla  
+
+  //obtenemos informacion de plantilla
     $sql_plantilla = "SELECT * FROM plantillas_resoluciones WHERE id  = '$plantilla' or tipo_resolucion = '$tipo'";
     $result_plantilla = sqlsrv_query( $mysqli,$sql_plantilla, array(), array('Scrollable' => 'buffered'));
     $row_plantilla = sqlsrv_fetch_array( $result_plantilla, SQLSRV_FETCH_ASSOC);
@@ -1531,7 +1534,7 @@ function generar_resolucion($comparendo, $plantilla,$tipo = 9999999999999999) {
     $row_comparendo = sqlsrv_fetch_array( $result_comparendo, SQLSRV_FETCH_ASSOC);
 
     $fecha_comparendo = fecha_letras($row_comparendo['Tcomparendos_fecha']);
-    
+
 //obtenemos informacion codigo comparendo
     $sql_comparendo_codigo = "SELECT * FROM comparendos_codigos WHERE TTcomparendoscodigos_codigo = '".$row_comparendo['Tcomparendos_codinfraccion']."'";
     $result_comparendo_codigo = sqlsrv_query( $mysqli,$sql_comparendo_codigo, array(), array('Scrollable' => 'buffered'));
@@ -1542,7 +1545,7 @@ function generar_resolucion($comparendo, $plantilla,$tipo = 9999999999999999) {
     $sql_ciudadano = "SELECT * FROM ciudadanos where numero_documento = '".$row_comparendo['Tcomparendos_idinfractor']."'";
     $resultado_ciudadano = sqlsrv_query( $mysqli,$sql_ciudadano, array(), array('Scrollable' => 'buffered'));
     $ciudadano = sqlsrv_fetch_array( $resultado_ciudadano, SQLSRV_FETCH_ASSOC);
-    
+
      //obtenemos informacion de la resolucion
     //  $sql_resolucion = "SELECT * FROM resolucion_sancion where ressan_comparendo = '$comparendo'";
     //  $resultado_resolucion = sqlsrv_query( $mysqli,$sql_resolucion);
@@ -1559,15 +1562,15 @@ function generar_resolucion($comparendo, $plantilla,$tipo = 9999999999999999) {
     $sql_ciudades_comparendo= "SELECT * FROM ciudades where id = '".$row_comparendo['Tcomparendos_municipiodir']."'";
     $resultado_ciudades_comparendo = sqlsrv_query( $mysqli,$sql_ciudades_comparendo, array(), array('Scrollable' => 'buffered'));
     $ciudades_comparendo = sqlsrv_fetch_array( $resultado_ciudades_comparendo, SQLSRV_FETCH_ASSOC);
-    
+
     //obtenemos informacion de tipo identificación
     $sql_tipoid= "SELECT * FROM tipo_identificacion where id = '".$ciudadano['tipo_documento']."'";
     $resultado_tipoid = sqlsrv_query( $mysqli,$sql_tipoid, array(), array('Scrollable' => 'buffered'));
     $tipoid = sqlsrv_fetch_array( $resultado_tipoid, SQLSRV_FETCH_ASSOC);
-    
+
     $ciudad_comparendo = $ciudades_comparendo['nombre'];
-    
-    
+
+
 $fecha_habiles_letras = sumar_dias_habiles($fecha, 30);
     $variables = [
         'comparendo' => $comparendo,
@@ -1598,7 +1601,7 @@ $fecha_habiles_letras = sumar_dias_habiles($fecha, 30);
         'fecha_30_habiles_letras' => fecha_letras(sumar_dias_habiles($fecha, 30)),
         'ano' => $ano,
 
-       
+
 
     ];
 
@@ -1701,9 +1704,9 @@ function obtener_fechayhora($fecha) {
 }
 
 function BuscarPropietario1($doc, $tipo) {
-    
+
     global $mysqli;
-    
+
     // Escapar las variables para prevenir la inyección de SQL
     //$doc = $mysqli->real_escape_string($doc);
     $tipo = (int)$tipo; // Asegurarse de que $tipo sea un entero
@@ -1792,21 +1795,21 @@ function gen_pdfheadfirm($userfirma = null){
     if ($userfirma == null) {
         $userfirma = $idusuario;
     }
-    $head = "SELECT 
-                departamentos.nombre as depart, 
+    $head = "SELECT
+                departamentos.nombre as depart,
                 ciudades.nombre as ciudad,
-                nit, 
+                nit,
                 sedes.direccion AS dirOT,
-                nombres as usuario, 
-                cargo as cargo, 
+                nombres as usuario,
+                cargo as cargo,
                 firma as firma
-            FROM   
-                sedes 
-                INNER JOIN departamentos ON sedes.departamento = departamentos.id 
-                INNER JOIN ciudades ON departamentos.id = ciudades.departamento 
+            FROM
+                sedes
+                INNER JOIN departamentos ON sedes.departamento = departamentos.id
+                INNER JOIN ciudades ON departamentos.id = ciudades.departamento
                     AND sedes.municipio = ciudades.id
                 INNER JOIN empleados ON idusuario = '$userfirma'
-            WHERE  
+            WHERE
                 (sedes.ppal = 1)";
 
     $query_header = sqlsrv_query( $mysqli,$head, array(), array('Scrollable' => 'buffered'));
@@ -1824,7 +1827,7 @@ function getNumResolucion($tipo, &$numero, &$desc, $anio = null, $dt = false) {
     sqlsrv_execute( $stmt );
     @$stmt->bind_result($numero, $desc);
     $stmt->fetch();
-   
+
 }
 
 
@@ -1841,9 +1844,9 @@ function fValue($valor) {
 }
 
 function creacombo($nombre, $Tabla, $campo1, $campo2, $campo_order, $condicion, $selected){
-    
+
 global $mysqli;
-    
+
     $Query = "SELECT " . $campo1 . ", " . $campo2 . " FROM " . $Tabla . " " . $condicion . " ORDER BY " . $campo_order;
     $Combo = "";
     $Result = sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
@@ -1870,9 +1873,9 @@ global $mysqli;
 }
 
 function traenombrecampo($Tabla, $campo1, $campo2, $campo_order, $condicion){
-    
+
     global $mysqli;
-    
+
     $Query = "SELECT " . $campo2 . " FROM " . $Tabla . " WHERE " . $campo1 . " = " . $condicion;
     $Result = sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
 
@@ -1886,13 +1889,17 @@ function traenombrecampo($Tabla, $campo1, $campo2, $campo_order, $condicion){
 
 
 function Sindatos($val){
-
-	$val = trim($val);
-	if(($val=='')||($val==NULL)||($val=='1900-01-01') || ($val=='0')){$rval='Sin Datos';}
-	else{$rval=$val;}
+    if (!($val instanceof DateTime)) {
+	    $val = trim($val);
+    }
+	if(($val=='')||($val==NULL)||($val=='1900-01-01') || ($val=='0')){
+        $rval='Sin Datos';
+        } else{
+            $rval=$val;
+        }
 	return $rval;
-	}
-	
+}
+
 	function DatosCiudadano($doc){
 	        global $mysqli;
 	$sql = "SELECT * FROM ciudadanos WHERE numero_documento='$doc'";
@@ -1903,7 +1910,7 @@ function Sindatos($val){
 
 
 function TipoDocumento($id){
-    
+
     global $mysqli;
 	$query_doc = "SELECT * FROM tipo_identificacion WHERE id='$id'";
 	$doc = sqlsrv_query( $mysqli,$query_doc, array(), array('Scrollable' => 'buffered'));

@@ -67,13 +67,13 @@ include 'sessiones/seguridadempresa.php';
     <!-- noUISlider Css -->
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js" defer></script>
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
-	
+
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
 
-	
+
     <script>
         $(document).ready(function() {
             $(".cargar").click();
@@ -88,26 +88,87 @@ include 'sessiones/seguridadempresa.php';
     <link href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" rel="stylesheet">
     <style>
         .card{
-    border-radius:20px;
+            border-radius:20px;
         }
+        .list {
+           height: 100% !important;
+        }
+
+        .slimScrollDiv {
+            height: 70% !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin: 0;
+            white-space: nowrap;
+            text-align: right;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            align-content: center;
+            flex-direction: row;
+        }
+
+        .dataTables_wrapper .dataTables_paginate span {
+            display: contents;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background-color: #008000;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                text-decoration: none;
+                cursor: pointer;
+            }
+        }
+        .page-loader-wrapper .loader-message {
+
+        }
+
+        .loader-spinner {
+        width: 35px;
+        height: 35px;
+        border: 4px solid #178735;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
     </style>
-    
+
      <script>
   $(function () {
     //Inicia el select2
-    
-    
+
+
     $('.select2').select2({
         theme: 'bootstrap4',
   minimumInputLength: 3 // para buscar a partir del 3er digito
 
 })
   })
-  
+
  $(document).ready(function(){
 
  $(".clientes").select2({
-  ajax: { 
+  ajax: {
    url: "select_clientes.php",
    type: "post",
    dataType: 'json',
@@ -130,7 +191,7 @@ include 'sessiones/seguridadempresa.php';
  $(document).ready(function(){
 
  $(".cobradores").select2({
-  ajax: { 
+  ajax: {
    url: "select_cobradores.php",
    type: "post",
    dataType: 'json',
@@ -153,7 +214,7 @@ include 'sessiones/seguridadempresa.php';
  $(document).ready(function(){
 
  $(".rutas").select2({
-  ajax: { 
+  ajax: {
    url: "select_rutas.php",
    type: "post",
    dataType: 'json',
@@ -173,14 +234,14 @@ include 'sessiones/seguridadempresa.php';
  });
 });
 
-</script> 
+</script>
 <style>
 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
-            .btn-flotante {
+.btn-flotante {
 	font-size: 16px; /* Cambiar el tamaño de la tipografia */
 	text-transform: uppercase; /* Texto en mayusculas */
 	font-weight: bold; /* Fuente en negrita o bold */
@@ -208,7 +269,7 @@ input[type=number]::-webkit-outer-spin-button {
 		bottom: 20px;
 		right: 20px;
 	}
-} 
+}
 
 
 .vibrar{
@@ -220,7 +281,7 @@ input[type=number]::-webkit-outer-spin-button {
   100%{ -webkit-transform:rotateZ( 5deg); }
 }
         </style>
-        
+
         <style>
     .notifications-container {
         position: absolute;
@@ -264,12 +325,21 @@ input[type=number]::-webkit-outer-spin-button {
     <div class="page-loader-wrapper">
         <div class="loader">
             <div class="preloader">
-             
-                  <img src="logo_transitar.png" width="220"> 
-                 
-           
+
+                  <img src="logo_transitar.png" width="220">
+
+
             </div>
-            <p>Cargando...</p>
+            <div class="loader-message" style="display: flex !important;
+                                        justify-content: center !important;
+                                        align-items: center !important;
+                                        width: 100% !important;
+                                        margin-top: 15px;
+                                        gap: 18px;"
+            >
+                <span class="loader-spinner"></span>
+                <p>Cargando...</p>
+            </div>
         </div>
     </div>
     <!-- #END# Page Loader -->
@@ -289,7 +359,7 @@ input[type=number]::-webkit-outer-spin-button {
     <!-- #END# Search Bar -->
     <!-- Top Bar -->
     <nav class="navbar" style="height:68px;background-color:green;">
-    
+
         <div class="container-fluid" style="background-color:green;">
 
             <div class="navbar-header" style="background-color:green;">
@@ -302,7 +372,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <!-- Call Search -->
                     <li><a href="#" class="js-search" data-close="true"><i class="material-icons">search</i></a></li>
                     <li><a href="#" class="js-notifications"><i class="material-icons">notifications</i></a></li>
-      
+
                     <!-- #END# Call Search -->
                     <!-- Notifications -->
 
@@ -328,27 +398,28 @@ input[type=number]::-webkit-outer-spin-button {
             <!-- #User Info -->
             <!-- Menu -->
             <div class="menu">
-                <ul class="list">
+            <!-- aquí se genera algo -->
+                <ul class="list" style="height: 100% !important;">
                     <li class="header" style="display: flex;align-items: center;justify-content: space-between; padding: 5px 20px;background-color:red;color:white">
                         <span><?= ucwords($nombre_usuario) ?></span>
-                       
-                      
+
+
                     </li>
-                    
+
                     <li>
                         <a href="micuenta.php">
                             <i class="material-icons">person</i>
                             <span>Inicio</span>
                         </a>
                     </li>
-                   
+
 <?php
 // Función recursiva para generar los menús y submenús
 function generarMenu($items, $padre = 0) {
     $html = '';
     foreach ($items as $item) {
         if ($item['padre_id'] == $padre) {
-            $html .= "<li><a href='" . $item['enlace'] . "' class='menu-toggle'> 
+            $html .= "<li><a href='" . $item['enlace'] . "' class='menu-toggle'>
             <i class='material-icons'>".$item['icono']."</i>
             <span>" . ucwords($item['nombre']) . "</span></a>";
 
@@ -366,13 +437,13 @@ function generarMenu($items, $padre = 0) {
                 $html .= generarMenu($items, $item['id']); // Recursive call for submenus
                 $html .= "</ul>";
             } else {
-  
+
             }
 
             $html .= "</li>";
-     
+
         }
-        
+
     }
 
     return $html;
@@ -386,9 +457,9 @@ if (sqlsrv_num_rows($result) > 0) {
     // echo "JLCM : menu.php : #3 --> opcionesPerfil = ";
 	// print_r($opcionesPerfil);
 	// die("JLCM : menu.php : #4");
-	
+
 	while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
-		if (in_array($row['id'], $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {       
+		if (in_array($row['id'], $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
 			$menuItems[] = $row;
 			//  $menuItems[] = $row['padre_id'];
 		}
@@ -421,12 +492,12 @@ echo generarMenu($menuItems);
                             <?php  if (in_array("Formularios", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {  ?>
                             <li><a href="crear_formularios.php"><b>Formularios</b></a></li>
                             <?php } ?>
-                         
+
                         </ul>
                     </li>
-                    
+
                     <?php } ?>
-                  
+
                     <li>
                         <a href="cerrar.php">
                             <i class="material-icons">arrow_back</i>
@@ -435,7 +506,7 @@ echo generarMenu($menuItems);
                     </li>
 
                 </ul>
- 
+
             </div>
             <!-- #Menu -->
             <!-- Footer -->
@@ -444,7 +515,7 @@ echo generarMenu($menuItems);
                     &copy; 2023 Transitar 2.
                 </div>
                 <div class="version">
-                    <b>Version: </b> 2.0 
+                    <b>Version: </b> 2.0
                 </div>
             </div>
             <!-- #Footer -->
@@ -456,8 +527,8 @@ echo generarMenu($menuItems);
     <section class="content">
         <div class="container-fluid">
             <div class="block-header">
-       
+
 
         <?php  if (in_array("Liquidaciones", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {  ?>
- <a href="#" class="btn-flotante vibrar"><span style="font-size: 25px;border-radius:50%" class="fa fa-hand-holding-usd"></span></a>
+ <!-- <a href="#" class="btn-flotante vibrar"><span style="font-size: 25px;border-radius:50%" class="fa fa-hand-holding-usd"></span></a> -->
  <?php } ?>

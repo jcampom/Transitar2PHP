@@ -2,7 +2,7 @@
 
 include 'conexion.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
- 
+
 
 
 $titulos = $_POST['titulos'];
@@ -15,12 +15,12 @@ $valor_total = 0;
         //$fecha = $mysqli->real_escape_string($titulo['fecha']);
         //$valor = $mysqli->real_escape_string($titulo['valor']);
         //$sql = "INSERT INTO titulos (numero, fecha, valor,liquidacion, empresa) VALUES ('$numero', '$fecha', '$valor','$liquidacion','$empresa')";
-		
+
 		$sql = "INSERT INTO titulos (numero, fecha, valor,liquidacion, empresa) VALUES (?, ?, ?,?,?)";
 		$parameters = [$titulo['numero'], $titulo['fecha'],$titulo['valor'],$liquidacion,$empresa];
-		$result = sqlsrv_query( $mysqli, $sql, $parameters, array('Scrollable' => 'buffered'));			
+		$result = sqlsrv_query( $mysqli, $sql, $parameters, array('Scrollable' => 'buffered'));
 
-        if ($result)!==TRUE){
+        if (!$result){
             echo "Error al insertar el título: " . serialize(sqlsrv_errors());
         }
         $valor_total += $valor;
@@ -30,6 +30,6 @@ $valor_total = 0;
 
     echo 'Títulos guardados exitosamente.';
 } else {
-    http_response_code(405);
+    http_response_code(403);
     echo 'Método no permitido.';
 }

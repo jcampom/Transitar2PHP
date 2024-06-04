@@ -1,6 +1,6 @@
 <?php include 'menu.php';
 
-$comparendo = $_POST['comparendo'];
+$comparendo = $_POST['comparendo'] ?? '';
 
 if(!empty($_POST['infraccion'])){
 
@@ -38,7 +38,7 @@ $sql = "INSERT INTO comparendos (Tcomparendos_comparendo, Tcomparendos_fecha, Tc
 VALUES ('$comparendo', '$fecha_infraccion', '$lugar', Tcomparendos_placa, Tcomparendos_servicio, '$tipoInfractor', '".$_POST['origen_comparendo']."', '$infraccion', '$sancion','1', '$numeroDocumento', '$tipoInfractor', '$numeroDocumento','Tcomparendos_LT', '".$_POST['solidario_propietario']."', '".$_POST['solidario_empresa']."', '".$_POST['reporte_fuga']."', '0', '$fecha', '".$_POST['grua']."',  '".$_POST['uso_grua']."',  '".$_POST['patio']."', '0', '0',  '".$_POST['observaciones']."',  '".$_POST['testigo']."', '', '',  '".$_POST['origen_comparendo']."',  '".$_POST['ayudas_tecnologicas']."', '".$_POST['reporta_accidente']."', '".$_POST['mal_diligenciado']."', '".$_POST['archivo']."', '$idusuario', '".$_POST['municipio']."', '".$_POST['localidad']."', '".$_POST['grado_alcohol']."', '".$_POST['reincidencia']."', Tcomparendos_smlv, Tcomparendos_gruazona)";
 
 // Ejecuta la consulta
-if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))===TRUE){	
+if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))===TRUE){
     echo "Registro insertado con éxito.";
 } else {
     echo "Error al insertar el registro: " . serialize(sqlsrv_errors());
@@ -53,7 +53,7 @@ if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))===TR
     </div>
     <br>
 
-         
+
          <form action="comparendos.php" method="POST">
             <div class="col-md-6">
                 <div class="form-group form-float">
@@ -68,29 +68,29 @@ if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))===TR
                     </div>
                 </div>
              </div>
-             
-      
+
+
           <div class="col-md-6">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
         <label for="numero_liquidacion">Numero de Comparendo</label>
-        <input name="comparendo" value="<?php echo $_POST['comparendo']; ?>" id="comparendo" class="form-control">
+        <input name="comparendo" value="" id="comparendo" class="form-control">
             </div>
              </div>
              <button type="submit" class="btn btn-success waves-effect"><i class="fa fa-search"></i></button><br><br>
          </div>
-         
-    
+
+
         </form>
 
-         
 
-             
 
-        
+
+
+
         </div>
                      <?php } ?>
-                     
+
 <?php if(!empty($_POST['comparendo'])){ ?>
 
 
@@ -99,39 +99,39 @@ if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))===TR
         <h2>Registrar Comparendos</h2>
     </div>
     <br>
-    
+
     <?php       $consulta_comparendo="SELECT * FROM comparendos where Tcomparendos_comparendo = '$comparendo'";
 
             $resultado_comparendo=sqlsrv_query( $mysqli,$consulta_comparendo, array(), array('Scrollable' => 'buffered'));
 
 
-            
-if (sqlsrv_num_rows($resultado_comparendo) == 0) {   
+
+if (sqlsrv_num_rows($resultado_comparendo) == 0) {
      echo '<form method="POST" action="comparendos.php">';
     if(empty($_POST['nuevo'])){
     echo "<b><font color='red'>Comparendo no encontrado.</font></b>
        <button type='submit'  class='btn btn-success waves-effect'><i class='fa fa-plus'></i></button><br><br>
     ";
-    
+
     }
-    
+
     echo '<br>
     <input name="comparendo" hidden value="'.$_POST['origen_comparendo'].'" id="origen_comparendo" >
     <input name="comparendo" hidden value="'.$_POST['comparendo'].'" id="comparendo" >
-    
-    <input name="nuevo" hidden value="1" id="nuevo" > 
-    
- 
+
+    <input name="nuevo" hidden value="1" id="nuevo" >
+
+
     ';
-    
-    
-    
-    
-    
+
+
+
+
+
 if($_POST['nuevo']){
     ?>
-    <legend>Información General</legend>    
-              
+    <legend>Información General</legend>
+
           <div class="col-md-4">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -141,12 +141,12 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-            
+
           <div class="col-md-4">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -155,12 +155,12 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-            
+
           <div class="col-md-4">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -169,12 +169,12 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-            
+
           <div class="col-md-4">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -183,12 +183,12 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-            
+
           <div class="col-md-4">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -197,12 +197,12 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-            
+
           <div class="col-md-4">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -211,14 +211,14 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-             
-             
-    <legend>Datos de la Infracción</legend>   
+
+
+    <legend>Datos de la Infracción</legend>
               <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -227,7 +227,7 @@ Ayudas Tecnológicas</label>
             </div>
              </div>
          </div>
-         
+
             <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -337,7 +337,7 @@ Ayudas Tecnológicas</label>
                             <option style='margin-left: 15px;' value='1'>1</option>
                             <option style='margin-left: 15px;' value='2'>2</option>
                             <option style='margin-left: 15px;' value='3'>3</option>
-               
+
                         </select>
             </div>
              </div>
@@ -350,7 +350,7 @@ Ayudas Tecnológicas</label>
             </div>
              </div>
          </div>
-    
+
             <div class="col-md-12">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -359,11 +359,11 @@ Ayudas Tecnológicas</label>
             </div>
              </div>
          </div>
-         
-         
-         
+
+
+
                 <div class="col-md-12">
-            <legend>Infractor</legend>   
+            <legend>Infractor</legend>
             </div>
               <div class="col-md-3">
                 <div class="form-group form-float">
@@ -384,7 +384,7 @@ Ayudas Tecnológicas</label>
             </div>
              </div>
          </div>
-         
+
             <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -490,7 +490,7 @@ Ayudas Tecnológicas</label>
             </div>
              </div>
          </div>
-    
+
             <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -499,7 +499,7 @@ Ayudas Tecnológicas</label>
             </div>
              </div>
          </div>
-         
+
                <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -508,13 +508,13 @@ Ayudas Tecnológicas</label>
             </div>
              </div>
          </div>
-         
-         
+
+
                <div class="col-md-12">
-            <legend>Otros</legend>   
+            <legend>Otros</legend>
             </div>
-            
-            
+
+
               <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -523,13 +523,13 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-             
-             
+
+
                    <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -549,8 +549,8 @@ Ayudas Tecnológicas</label>
                     </div>
                 </div>
              </div>
-             
-             
+
+
                      <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -559,13 +559,13 @@ Ayudas Tecnológicas</label>
 
                             <option style='margin-left: 15px;' value='SI'>SI</option>
                             <option style='margin-left: 15px;' value='NO'>NO</option>
-               
+
                         </select>
                     </div>
                 </div>
              </div>
-             
-             
+
+
                    <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -585,7 +585,7 @@ Ayudas Tecnológicas</label>
                     </div>
                 </div>
              </div>
-             
+
                  <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -605,7 +605,7 @@ Ayudas Tecnológicas</label>
                     </div>
                 </div>
              </div>
-             
+
                  <div class="col-md-3">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -614,7 +614,7 @@ Ayudas Tecnológicas</label>
                     </div>
                 </div>
              </div>
-             
+
       <div class="col-md-12">
                 <div class="form-group form-float">
                     <div id="select_comparendos" class="form-line">
@@ -623,11 +623,11 @@ Ayudas Tecnológicas</label>
                     </div>
                 </div>
              </div>
-             
+
              <br>
                    <div class="col-md-12">
                <center><button type="submit" class="btn btn-success waves-effect"><i class="fa fa-plus"></i><b> Adicionar</b></button></center><br><br>
-                       </div>    
+                       </div>
 <?php
 }
 }else{
@@ -638,10 +638,10 @@ echo "<b><font color='green'>El comparendo ya se encuentra registrado en el sist
         </div>
                      <?php } ?>
   <script>
-      
+
           $(document).ready(function() {
-              
-              
+
+
                   $('#numero_documento').on('blur', function() {
         var numeroDocumento = $(this).val();
 
@@ -678,19 +678,19 @@ $('#telefono').val(datosCiudadano.telefono);
 
          $("#infraccion").change(function () {
         var infraccion = $(this).val();
-        
 
-                
+
+
                 // Dependiendo del valor seleccionado, activamos o desactivamos los campos de entrada
                 if (infraccion === 'F') {
                     $("#grado_alcohol").prop('disabled', false); // Activar el campo "grado_alcohol"
                     $("#reincidencia").prop('disabled', false); // Activar el campo "reincidencia"
-                    
+
                      $('#reincidencia').val(1);
                 } else {
                     $("#grado_alcohol").prop('disabled', true); // Desactivar el campo "grado_alcohol"
                     $("#reincidencia").prop('disabled', true); // Desactivar el campo "reincidencia"
-                    
+
                     $('#reincidencia').val(0);
                 }
 
@@ -702,11 +702,11 @@ $('#telefono').val(datosCiudadano.telefono);
             success: function(response) {
                 if (response.success) {
                     var datos = response.datos;
-                    
+
                       // Redondear los valores antes de asignarlos a los campos de entrada
                     var valorSmldvRedondeado = Math.round(datos.valor_smldv);
                     var valorPesosRedondeado = Math.round(datos.valor_pesos);
-                    
+
                       // Formatear los valores como números con comas y sin decimales
                     var valorSmldvFormateado = valorSmldvRedondeado.toLocaleString();
                     var valorPesosFormateado = valorPesosRedondeado.toLocaleString();
@@ -716,7 +716,7 @@ $('#telefono').val(datosCiudadano.telefono);
                     $('#valor_smldv').val(valorSmldvRedondeado);
                     $('#valor_pesos').val(valorPesosRedondeado);
                     $('#descripcion_infraccion').val(datos.descripcion);
-                    
+
 
                 } else {
                     // No se encontró el ciudadano, puedes mostrar un mensaje o realizar alguna acción
@@ -729,13 +729,13 @@ $('#telefono').val(datosCiudadano.telefono);
         });
     });
     // por grado de alcohol
-    
+
          $("#grado_alcohol").change(function () {
         var grado_alcohol = $('#grado_alcohol').val();
          var reincidencia = $('#reincidencia').val();
-        
 
-                
+
+
                 // Dependiendo del valor seleccionado, activamos o desactivamos los campos de entrada
 if (grado_alcohol === '0' && reincidencia === '1') {
  var valor = "2,811,000";
@@ -805,14 +805,14 @@ if (grado_alcohol === '3' && reincidencia === '3') {
 }
 
     });
-    
-    
+
+
 $('#reincidencia').on('blur', function() {
         var grado_alcohol = $('#grado_alcohol').val();
          var reincidencia = $('#reincidencia').val();
-        
 
-                
+
+
                 // Dependiendo del valor seleccionado, activamos o desactivamos los campos de entrada
 if (grado_alcohol === '0' && reincidencia === '1') {
  var valor = "2,811,000";
@@ -884,5 +884,5 @@ if (grado_alcohol === '3' && reincidencia === '3') {
     });
 });
   </script>
-  <br><br><br>  <br><br><br>  
+  <br><br><br>  <br><br><br>
 <?php include 'scripts.php'; ?>

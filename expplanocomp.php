@@ -1,7 +1,8 @@
 <?php
+include 'menu.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-include 'conexion.php';
+//include 'conexion.php';
 set_time_limit(0);
 // $_POST = decodeUTF8($_POST);
 $row_param = ParamGen();
@@ -11,7 +12,7 @@ $fechaini = date('Y-m-d H:i:s');
 $fechhoy = date('Y-m-d');
 
 $psedes = BuscarSedes();
-$ndivipo = trim($psedes['Tsedes_divipo']);
+$ndivipo = trim($psedes['municipio']);
 set_time_limit(0);
 function fixText($text, $ws = false) {
     $remove = str_replace(array(',', '°', 'º', 'ª'), " ", $text);
@@ -49,36 +50,34 @@ if (!$pagina) {
 }
 $filter = "";
 if (isset($_POST['Comprobar']) || isset($_GET["paginar"])) {
-    echo "hola";
     $sespos = isset($_GET["pagina"]) ? $_SESSION : $_POST;
-    if ($sespos['fechainicial'] <> '') {
-        $fechainicio = $sespos['fechainicial'];
+    if ($_GET['fechainicial'] <> '') {
+        $fechainicio = $_GET['fechainicial'];
     } else {
         $fechainicio = date('1900-01-01');
     }
     $_SESSION['fechainicial'] = $fechainicio;
-    if ($sespos['fechafinal'] <> '') {
-        $fechafinall = $sespos['fechafinal'];
+    if ($_GET['fechafinal'] <> '') {
+        $fechafinall = $_GET['fechafinal'];
     } else {
         $fechafinall = date('Y-m-d');
     }
     $_SESSION['fechafinal'] = $fechafinall;
     $filter = " AND (CAST(Tcomparendos_fecha AS date) BETWEEN '$fechainicio' AND '$fechafinall')";
-    $_SESSION['identificacion'] = $fplaca = $sespos['placa'];
-    if ($sespos['placa'] <> '') {
+    $_SESSION['identificacion'] = $fplaca = $_GET['placa'];
+    if ($_GET['placa'] <> '') {
         $filter .= " AND (Tcomparendos_placa = '$fplaca') ";
     }
-    $_SESSION['identificacion'] = $finfrac = $sespos['identificacion'];
-    if ($sespos['identificacion'] <> '') {
+    $_SESSION['identificacion'] = $finfrac = $_GET['identificacion'];
+    if ($_GET['identificacion'] <> '') {
         $filter .= " AND (Tcomparendos_idinfractor = '$finfrac') ";
     }
-    $_SESSION['comparendo'] = $fcompa = $sespos['comparendo'];
-    if ($sespos['comparendo'] <> '') {
-        echo "2";
+    $_SESSION['comparendo'] = $fcompa = $_GET['comparendo'];
+    if ($_GET['comparendo'] <> '') {
         $filter .= " AND (Tcomparendos_comparendo = '$fcompa') ";
     }
-    $_SESSION['origen'] = $forigen = $sespos['origen'];
-    if ($sespos['origen'] <> 0) {
+    $_SESSION['origen'] = $forigen = $_GET['origen'];
+    if ($_GET['origen'] <> 0) {
         $filter .= " AND (Tcomparendos_origen = '$forigen')";
     }
 }
@@ -92,19 +91,19 @@ $query_base = "SELECT ROW_NUMBER() OVER (ORDER BY Tcomparendos_fecha, Tcomparend
         FROM comparendos c
             INNER JOIN comparendos_codigos cc ON Tcomparendos_codinfraccion = TTcomparendoscodigos_codigo
             INNER JOIN comparendos_estados ce ON ce.id = c.Tcomparendos_estado
-        WHERE Tcomparendos_estado IN (1) $filter 
+        WHERE Tcomparendos_estado IN (1) $filter
             AND Tcomparendos_comparendo NOT IN (SELECT DISTINCT Texportplano_comp FROM Texportplano WHERE Texportplano_tipo='1') ";
 
 if ($paginar == 1) {
-    $sql = "SELECT Tcomparendos_ID  
+    $sql = "SELECT Tcomparendos_ID
             FROM comparendos
-            WHERE Tcomparendos_estado IN (1) $filter 
-            AND Tcomparendos_comparendo NOT IN 
+            WHERE Tcomparendos_estado IN (1) $filter
+            AND Tcomparendos_comparendo NOT IN
             (SELECT DISTINCT Texportplano_comp
              FROM Texportplano
              WHERE Texportplano_tipo='1')";
     $comp1=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
-    echo $sql;
+    //echo $sql;
     $total_registros = sqlsrv_num_rows($comp1);
     $total_paginas = ceil($total_registros / $registros);
     $query_comp = "SELECT * FROM ($query_base) T WHERE T.fila BETWEEN $inicio AND $fin";
@@ -115,7 +114,7 @@ $comp=sqlsrv_query( $mysqli,$query_comp, array(), array('Scrollable' => 'buffere
 
 // echo $query_comp;
 
-if ($_POST['webservice']) {
+if (isset($_POST['webservice'])) {
     ini_set("memory_limit", "256M");
     set_time_limit(0);
     $registrosCorrectos = "";
@@ -179,7 +178,7 @@ if ($_POST['webservice']) {
 }
 
 
-if ($_POST['generar']) {
+if (isset($_POST['generar'])) {
 
     ini_set("memory_limit", "256M");
     set_time_limit(0);
@@ -210,7 +209,7 @@ if ($_POST['generar']) {
         $idcomp = $_POST['idcomp'];
 
         foreach ($idcomp as $id) {
-            
+
             $query_compexp = "SELECT * FROM VExportComp WHERE idcomp = $id";
             $compexp=sqlsrv_query( $mysqli,$query_compexp, array(), array('Scrollable' => 'buffered'));
             $row_compexp = fixArray(sqlsrv_fetch_array($compexp, SQLSRV_FETCH_ASSOC));
@@ -285,11 +284,11 @@ if ($_POST['generar']) {
         $id = trim($row[0]);
 
         $sql2 = " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Texportplano', 'INSERT', '" . $id . "', '$mensp', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        
+
         sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
-        
+
         $sql2 = " INSERT INTO Trecaudos_ec (Trecaudos_ec_numcuenta, Trecaudos_ec_fechadesde, Trecaudos_ec_fechahasta, Trecaudos_ec_divipo, Trecaudos_ec_tiporecaudo, Trecaudos_ec_numrec, Trecaudos_ec_sumrec, Trecaudos_ec_oficio, Trecaudos_ec_codchequeo, Trecaudos_ec_idarch, Trecaudos_ec_pdf, Trecaudos_ec_expimp, Trecaudos_ec_user, Trecaudos_ec_fecha) VALUES ('', '', '', '', '', '" . ($consec - 1) . "', '$valortotal', " . $_POST['oficio'] . ", '" . $rsumaascii . "', '" . $id . "', '$mensp', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        
+
         sqlsrv_query( $mysqli,$sql2, array(), array('Scrollable' => 'buffered'));
 
         fclose($fp);
@@ -305,23 +304,24 @@ if ($_POST['generar']) {
             </tr>";
 
         $sql3 = "INSERT INTO Trecaudos_error (Trecaudos_error_nlinea, Trecaudos_error_ncampo, Trecaudos_error_error, Trecaudos_error_idarch, Trecaudos_error_expimp, Trecaudos_error_user, Trecaudos_error_fecha) VALUES ('$row', '$c', '" . $mensn . "', '" . $id . "', '1', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-     
-        
+
+
         if (sqlsrv_query( $mysqli,$sql3, array(), array('Scrollable' => 'buffered'))){
     // Insert successful
-    
+
       echo '<div class="alert alert-warning"><strong>¡No se pudo generar el archivo!</strong> Se dejo un registro del error.</div>';
 
 } else {
     // Insert failed
-    
+
     echo '<div class="alert alert-danger"><strong>¡No se pudo generar el archivo!</strong> y no se genero registro del error por:.</div>'. serialize(sqlsrv_errors());;
-    
+
 }
     }
 }
 
-?>    
+?>
+
   <script type="text/javascript" src="funciones.js"></script>
 <div class="card container-fluid">
     <div class="header">
@@ -331,36 +331,36 @@ if ($_POST['generar']) {
 		<script type="text/javascript" src="funciones.js"></script>
 
                             <form name="form" id="form" action="expplanocomp.php" method="GET" onSubmit="ValidaInfoComp()">
-                           
-                                            <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                            <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Identificaci&oacute;n ciudadano</strong>
-                                 
+
                                <input class="form-control" name='identificacion' type='text' id='identificacion' size="15"  value='<?php echo @$_GET['identificacion']; ?>' />
-                               
+
                                </div></div></div>
-                               
-                                            <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                            <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Placa</strong>
                                <input class="form-control" name='placa' type='text' id='placa' size="15"  value='<?php echo @$_GET['placa']; ?>' />
                                       </div></div></div>
-                                  
-                                      <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                      <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                   <strong>No. de comparendo</strong>
-                                  
+
                             <input class="form-control" name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo @$_GET['comparendo']; ?>' />
                                 </div></div></div>
-                            
-                                    <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                    <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
-                                 <strong>Origen</strong>                           
-                                  
+                                 <strong>Origen</strong>
+
                                       <select class="form-control" name='origen' id='origen' style='width:150px' value="<?php echo @$_GET['origen']; ?>">
     <option value='0'>Todos</option>
     <?php
@@ -371,12 +371,12 @@ if ($_POST['generar']) {
     }
     ?>
 </select>
-    </div></div></div>             
-                          <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+    </div></div></div>
+                          <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Estado</strong>
-                     
+
                                           <select class="form-control" name='estado' id='estado' style='width:150px' value="<?php echo @$_GET['estado']; ?>">
     <option value='0'>Todos</option>
     <?php
@@ -389,11 +389,11 @@ if ($_POST['generar']) {
 </select>
 
     </div></div></div>
-                                          <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                                          <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Codigo</strong>
-                                      
+
                                          <select class="form-control" name='codigo' id='codigo' style='width:150px' value="<?php echo @$_GET['codigo']; ?>">
     <option value='0'>Todos</option>
     <?php
@@ -404,29 +404,29 @@ if ($_POST['generar']) {
     }
     ?>
 </select>
-                             </div></div></div>    
-                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                             </div></div></div>
+                                <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <b>Fecha inicial</b>
-                                <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechainicial']; ?>" />
+                                <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechainicial']; ?>" />
                                     </div></div></div>
-                                
-                                 
-                                     <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+
+                                     <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <b>Fecha final</b>
                                 <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinal']; ?>" />
                                    </div></div></div>
-                                   
-                             
 
-      <div class="col-md-6"> 
-                             <div class="form-group form-float">  
-                             <div class="form-line"> 
+
+
+      <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
                              <strong>Paginar</strong>
-                                           
+
                                                 <select class="form-control" name="paginar" id="paginar" style="vertical-align:middle">
                                                     <?php if ($paginar == 1) : ?>
                                                         <option value="1" selected>Si</option>
@@ -437,13 +437,13 @@ if ($_POST['generar']) {
                                                     <?php endif; ?>
                                                 </select>
                                              </div></div></div>
-                                             
-                                             
-                                                
-                                                
-                                                      <div class="col-md-6"> 
-                             <div class="form-group form-float">  
-                             <div class="form-line"> 
+
+
+
+
+                                                      <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
                              <strong>Registros por Pagina</strong>
                                                 <select class="form-control" name="nregistros" id="nregistros" style="vertical-align:middle">
                                                     <?php for ($k = 100; $k <= 2000; $k += 100) : ?>
@@ -455,17 +455,17 @@ if ($_POST['generar']) {
                                                     <?php endfor; ?>
                                                 </select>
                                           </div></div></div>
-                                                
-                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
-                             <div class="form-line">         
+
+                                <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
                           <input  class="btn btn-success" name="Comprobar" type="submit" id="Comprobar" value="Generar"/><br /><br /><?php echo @$mesliq; ?>
                               </div></div></div>
                             </form>
-          
-          
-                    <?php if ($_POST['webservice']) : ?>
-              
+
+
+                    <?php if (isset($_POST['webservice'])) : ?>
+
                         <tr>
                             <td colspan="10" align="center" class="t_normal_n">Detalle registros enviado a SIMIT</td>
                         </tr>
@@ -517,7 +517,7 @@ if ($_POST['generar']) {
                         <tr>
                             <td colspan="10">&nbsp;</td>
                         </tr>
-                    <?php elseif ($_POST['generar']) : ?>
+                    <?php elseif (isset($_POST['generar'])) : ?>
                         <tr>
                               <div class="col-md-12">Detalle archivo plano SIMIT
                         </tr>
@@ -569,7 +569,7 @@ if ($_POST['generar']) {
                         <tr>
                             <td colspan="10">&nbsp;</td>
                         </tr>
-                    <?php elseif (sqlsrv_num_rows($comp) > 0) : ?>
+                    <?php elseif ($comp &&  sqlsrv_num_rows($comp) > 0) : ?>
                         <form name="form" id="form" action="expplanocomp.php" method="POST" onSubmit="return ValidaExporComp()">
                                   <table class="table">
                             <tr class="contenido2">
@@ -582,8 +582,8 @@ if ($_POST['generar']) {
                                 <th colspan="2" align="center">Valor</th>
                                 <th align="center">Estado</th>
                                 <th align="center">
-                              
-                                    
+
+
                                     <div class="form-check">
     <input name="todos" type="checkbox" id="todos" class="form-check-input" checked onclick="CheckOnCheck()" />
     <label class="form-check-label" for="todos"></label>
@@ -612,12 +612,12 @@ if ($_POST['generar']) {
                             </tr>
                             <?php if ($paginar == 1): ?>
                                 <tr>
-                                    <td colspan="10" align="center">   
-                                        <?php if ($total_registros){ ?>                            
+                                    <td colspan="10" align="center">
+                                        <?php if ($total_registros){ ?>
                                             <?php if (($pagina - 1) > 0): ?>
                                                 <a class="Recaudada" href="expplanocomp.php?pagina=<?php echo ($pagina - 1); ?>&nregistros=<?php echo $registros; ?>">< Anterior&nbsp;</a>
-                                            <?php endif; ?>		
-                                            <?php for ($i = 1; $i <= $total_paginas; $i++): ?>		
+                                            <?php endif; ?>
+                                            <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
                                                 <?php if ($pagina == $i) : ?>
                                                     <b class='highlight2'>&nbsp;<?php echo $pagina ?>&nbsp;</b>
                                                 <?php else: ?>
@@ -664,7 +664,7 @@ if ($_POST['generar']) {
                                     </td>
                                 </tr>
                             <?php }?>
-                        </form>		
+                        </form>
                     <?php else : ?>
                         <tr>
                             <td colspan="10" align="center">No hay datos para mostrar</td>

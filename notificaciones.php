@@ -2,7 +2,8 @@
 include 'menu.php';
 date_default_timezone_set("America/Bogota");
 $row_param = ParamGen();
-$segsession = $row_param[5] * 60;
+
+$segsession = $row_param['Tparamgenerales_minutossesion'] * 60;
 
 if (isset($_POST['valnauto']) && isset($_POST['numero'])) {
     $numero = intval($_POST['numero']);
@@ -34,7 +35,7 @@ $tipoAct = ($tipo == 1) ? " Notificacion" : 'Infractor';
 if (isset($_POST['enviar'])) {
     $ok = false;
     $comp = $_POST['comparendo'];
-    $query = "SELECT Tcomparendos_ID AS id, Tcomparendos_comparendo AS comparendo, Tnotifica_notificaf AS fnotifica, 
+    $query = "SELECT Tcomparendos_ID AS id, Tcomparendos_comparendo AS comparendo, Tnotifica_notificaf AS fnotifica,
                 Tcomparendos_estado AS estadoid, CE.nombre AS estado, Tcomparendos_origen AS origen,
                 Tnotifica_estado AS estadofnid, NE.nombre AS estadofn
             FROM comparendos
@@ -58,17 +59,17 @@ if (isset($_POST['enviar'])) {
 
         if ($responce == "") {
 
-if($tipo == 1){            
-             $consulta_noti="SELECT Tnotifparams_maxactfnot as maxact FROM tnotifparams "; 
-             
+if($tipo == 1){
+             $consulta_noti="SELECT Tnotifparams_maxactfnot as maxact FROM tnotifparams ";
+
 }else{
-    $consulta_noti="SELECT Tnotifparams_maxactinf as maxact FROM tnotifparams ";  
+    $consulta_noti="SELECT Tnotifparams_maxactinf as maxact FROM tnotifparams ";
 }
-         
+
          $resultado_noti=sqlsrv_query( $mysqli,$consulta_noti, array(), array('Scrollable' => 'buffered'));
 
          $row_noti=sqlsrv_fetch_array($resultado_noti, SQLSRV_FETCH_ASSOC);
-         
+
                      $maxact = $row_noti['maxact'];
             $queryn = "SELECT COUNT(*) AS total
                     FROM notificaciones WHERE compId = {$compinf['id']} AND tipo = '$tipo'";
@@ -90,7 +91,7 @@ if($tipo == 1){
             }
         }
         if ($ok && $tipo == 2) {
-            $query = "SELECT Tcomparendos_idinfractor AS ident, ciudadanos.nombres AS nombre, 
+            $query = "SELECT Tcomparendos_idinfractor AS ident, ciudadanos.nombres AS nombre,
                ciudadanos.apellidos AS apellido, ciudadanos.id AS id, tipo_identificacion.nombre AS tipodoc
             FROM comparendos
                 INNER JOIN ciudadanos ON Tcomparendos_idinfractor = ciudadanos.numero_documento
@@ -134,10 +135,10 @@ sqlsrv_begin_transaction( $mysqli );
 
 try {
     $sqltrans = "";
-   
+
     if ($tipo == 1) {
 $plantilla = 13;
-        
+
             $documento = '../sanciones/gdp_notifica_pdf.php';
         // Construir consulta 1
         $query1 = "INSERT INTO notificaciones (compId, tipo, fnotant, fnotnew, estadoant, archivo, documento, username) "
@@ -151,8 +152,8 @@ $plantilla = 13;
         // Construir consulta 3
         $query3 = "UPDATE comparendos SET Tcomparendos_estado = 15 WHERE Tcomparendos_ID = $compid";
         sqlsrv_query( $mysqli,$query3, array(), array('Scrollable' => 'buffered'));
-        
-        
+
+
     } elseif ($tipo == 2) {
         $plantilla = 13;
         $documento = '../sanciones/gdp_cambioinf_pdf.php';
@@ -160,10 +161,10 @@ $plantilla = 13;
         // Inserto datos del infractor
         if ($_POST['ID'] != "") {
             $ciunew = $_POST['ID'];
-            $sqltrans = " UPDATE ciudadanos SET nombres = '{$_POST['nombres']}', apellidos = '{$_POST['apellidos']}', 
+            $sqltrans = " UPDATE ciudadanos SET nombres = '{$_POST['nombres']}', apellidos = '{$_POST['apellidos']}',
                 direccion = '{$_POST['direccion']}', telefono = '{$_POST['telfijo']}', ciudad_residencia = '{$_POST['cr']}'
                 WHERE ID = '$ciunew';";
-                
+
                  sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'));
         } else {
 $Query = " INSERT INTO ciudadanos (tipo_documento, numero_documento,  nombres, apellidos, direccion, telefono, ciudad_residencia, usuario, fecha, tipo_ciudadano, sexo)
@@ -175,22 +176,22 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
         }
         $sqltrans = " INSERT INTO notificaciones (compId, tipo, fnotant, fnotnew, estadoant, archivo, documento, infant, infnew, presente, nauto, username) "
                 . "VALUES ($compid, $tipo, '$oldfnotif', '$fnotifica', $estadoid, '$patharchivo', '$documento', $ciuant, $ciunew, {$_POST['presente']}, {$_POST['nauto']}, '{$_SESSION['MM_Username']}');";
-                
+
                  sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'));
-                 
+
         $sqltrans = " UPDATE Tnotifica SET Tnotifica_notificaf = '$fnotifica' WHERE Tnotifica_compid = '$compid';";
          sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'));
-         
+
         $sqltrans = " UPDATE comparendos SET Tcomparendos_idinfractor = '{$_POST['Tcomparendos_idinfractor']}', Tcomparendos_estado = '15' WHERE Tcomparendos_ID = '$compid';";
          sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'));
     }
 	// Confirmar la transacción
     sqlsrv_commit( $mysqli );
-    
+
          $notifica = sqlsrv_query( $mysqli,"SELECT TOP 1 id FROM notificaciones N WHERE N.compId = $compid AND N.tipo = $tipo ORDER BY id DESC", array(), array('Scrollable' => 'buffered'));
         $rownot = sqlsrv_fetch_array($notifica, SQLSRV_FETCH_ASSOC);
-        
-        $result = ""; 
+
+        $result = "";
 } catch (Exception $e) {
     // Revertir la transacción en caso de error
 	sqlsrv_rollback( $mysqli );
@@ -199,7 +200,7 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
     echo "Número de error: " . serialize(sqlsrv_errors());
 }
 
- 
+
 }
 ?>
 
@@ -214,12 +215,12 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
                                 <label>Comparendo: </label><br>
                                 <input size='10' id='comparendo'  name='comparendo' class="form-control" value='<?php echo $_POST['comparendo']; ?>' required/>
                                 <input type="hidden" name="tipo" value="<?php echo $tipo; ?>" /><br>
-                               <center><input class="btn btn-success waves-effect" name="enviar" type="submit" value= "Verificar Comparendo" /></center> 
+                               <center><input class="btn btn-success waves-effect" name="enviar" type="submit" value= "Verificar Comparendo" /></center>
                                <br><br>
                             </form>
- 
+
                             <?php if (isset($_POST['enviar'])) : ?>
-                              
+
                                     <?php if ($ok) : ?>
                                         <form method="post" enctype="multipart/form-data" name="form2" id="form2">
                                             <input type="hidden" name="compid" value="<?php echo $compinf['id']; ?>" />
@@ -235,7 +236,7 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
                                                 <?php if ($tipo == 1): ?>
                                                     <tr class="tr">
                                                         <td align="right"><label>Fecha Notifica Actual:</label></td>
-                                                        <td><input type="text" size="15" name="oldfnotif" value="<?php echo $compinf['fnotifica']; ?>" readonly/></td>
+                                                        <td><input type="text" size="15" name="oldfnotif" value="<?php echo $compinf['fnotifica']->format('Y-m-d H:i:s'); ?>" readonly/></td>
                                                         <td align="right"><label>Fecha Notifica Nueva:</label></td>
                                                         <td><input type="text" size="15" id="fnotifica" name="fnotifica" value="" required onkeypress="return false;"/>
                                                             <button id="f_btn1" class="btn btn-success waves-effect" type="button">
@@ -248,19 +249,19 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
                              <label><center><b>Datos de Infractor Anterior</b></label>        </center>
                                                             <input type="hidden" size="15" name="oldfnotif" value="<?php echo $compinf['fnotifica']; ?>" readonly/>
                                                             <input type="hidden" size="15" name="fnotifica" value="<?php echo date('Y-m-d'); ?>" readonly/>
-                                                            
-                                                
+
+
              <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
           <label>Tipo Doc:</label><br>
         <input type="hidden" name="idciuant" value="<?php echo $ciud['id']; ?>" />
          <?php echo $ciud['tipodoc'] ?>
-                                                        
+
 </div>
             </div>
         </div>
-                                                        
+
       <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
@@ -269,17 +270,17 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
 </div>
             </div>
         </div>
-             
+
                           <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
                                                         <label>Nombres:</label><br>
                          <?php echo trim($ciud['nombre']); ?>
-                                                        
+
                                          </div>
             </div>
-        </div>                              
-                                                        
+        </div>
+
                                                      <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
@@ -287,13 +288,13 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
                                     <?php echo trim($ciud['apellido']); ?>
                                              </div>
             </div>
-        </div>   
-                                 
+        </div>
+
                                               <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
                                                         <label>Infractor esta presente:</label>
-                                     
+
                                                             <select name="presente" required>
                                                                 <option value="" selected></option>
                                                                 <option value="1">SI</option>
@@ -306,7 +307,7 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
             <div class="form-group form-float">
                 <div class="form-line">
                                                         <label>Numero de Doc.:</label><br>
-                                      
+
                                                             <input type="number" id="nauto" name="nauto" value="<?php echo $nauto; ?>" />
                                                                      </div>
             </div>
@@ -319,14 +320,14 @@ VALUES('{$_POST['tipoid']}','{$_POST['Tcomparendos_idinfractor']}', '{$_POST['no
                                                             </div>
                                                 </div>
                                                 <?php endif; ?>
-                                                <tr class="tr"> 
+                                                <tr class="tr">
                                                     <td align="right"><label>Documento de Solicitud:</label></td>
                                                     <td colspan="3"><input type="file" class="form-control" name="archivo" id="archivo" value="" accept="application/pdf" required/></td>
                                                 </tr>
-                                                <tr class="tr"> 
+                                                <tr class="tr">
                                                     <td colspan="4" align="center">&nbsp;</td>
                                                 </tr>
-                                                <tr class="tr"> 
+                                                <tr class="tr">
                                                     <td colspan="4" align="center"><input type="submit" id="enviar" class="btn btn-success" name="update" value="Actualizar <?php echo $tipoAct; ?>"/></td>
                                                 </tr>
                                                 <tr class='tr'>

@@ -1,15 +1,16 @@
-<?php 
+<?php
 include 'menu.php';
 if(!empty($_GET["eliminar"])){
-    $queryeliminar="DELETE FROM detalle_tramites WHERE id='".$_GET["id"]."' ";
+    $queryeliminar="DELETE FROM detalle_tramites WHERE concepto_id='".$_GET["id"]."' ";
 
     $resultadoeliminar=sqlsrv_query( $mysqli,$queryeliminar, array(), array('Scrollable' => 'buffered'));
 }
+$tramiteId = '';
 if(!empty($_GET)){
-$tramiteId = $_GET["tramite"];
+$tramiteId = $_GET["tramite"] ?? '';
 }
 if(!empty($_POST)){
-$tramiteId = $_POST["tramite"];
+$tramiteId = $_POST["tramite"] ?? '';
 }
 // Verificar si se ha enviado el formulario
 if (!empty($_POST['concepto']) && !empty($_POST['tramite'])) {
@@ -20,14 +21,14 @@ if (!empty($_POST['concepto']) && !empty($_POST['tramite'])) {
  // Verificar si ya existe el concepto para el trámite en la tabla detalle_tramites
     $sqlExistencia = "SELECT * FROM detalle_tramites WHERE concepto_id = '$conceptoId' AND tramite_id = '$tramiteId'";
     $resultExistencia=sqlsrv_query( $mysqli,$sqlExistencia, array(), array('Scrollable' => 'buffered'));
-    
+
   if (sqlsrv_num_rows($resultExistencia) > 0) {
         echo '<div class="alert alert-warning"><strong>Advertencia:</strong> El concepto ya existe para el trámite seleccionado.</div>';
     } else {
         // Insertar los datos en la tabla detalle_tramites
         $sqlInsert = "INSERT INTO detalle_tramites (concepto_id, tramite_id) VALUES ('$conceptoId', '$tramiteId')";
-    
-        if (sqlsrv_query( $mysqli,$sqlInsert, array(), array('Scrollable' => 'buffered'))===TRUE){
+
+        if (sqlsrv_query( $mysqli,$sqlInsert, array(), array('Scrollable' => 'buffered'))){
             echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El concepto ha sido guardado correctamente.</div>';
         } else {
             echo "Error: " . $sqlInsert . "<br>" . serialize(sqlsrv_errors());
@@ -71,7 +72,7 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                       echo ucwords($row_tramites2['nombre']); ?></option>
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tramite...</option>
-                            
+
                             <?php } ?>
                             <?php
                             if (sqlsrv_num_rows($resultTramites) > 0) {
@@ -100,20 +101,20 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                             }
                             ?>
                         </select>
-                        
+
                         <input name="tramite" hidden value="<?php echo $tramiteId; ?>">
                     </div>
                 </div>
             </div>
-       
+
             <div class="col-md-12">
                 <button type="submit" class="btn btn-primary">Agregar Concepto</button>
                 <br><br>
             </div>
         </form>
-        
+
     </div>
-    
+
     <div class="card">
     <div class="header">
         <h2>
@@ -125,15 +126,15 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
         <div class="table-responsive">
             <table class="table table-bordered table-striped " id="admin">
                 <thead>
-                    <tr> 
+                    <tr>
                     <th style="width:100px"></th>
-                    
+
                         <th>Concepto</th>
-       
-                    
-                  
-                            
-                      
+
+
+
+
+
 
 
 
@@ -143,15 +144,16 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
 
                 <tbody>
                   <?php
-              
+
                   $consulta_detalle="SELECT * FROM detalle_tramites  where tramite_id = '". $tramiteId."'";
+                  #echo $consulta_detalle;
 
                     $resultado_detalle=sqlsrv_query( $mysqli,$consulta_detalle, array(), array('Scrollable' => 'buffered'));
 
                    while($row_detalle=sqlsrv_fetch_array($resultado_detalle, SQLSRV_FETCH_ASSOC)){ ?>
                     <tr><th>
-                       <?php if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?> 
-                <a onclick="return confirm('Estas seguro de eliminar este concepto?');" href="conceptos_tramites.php?id=<?php echo $row_detalle['id'] ?>&eliminar=1&tramite=<?php echo $row_detalle['tramite_id'] ?>"> <button type="button" class="btn btn-danger" style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" ><i class="fa fa-times" style="margin:3px"></i></button></a>
+                       <?php if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?>
+                <a onclick="return confirm('Estas seguro de eliminar este concepto?');" href="conceptos_tramites.php?id=<?php echo $row_detalle['concepto_id'] ?>&eliminar=1&tramite=<?php echo $row_detalle['tramite_id'] ?>"> <button type="button" class="btn btn-danger" style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" ><i class="fa fa-times" style="margin:3px"></i></button></a>
                 <?php } ?>
          </th>
                       <td><?php
@@ -161,10 +163,10 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
 
             $row_conceptos=sqlsrv_fetch_array($resultado_conceptos, SQLSRV_FETCH_ASSOC);
                       echo ucwords($row_conceptos['nombre']); ?>
-                
-                
+
+
                       </td>
-              
+
                       <?php
                               }
                               ?>

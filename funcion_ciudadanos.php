@@ -233,34 +233,80 @@
                 </div>
             </div>
         </div>
-    
+
     </div>
 </div>
 <script>
+    let ciudadanoDoc = ""
+    let valorTotal = 0
+
     $(document).ready(function() {
     $('#numero_documento').on('blur', function() {
         var numeroDocumento = $(this).val();
+        var tipoDocumento = $('#tipo_documento').val()
+        var tipoCiudadano = $('#tipo_ciudadano').val()
+        var empty = 0;
+        valorTotal = 0
+
+        if(tipoDocumento == '') {
+            var elementos = document.querySelectorAll('[data-id="tipo_documento"]');
+            elementos.forEach(function(elemento) {
+                elemento.style.border = "2px solid red";
+            });
+            empty++
+        } else {
+            var elementos = document.querySelectorAll('[data-id="tipo_documento"]');
+            elementos.forEach(function(elemento) {
+                elemento.style.border = "";
+            });
+        }
+
+        if(tipoCiudadano == '') {
+            var elementos = document.querySelectorAll('[data-id="tipo_ciudadano"]');
+            elementos.forEach(function(elemento) {
+                elemento.style.border = "2px solid red";
+            });
+            empty++
+        } else {
+            document.getElementById("tipo_ciudadano").style.border = "";
+            var elementos = document.querySelectorAll('[data-id="tipo_ciudadano"]');
+            elementos.forEach(function(elemento) {
+                elemento.style.border = "";
+            });
+        }
+
+        if(empty != 0) {
+            alert('Por favor llene los campos necesarios')
+            return
+        }
 
         $.ajax({
             url: 'obtener_ciudadano.php',
             method: 'POST',
-            data: {numero_documento: numeroDocumento},
+            data: {
+                numero_documento: numeroDocumento,
+                tipo_documento: tipoDocumento,
+                tipo_ciudadano: tipoCiudadano
+            },
             dataType: 'json',
             success: function(response) {
+
                 if (response.success) {
                     var datosCiudadano = response.datosCiudadano;
 
              // Rellenar los campos <input> del formulario con los datos obtenidos
-$('#nombres').val(datosCiudadano.nombres);
-$('#apellidos').val(datosCiudadano.apellidos);
-$('#direccion').val(datosCiudadano.direccion);
-$('#telefono').val(datosCiudadano.telefono);
-$('#celular').val(datosCiudadano.celular);
-$('#email').val(datosCiudadano.email);
-$('#fecha_expedicion').val(datosCiudadano.fecha_expedicion);
-$('#fecha_nacimiento').val(datosCiudadano.fecha_nacimiento);
-$('#ciudadano').val(datosCiudadano.id);
-$('#numero_documento_actual').val(datosCiudadano.identificacion);
+                    $('#nombres').val(datosCiudadano.nombres);
+                    $('#apellidos').val(datosCiudadano.apellidos);
+                    $('#direccion').val(datosCiudadano.direccion);
+                    $('#telefono').val(datosCiudadano.telefono);
+                    $('#celular').val(datosCiudadano.celular);
+                    $('#email').val(datosCiudadano.email);
+                    $('#fecha_expedicion').val(datosCiudadano.fecha_expedicion);
+                    $('#fecha_nacimiento').val(datosCiudadano.fecha_nacimiento);
+                    $('#ciudadano').val(datosCiudadano.id);
+                    $('#numero_documento_actual').val(datosCiudadano.identificacion);
+
+                    ciudadanoDoc = datosCiudadano.identificacion
 
 
 
@@ -268,7 +314,11 @@ $('#numero_documento_actual').val(datosCiudadano.identificacion);
 // Para campos <select> que se llenan dinámicamente, puedes utilizar el método .trigger('change') para que se dispare el evento de cambio y se refleje el valor seleccionado
      // Rellenar los campos <select> del formulario con los datos obtenidos
                     $('#tipo_ciudadano').val(datosCiudadano.tipo_ciudadano).trigger('change');
-                    $('#tipo_documento').val(datosCiudadano.tipo_documento).trigger('change');
+
+                    if(tipoDocumento != 100 ) {
+                        $('#tipo_documento').val(datosCiudadano.tipo_documento).trigger('change');
+                    }
+
                     $('#donante_organos').val(datosCiudadano.donante_organos).trigger('change');
                     $('#grupo_sanguineo').val(datosCiudadano.grupo_sanguineo).trigger('change');
                     $('#pais_nacimiento').val(datosCiudadano.pais_nacimiento).trigger('change');
@@ -276,8 +326,86 @@ $('#numero_documento_actual').val(datosCiudadano.identificacion);
                     $('#ciudad_residencia').val(datosCiudadano.ciudad_residencia).trigger('change');
                     $('#sexo').val(datosCiudadano.sexo).trigger('change');
 
+                    $.ajax({
+                        url: 'obtener_comparendos.php',
+                        method: 'POST',
+                        data: {
+                            numeroDocumento: tipoDocumento == 100 ? numeroDocumento : ciudadanoDoc,
+                            tipoDocumento: tipoDocumento,
+                            tipoCiudadano: tipoCiudadano
+                        },
+                        success: function(response) {
+
+                            $('#comparendos-seleccionados').html(response);
+
+                            if(ciudadanoDoc == undefined  || ciudadanoDoc == "") {
+                                ciudadanoDoc = $('#ciudadano_document').val()
+                            }
+                        }});
+
+                        $.ajax({
+                            url: 'obtener_dt.php',
+                            method: 'POST',
+                            data: {
+                                numeroDocumento: numeroDocumento,
+                                tipoDocumento: tipoDocumento,
+                                tipoCiudadano: tipoCiudadano
+                            },
+                            success: function(response) {
+                                $('#dt-seleccionados').html(response);
+                            }
+                        });
+
                 } else {
-                    // No se encontxró el ciudadano, puedes mostrar un mensaje o realizar alguna acción
+                    $.ajax({
+                        url: 'obtener_comparendos.php',
+                        method: 'POST',
+                        data: {
+                            numeroDocumento: numeroDocumento,
+                            tipoDocumento: tipoDocumento,
+                            tipoCiudadano: tipoCiudadano
+                        },
+                        success: function(response) {
+
+                            $('#comparendos-seleccionados').html(response);
+
+                            if(ciudadanoDoc == undefined || ciudadanoDoc == "") {
+                                ciudadanoDoc = $('#ciudadano_document').val()
+                            }
+
+                            $('#nombres').val("");
+                            $('#apellidos').val("");
+                            $('#direccion').val("");
+                            $('#telefono').val("");
+                            $('#celular').val("");
+                            $('#email').val("");
+                            $('#fecha_expedicion').val("");
+                            $('#fecha_nacimiento').val("");
+                            $('#ciudadano').val("");
+                            $('#numero_documento_actual').val("");
+
+                            $('#donante_organos').val("").trigger('change');
+                            $('#grupo_sanguineo').val("").trigger('change');
+                            $('#pais_nacimiento').val("").trigger('change');
+                            $('#ciudad_nacimiento').val("").trigger('change');
+                            $('#ciudad_residencia').val("").trigger('change');
+                            $('#sexo').val("").trigger('change');
+                        }
+                    });
+
+                    $.ajax({
+                        url: 'obtener_dt.php',
+                        method: 'POST',
+                        data: {
+                            numeroDocumento: numeroDocumento,
+                            tipoDocumento: tipoDocumento,
+                            tipoCiudadano: tipoCiudadano
+                        },
+                        success: function(response) {
+
+                            $('#dt-seleccionados').html(response);
+                        }
+                    });
                 }
             },
             error: function() {
@@ -288,7 +416,14 @@ $('#numero_documento_actual').val(datosCiudadano.identificacion);
     });
 });
 
-
+function calculaValorComparendo(view, value) {
+    if(view.checked) {
+        valorTotal += value;
+    } else {
+        valorTotal -= value;
+    }
+    $('#total_pagar').html('Total a pagar general: $ ' + valorTotal.toLocaleString().replace(/\./g, ','))
+}
 
 
 $(document).ready(function() {
@@ -331,7 +466,7 @@ $(document).ready(function() {
                             // Operación de actualización exitosa
                             console.log('Actualización realizada con éxito');
                  alert('Actualización realizada con éxito');
-                           
+
                         },
                         error: function() {
                             // Error en la petición de actualización
@@ -340,7 +475,7 @@ $(document).ready(function() {
                         }
                     });
                 } else {
-                    
+
                     // Obtener los valores de los campos
 var tipoDocumento = $('#tipo_documento').val();
 var nombres = $('#nombres').val();
@@ -350,7 +485,7 @@ var numeroDocumento = $('#numero_documento').val();
 // Verificar si los campos requeridos están vacíos
 if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocumento === "") {
     alert('Los campos tipo de documento, nombres, dirección y número de documento son obligatorios.');
-}else{ 
+}else{
                     // El número de documento no existe, realizar una operación de inserción (INSERT)
                     $.ajax({
                         url: 'insertar_ciudadano.php',
@@ -378,7 +513,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
                             // Operación de inserción exitosa
                             console.log('Inserción realizada con éxito');
                             alert('Inserción realizada con éxito');
-                  
+
                         },
                         error: function() {
                             // Error en la petición de inserción
@@ -406,15 +541,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
         $('#numero_documento').on('blur', function() {
             var numeroDocumento = $(this).val();
             if (numeroDocumento !== '') {
-                $.ajax({
-                    url: 'obtener_comparendos.php',
-                    method: 'POST',
-                    data: {numeroDocumento: numeroDocumento },
-                    success: function(response) {
-               
-                        $('#comparendos-seleccionados').html(response);
-                    }
-                });
+
             } else {
 
                 $('#comparendos-seleccionados').empty();
@@ -431,15 +558,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
         $('#numero_documento').on('blur', function() {
             var numeroDocumento = $(this).val();
             if (numeroDocumento !== '') {
-                $.ajax({
-                    url: 'obtener_dt.php',
-                    method: 'POST',
-                    data: {numeroDocumento: numeroDocumento },
-                    success: function(response) {
-               
-                        $('#dt-seleccionados').html(response);
-                    }
-                });
+
             } else {
 
                 $('#dt-seleccionados').empty();
@@ -462,7 +581,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
                     method: 'POST',
                     data: {numeroDocumento: numeroDocumento },
                     success: function(response) {
-               
+
                         $('#ap-seleccionados').html(response);
                     }
                 });
@@ -475,6 +594,6 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
     });
 </script>
 
-  
+
 
 

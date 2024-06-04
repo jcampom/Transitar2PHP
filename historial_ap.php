@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 
 ini_set('display_errors', 1);
@@ -38,26 +38,26 @@ if (isset($_POST['guardar'])) {
 
     if (sqlsrv_num_rows($result_ap) == 0) {
         for ($i = 1; $i <= $_POST['cuotas']; $i++) {
-            $query_ap=$query_ap. "INSERT INTO acuerdos_pagos (TAcuerdop_numero, TAcuerdop_comparendo, TAcuerdop_valor, TAcuerdop_periodicidad, TAcuerdop_cuota, TAcuerdop_cuotas, TAcuerdop_identificacion, TAcuerdop_estado, TAcuerdop_fechapago, TAcuerdop_tipodoc, TAcuerdop_fecha, TAcuerdop_user) 
+            $query_ap=$query_ap. "INSERT INTO acuerdos_pagos (TAcuerdop_numero, TAcuerdop_comparendo, TAcuerdop_valor, TAcuerdop_periodicidad, TAcuerdop_cuota, TAcuerdop_cuotas, TAcuerdop_identificacion, TAcuerdop_estado, TAcuerdop_fechapago, TAcuerdop_tipodoc, TAcuerdop_fecha, TAcuerdop_user)
                VALUES (".$_POST['ap'].", ".$_POST['documento'].", ".$_POST['valor_'.$i].", ".$_POST['periodicidad'].", ".$i.", ".$_POST['cuotas'].", ".$_POST['infractor'].", ".$_POST['APEstado_'.$i].", '".$_POST['fecha_AP_'.$i]."', 'COM', '".$_POST['fecha_AP']."', 'User');\r";
         }
     } else {
         for ($i = 1; $i <= $_POST['cuotas']; $i++) {
-            $query_ap=$query_ap. "UPDATE acuerdos_pagos SET 
-            TAcuerdop_numero=".$_POST['ap'].", 
-            TAcuerdop_comparendo=".$_POST['documento'].", 
-            TAcuerdop_valor=".$_POST['valor_'.$i].", 
-            TAcuerdop_periodicidad=".$_POST['periodicidad'].", 
-            TAcuerdop_cuota=".$i.", 
-            TAcuerdop_cuotas=".$_POST['cuotas'].", 
-            TAcuerdop_identificacion=".$_POST['infractor'].", 
-            TAcuerdop_estado=".$_POST['APEstado_'.$i].", 
-            TAcuerdop_fechapago='".$_POST['fecha_AP_'.$i]."', 
-            TAcuerdop_tipodoc='COM', 
+            $query_ap=$query_ap. "UPDATE acuerdos_pagos SET
+            TAcuerdop_numero=".$_POST['ap'].",
+            TAcuerdop_comparendo=".$_POST['documento'].",
+            TAcuerdop_valor=".$_POST['valor_'.$i].",
+            TAcuerdop_periodicidad=".$_POST['periodicidad'].",
+            TAcuerdop_cuota=".$i.",
+            TAcuerdop_cuotas=".$_POST['cuotas'].",
+            TAcuerdop_identificacion=".$_POST['infractor'].",
+            TAcuerdop_estado=".$_POST['APEstado_'.$i].",
+            TAcuerdop_fechapago='".$_POST['fecha_AP_'.$i]."',
+            TAcuerdop_tipodoc='COM',
             TAcuerdop_fecha='".$_POST['fecha_AP']."', TAcuerdop_user='User' WHERE TAcuerdop_numero='".$_POST['ap']."' AND TAcuerdop_comparendo=".$_POST['documento']." AND TAcuerdop_cuota=".$i.";\r";
         }
     }
-    
+
     $query_ap=$query_ap."COMMIT TRANSACTION InsertAP;\r";
     $result_ap=sqlsrv_query( $mysqli,$query_ap, array(), array('Scrollable' => 'buffered'));
 }
@@ -87,7 +87,7 @@ if (isset($_POST['generar'])) {
 ?>
 
 
-<script languaje="javascript"> 
+<script languaje="javascript">
 
 function validarNro(e) {
 var key;
@@ -103,7 +103,7 @@ if (key < 48 || key > 57)
 {
 if(key == 8 ) // Detectar . (punto) y backspace (retroceso)
     { return true; }
-else 
+else
     { return false; }
 }
 return true;
@@ -132,16 +132,16 @@ body {
     </div>
     <br>
     <form id="form1" name="form1" method="post" action="historial_ap.php">
- <div class="col-md-6">            
-                             <div class="form-group form-float">          
-                             <div class="form-line"> 
+ <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
                              <strong>Comparendo Número<span class="style1">*</span>: </strong><br>
-                             
+
                              	<input class='form-control' name="documento" type="text" id="documento" size="10" maxlength="15" <?php if ($_POST['documento']){echo "value=\"".$_POST['documento']."\"";}?> />
 				 	</div></div></div>
-				 	 <div class="col-md-6">            
-                             <div class="form-group form-float">          
-                             <div class="form-line"> 
+				 	 <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
 				<br>
 				 	<input class='form-control btn btn-success'name="buscar" type="submit" value="Buscar" />
 				 	</div></div></div>
@@ -156,15 +156,15 @@ if ($_POST['documento']!="")  // Si el comparendo no está vacío
         echo "<tr><td align='center' colspan=5><p><strong>Comparendo NO encontrado</strong></td></tr>";
     } else {
         echo "<tr><td align='center' colspan=5><p><strong>Comparendo encontrado</strong></td></tr>";
-        
-        
+
+
         echo "<table class='table table-bordered table-striped '><tr><td align='center'><strong>Fecha</strong></td>";
         echo "<td align='center'><strong>Placa</strong></td>";
         echo "<td align='center'><strong>Infracción</strong></td>";
         echo "<td align='center'><strong>Infractor</strong></td>";
         echo "<td align='center'><strong>Estado</strong></td></tr>";
         $row_comp = sqlsrv_fetch_array($result_comp, SQLSRV_FETCH_ASSOC); // Escribe información del comparendo
-        $fechacomp = date("Y-m-d", strtotime($row_comp['Tcomparendos_fecha']));
+        $fechacomp = $row_comp['Tcomparendos_fecha']->format("Y-m-d");;
         echo "<tr><td align='center'>".$fechacomp."</td>"; // Imprime la fecha
         echo "<td align='center'>".$row_comp['Tcomparendos_placa']."</td>"; // Imprime placa
         echo "<td align='center'>".$row_comp['Tcomparendos_codinfraccion']."</td>"; // Imprime Infracción
@@ -178,7 +178,7 @@ if ($_POST['documento']!="")  // Si el comparendo no está vacío
       $resultado_consulta=sqlsrv_query( $mysqli,$query_consulta, array(), array('Scrollable' => 'buffered'));
 
       $existe=sqlsrv_fetch_array($resultado_consulta, SQLSRV_FETCH_ASSOC);
-      
+
       echo $existe['nombre'];
         echo "</td></tr>   </table>";
         $estado_comp = $row_comp['Tcomparendos_estado'];
@@ -313,20 +313,20 @@ echo "</td></tr>";
 							<tr>
 								<td colspan="5">
 								  <div align="center">
-								  	<?php 
+								  	<?php
 									if ($ap_numero=="" and $ap_cuotas==0){echo "<input class='form-control'name=\"guardar\" id=\"guardar\" type=\"submit\" value=\"Guardar\" />";}
 
 									?>
-										
+
 								  </div>
 								</td>
 						  </tr>
-				<?php } 
+				<?php }
 				if ((@$_POST['ap']=="" || (@$_POST['cuotas']=="" || @$_POST['cuotas']<1)) && isset($_POST['generar'])){echo "<tr><td align='center' colspan=5><p><strong>Recuerde, el No. de AP no puede estar vacío y la cantidad de cuotas debe ser mayor a 1.</strong></td></tr>";}
-							
-			   	?>		  
-				
-     
+
+			   	?>
+
+
 		</form>
       </div>
 </div>

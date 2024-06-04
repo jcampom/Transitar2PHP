@@ -7,16 +7,16 @@ if(!empty($_GET["eliminar"])){
       	   echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El Menu se ha Eliminado correctamente.</div>';
 }
 
-  if($_POST['editar'] > 0){
+  if(isset($_POST['editar']) > 0){
 
-  
+
 
   $editar="UPDATE menu_items SET  nombre = '".$_POST['nombre']."', enlace = '".$_POST['enlace']."',padre_id = '".$_POST['padre']."', icono = '".$_POST['icono']."' where id = '".$_POST['editar']."' ";
 	$resultadoedit=sqlsrv_query( $mysqli,$editar, array(), array('Scrollable' => 'buffered'));
-  	
+
   	   echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El Menu se ha editado correctamente.</div>';
 
-  	
+
   }
 ?>
 <!DOCTYPE html>
@@ -29,14 +29,14 @@ if(!empty($_GET["eliminar"])){
     <?php
     // Verificar si se ha enviado el formulario
     if ($_SERVER["REQUEST_METHOD"] == "POST" && empty($_POST['editar'])) {
-     
+
         $nombre = $_POST['nombre'];
         $enlace = $_POST['enlace'];
         $padre = $_POST['padre'];
         $icono = $_POST['icono'];
         // Insertar los datos en la tabla menu_items
         $sql_crear_menu = "INSERT INTO menu_items (nombre, enlace, padre_id, empresa,fecha,fechayhora,usuario,icono) VALUES ('$nombre', '$enlace', '$padre','$empresa','$fecha','$fechayhora','$idusuario','$icono')";
-  
+
         if (sqlsrv_query( $mysqli,$sql_crear_menu, array(), array('Scrollable' => 'buffered'))===TRUE){
 echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu guardado correctamente.</div>';
         } else {
@@ -45,14 +45,14 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
         }
     }
     ?>
-    
+
     <div class="card">
         <div class="card-body">
              <div class="header">
         <h2>Crear Menu</h2>
     </div>
     <br>
-            
+
             <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                 <div class="row">
                     <div class="col-md-6">
@@ -98,7 +98,7 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
                                               <label for="padre">Icono</label><br>
 
   <select class="form-control" name="icono"  data-live-search="true">
-      
+
        <option value="3d_rotation" data-content="<i class='material-icons' style='margin-left: 15px;'>3d_rotation</i> Rotación 3D">Rotación 3D</option>
 <option value="ac_unit" data-content="<i class='material-icons' style='margin-left: 15px;'>ac_unit</i> Unidad de Aire Acondicionado">Unidad de Aire Acondicionado</option>
 <option value="access_alarm" data-content="<i class='material-icons' style='margin-left: 15px;'>access_alarm</i> Acceso a Alarma">Acceso a Alarma</option>
@@ -434,7 +434,7 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
                         </button>
                         <br><br>
                     </div>
-              
+
             </form>
         </div>
     </div>
@@ -452,7 +452,7 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
                         <th>Menú Padre</th>
                         <th>Icono</th>
                         <th></th>
-                      
+
                     </tr>
                 </thead>
                 <tbody>
@@ -471,13 +471,13 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
                          ?>
                          <td>
                       <?php if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?>  <a onclick="return confirm('Estas seguro de eliminar este registro?');" href="crear_menu.php?id=<?php echo $row['id'] ?>&eliminar=1"> <button type="button" class="btn btn-danger" style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" ><i class="fa fa-times" style="margin:3px"></i></button></a>
-                      <?php } 
+                      <?php }
                       if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
                       ?>
                       <a  href="perfil_menu.php?id=<?php echo $row['id'] ?>"> <button style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" type="button" class="btn btn-info" ><i class="fa fa-pencil-alt"></i></button></a>
                       <?php } ?>
-                      
-                    
+
+
                       </td>
                       <?php
                         }

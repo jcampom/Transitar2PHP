@@ -28,13 +28,13 @@ if (isset($_GET['Comprobar'])) {
         $andwhere .= " AND Tcomparendos_codinfraccion = '{$_GET['codigo']}' ";
     }
 
-    $sql = "SELECT TOP 50 ciu.id AS ciuId, ciu.numero_documento AS ident, ciu.apellidos AS apellido, 
+    $sql = "SELECT TOP 50 ciu.id AS ciuId, ciu.numero_documento AS ident, ciu.apellidos AS apellido,
  ciu.nombres AS nombre, comp.Tcomparendos_placa AS placa, comp.Tcomparendos_comparendo AS comparendo,
  comp.Tcomparendos_origen AS origen, comp.Tcomparendos_estado AS estadoId, comp.Tcomparendos_codinfraccion AS codigo,
  est.nombre AS estado, CAST(comp.Tcomparendos_fecha AS DATE) AS fechacomp, noti.Tnotifica_notificaf AS fnotifica
  FROM comparendos AS comp
  INNER JOIN ciudadanos AS ciu ON comp.Tcomparendos_idinfractor = ciu.numero_documento
- 
+
  INNER JOIN comparendos_estados AS est ON comp.Tcomparendos_estado = est.id
  LEFT JOIN Tnotifica AS noti ON noti.Tnotifica_comparendo = comp.Tcomparendos_comparendo
  WHERE CAST(comp.Tcomparendos_fecha AS DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere
@@ -73,36 +73,36 @@ if (isset($_GET['Comprobar'])) {
 		<script type="text/javascript" src="funciones.js"></script>
 
                             <form name="form" id="form" action="comparendos_generales.php" method="GET" onSubmit="ValidaInfoComp()">
-                           
-                                            <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                            <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Identificaci&oacute;n ciudadano</strong>
-                                 
+
                                <input class="form-control" name='identificacion' type='text' id='identificacion' size="15"  value='<?php echo @$_GET['identificacion']; ?>' />
-                               
+
                                </div></div></div>
-                               
-                                            <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                            <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Placa</strong>
                                <input class="form-control" name='placa' type='text' id='placa' size="15"  value='<?php echo @$_GET['placa']; ?>' />
                                       </div></div></div>
-                                  
-                                      <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                      <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                   <strong>No. de comparendo</strong>
-                                  
+
                             <input class="form-control" name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo @$_GET['comparendo']; ?>' />
                                 </div></div></div>
-                            
-                                    <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                                    <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
-                                 <strong>Origen</strong>                           
-                                  
+                                 <strong>Origen</strong>
+
                                       <select class="form-control" name='origen' id='origen' style='width:150px' value="<?php echo @$_GET['origen']; ?>">
     <option value='0'>Todos</option>
     <?php
@@ -113,12 +113,12 @@ if (isset($_GET['Comprobar'])) {
     }
     ?>
 </select>
-    </div></div></div>             
-                          <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+    </div></div></div>
+                          <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Estado</strong>
-                     
+
                                           <select class="form-control" name='estado' id='estado' style='width:150px' value="<?php echo @$_GET['estado']; ?>">
     <option value='0'>Todos</option>
     <?php
@@ -131,11 +131,11 @@ if (isset($_GET['Comprobar'])) {
 </select>
 
     </div></div></div>
-                                          <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                                          <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Codigo</strong>
-                                      
+
                                          <select class="form-control" name='codigo' id='codigo' style='width:150px' value="<?php echo @$_GET['codigo']; ?>">
     <option value='0'>Todos</option>
     <?php
@@ -146,26 +146,26 @@ if (isset($_GET['Comprobar'])) {
     }
     ?>
 </select>
-                             </div></div></div>    
-                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                             </div></div></div>
+                                <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <b>Fecha inicial</b>
                                 <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo isset($_GET['fechainicial'])? $_GET['fechainicial'] : ''; ?>" />
                                     </div></div></div>
-                                
-                                 
-                                     <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+
+                                     <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <b>Fecha final</b>
                                 <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinal']; ?>" />
                                    </div></div></div>
-                                   
-                                   
-                                <div class="col-md-6"> 
-                             <div class="form-group form-float">  
-                             <div class="form-line">         
+
+
+                                <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
                           <input  class="btn btn-success" name="Comprobar" type="submit" id="Comprobar" value="Generar"/><br /><br /><?php echo @$mesliq; ?>
                               </div></div></div>
                                     </tr>
@@ -187,7 +187,7 @@ if (isset($_GET['Comprobar'])) {
                                         <td align='center'><strong>Codigo</strong></td>
                                         <td align='center'><strong>Fecha Comp.</strong></td>
                                         <td align='center'><strong>Resoluciones / Fecha</strong></td>
-                                        <td align='center'><?php echo $res_pago_multa; ?></td>                                        
+                                        <td align='center'><?php echo $res_pago_multa; ?></td>
                                     </tr>
                                     <?php
                                $count = 1;
@@ -204,18 +204,18 @@ while ($row = sqlsrv_fetch_array($result4, SQLSRV_FETCH_ASSOC)) {
     <tr bgcolor="<?php echo $color; ?>">
         <td align='center'><a href='../form/formmov.php?tabla=Tciudadanos&ver=<?php echo $row['ciuId']; ?>' target='_blank'><?php echo $row['ident']; ?></a></td>
         <td align='left' width="15%"><?php echo toUTF8($row['nombre'] . " " . $row['apellido']) ?></td>
-        <td align='center'><?php echo $row['fnotifica']; ?></td>
+        <td align='center'><?php echo $row['fnotifica'] ->format('Y-m-d'); ?></td>
         <td align='center'><?php echo $row['placa']; ?></td>
         <td align='center'><a href='../comparendos/comparendos.php?tabla=Tcomparendos&ver=<?php echo $row['comparendo'] ?>&Tcomparendos_origen=<?php echo $row['origen']; ?>' target='_blank' ><?php echo $row['comparendo']; ?></a></td>
         <td align='center'><?php echo $row['estado']; ?></td>
         <td align='center'><?php echo $row['codigo']; ?></td>
-        <td align='center'><?php echo $row['fechacomp']; ?></td>
+        <td align='center'><?php echo $row['fechacomp']->format('Y-m-d'); ?></td>
         <td>
             <?php
             /** INICIO: SANCIÓN / FECHA */
-            $sql_sancion = "SELECT ressan_id, ressan_ano, ressan_numero, ressan_comparendo, ressan_archivo, 
+            $sql_sancion = "SELECT ressan_id, ressan_ano, ressan_numero, ressan_comparendo, ressan_archivo,
                 CAST(ressan_fecha AS DATE) as fechares, id, nombre, sigla,ressan_tipo
-                FROM resolucion_sancion 
+                FROM resolucion_sancion
                 INNER JOIN resolucion_sancion_tipo ON ressan_tipo = id
                 WHERE ressan_comparendo='{$row['comparendo']}' -- OR (ressan_comparendo='{$row['ident']}' AND ressan_tipo IN (17,18))
                 ORDER BY ressan_fecha DESC";
@@ -263,12 +263,12 @@ while ($row = sqlsrv_fetch_array($result4, SQLSRV_FETCH_ASSOC)) {
                     }
                     $numres = trim($row_sancion['ressan_ano'] . "-" . $row_sancion['ressan_id'] . "-" . $row_sancion['sigla']);
                     if (trim($row_sancion['ressan_archivo']) != '') {
-                   
-                        
-                        
+
+
+
                             $href = "imprimir_resolucion.php?comparendo=".$row_sancion['ressan_comparendo']."&tipo=".$row_sancion['ressan_tipo'];
-                        
-                        echo "<tr><td><a href='" . $href . "' target='_blank' title='" . toUTF8($row_sancion['nombre']) . "'>" . $numres . "</a></td><td>" . $row_sancion['fechares'] . "</td></tr>";
+
+                        echo "<tr><td><a href='" . $href . "' target='_blank' title='" . toUTF8($row_sancion['nombre']) . "'>" . $numres . "</a></td><td>" . $row_sancion['fechares']->format('Y-m-d'). "</td></tr>";
                     } else {
                         echo "<tr><td>" . $numres . "</td><td>" . $row_sancion['fechares'] . "</td></tr>";
                     }
@@ -361,7 +361,7 @@ if ($cl == 0 and $row['estadoId'] != 2) {
                                             ?>
                                         </td>
                                     </tr>
-                                </table> 
+                                </table>
                             </td>
                         </tr>
                         <tr>

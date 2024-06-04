@@ -1,7 +1,9 @@
 <?php
 include 'conexion.php';
 // Obtener los tramites disponibles basados en los tramites seleccionados
-$tramitesSeleccionados = $_POST['tramitesSeleccionados'];
+if(!isset($_POST['tramitesSeleccionados']) && isset($_POST['tramitesSeleccionados']) != null) {
+	$tramitesSeleccionados = $_POST['tramitesSeleccionados'];
+}
 $tipo_tramite =  $_POST['tipoTramite'];
 //  llenamos el array
 $tramitesDisponibles = array();

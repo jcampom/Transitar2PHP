@@ -1,20 +1,20 @@
 <?php
 include 'menu.php';
 $row_param = ParamGen();
-$segsession = $row_param[5] * 60;
+$segsession = $row_param["Tparamgenerales_minutossesion"] * 60;
 
 $time = 1;
 $pps = 200;
 $time2 = 25;
 $pps2 = 4;
 $detallecsv = "<font color='green'>El tipo de archivo debe ser un csv con la siguiente estructura separada por punto y coma ( ; ) :
-		<br>Comparendo (Numero largo), Numero Resolucion (Solo el numero, la estructura es dada por el sistema), 
+		<br>Comparendo (Numero largo), Numero Resolucion (Solo el numero, la estructura es dada por el sistema),
         Fecha Resolucion (YYYY-MM-DD), Resolucion Anterior (Opcional).
         <br>Ejemplo de registro: '47189000000020055936;20055936;2018-08-27;2018-20055936-SA'.
         <br>Verifique que la columna de comparendo se guarde como texto, no como numero.
 		<br>La Informacion suministrada sera contrarrestada y dara informe de lo que no fue procesado.</font>";
 
-if ($_POST['generar']) {
+if (isset($_POST['generar'])) {
 ini_set("memory_limit", "256M");
 set_time_limit(0);
 
@@ -65,7 +65,7 @@ if (($gestor = fopen($_FILES['lote_archivo']['tmp_name'], "r")) !== FALSE) {
                 if (valResolucion($comparendo, $numres, $resolucion)) {
                     $archive_pdf = $relaction == "oah" ? "verregistro.php?$refArchivo" : $refArchivo;
                     $nota = $relaction == "oah" ? "Archivo Remoto" : "Documento Generado";
-                    $insert_sancion = " INSERT INTO resolucion_sancion (ressan_ano, ressan_numero, ressan_tipo, ressan_comparendo, ressan_archivo, ressan_observaciones, ressan_fecha, ressan_resant) 
+                    $insert_sancion = " INSERT INTO resolucion_sancion (ressan_ano, ressan_numero, ressan_tipo, ressan_comparendo, ressan_archivo, ressan_observaciones, ressan_fecha, ressan_resant)
                     VALUES ('$anioRes', '$numres', '$resolucion', '$comparendo', '../sanciones/$archive_pdf', '$nota', '$fechaRes', '$resant')";
                     // echo $insert_sancion . "<br>";
                     sqlsrv_query( $mysqli,$insert_sancion, array(), array('Scrollable' => 'buffered'));
@@ -187,7 +187,7 @@ function valUpdateComp($estado, $state = array(1)) {
 }
 
 function valResolucion($comparendo, $numero, $tipo) {
-    
+
     global $mysqli;
     $sql = "SELECT ressan_numero FROM resolucion_sancion WHERE ressan_comparendo = '$comparendo' AND ressan_numero = '$numero' AND ressan_tipo = '$tipo'";
     $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
@@ -203,9 +203,9 @@ function valResolucion($comparendo, $numero, $tipo) {
 }
 
 function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
-    
+
    global $mysqli;
-   
+
     $resp = false;
     if ($resant != null && $resant != "") {
         $sql = "SELECT ressan_numero FROM resolucion_sancion WHERE ressan_comparendo = '$comparendo' AND ressan_tipo = '$tipo' AND ressan_numero = '$numres' AND ressan_ano = '$anioRes'";
@@ -221,7 +221,7 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
     return $resp;
 }
 
-?>    
+?>
 
         <script type="text/javascript" src="funciones.js"></script>
 
@@ -237,7 +237,7 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
 
                 <table align="center" bgcolor="#FFFFFF" >
 
-                    <?php if ($_POST['generar']): ?>
+                    <?php if (isset($_POST['generar'])): ?>
                         <tr>
                             <td colspan="10" align="center" class="t_normal_n">Detalle a Generacion por Lote</td>
                         </tr>
@@ -267,17 +267,17 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
                         </tr>
                         <tr>
                             <td colspan="10">&nbsp;</td>
-                        </tr>	
+                        </tr>
                     <?php else : ?>
                         <tr><td colspan='10'>
                                 <form name="form" id="form" action="gen_resol_ref.php" method="POST" enctype="multipart/form-data" onSubmit="" accept-charset=utf-8>
                                     <table width="90%" border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
-                                        <tr>                
-                                        <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                                        <tr>
+                                        <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>No. registros a procesar</strong>
-                                     
+
                                                 <select class="form-control" name="nregistros" id="nregistros" onChange="genTimeRun(this);">
                                                     <?php for ($k = 200; $k <= 4000; $k += 200): ?>
                                                         <option value="<?php echo $k; ?>" <?php
@@ -287,25 +287,25 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
                                                         ?>><?php echo $k; ?></option>
                                                             <?php endfor; ?>
                                                 </select>
-                                                
+
                                               </div> </div> </div>
-                                            
-                         <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                         <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Tipo de Resolución</strong>
-<select name="resolucion" required class="form-control"> 	
+<select name="resolucion" required class="form-control">
     <option value="" selected>Seleccione</option>
     <?php
 
-    
+
     $query_resol = "SELECT id, nombre FROM resolucion_sancion_tipo where id in (2,28,16)";
     $resol=sqlsrv_query( $mysqli,$query_resol, array(), array('Scrollable' => 'buffered'));
-    
+
     if (sqlsrv_num_rows($resol) > 0) {
         while ($row_resol = sqlsrv_fetch_array($resol, SQLSRV_FETCH_ASSOC)) {
             ?>
-            <option value="<?php echo $row_resol['id']; ?>"><?php echo $row_resol['nombre']; ?> </option> 		
+            <option value="<?php echo $row_resol['id']; ?>"><?php echo $row_resol['nombre']; ?> </option>
         <?php
         }
     } else {
@@ -317,7 +317,7 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
                                             </div>
                                         </div>
                                             </div>
-                                        <!--<tr> 
+                                        <!--<tr>
                                             <td align="left"><strong>Tipo de relacion</strong></td>
                                             <td align="left"><strong>
                                                     <select name="relaction" id="relaction" onChange="changeTipeRun(this);" required>
@@ -335,12 +335,12 @@ function valUpdateAnt($numres, $tipo, $comparendo, $anioRes, $resant) {
                                                     </select></strong>
                                             </td>
                                         </tr>-->
-                                              <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+                                              <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <strong>Archivo a Procesar</strong>
                                             <input class="form-control" name="lote_archivo" type="file" id="lote_archivo" class="cambia_input_file" onChange="nombre_arcsv(this)" required/>
-                                            
+
                                             </div></div></div>
                                             <td rowspan="2" id="exect" class="count"><?php echo $time; ?></td>
                                             <td colspan="3" align="left">

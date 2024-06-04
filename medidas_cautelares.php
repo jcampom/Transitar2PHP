@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 include 'menu.php';
 $row_param = ParamGen();
-$segsession = $row_param[5] * 60;
+$segsession = $row_param["Tparamgenerales_minutossesion"] * 60;
 $fechhoy = date('Ymd');
 $year = date('Y');
 set_time_limit(0);
@@ -28,9 +28,9 @@ if (isset($_POST['update'])) {
     $bancos = $_POST['bancos'];
     $usuario = $_SESSION['MM_Username'];
     if (!empty($checks)) {
-  
+
         if (count($bancos) >= 1 or $bancos[0] == '0') {
-            
+
             $bancos = array();
 $queryb = "SELECT id FROM bancos WHERE Tbancos_activo = 1 ORDER BY nombre";
 $resultb=sqlsrv_query( $mysqli,$queryb, array(), array('Scrollable' => 'buffered'));
@@ -58,7 +58,7 @@ if (sqlsrv_num_rows($querynum_result) == 0) {
         $genarchiv = array();
         $ninscri = 0;
         $compids = implode(',', $checks);
-        
+
 
 foreach ($bancos as $banco) {
     if ($banco == '0') {
@@ -75,29 +75,29 @@ $querychk_result=sqlsrv_query( $mysqli,$querychk, array(), array('Scrollable' =>
 
     } else {
         $pchecks = $checks;
-        
+
     }
 
     if (count($pchecks) > 0) {
         $archivo = "mc_inscripcion.php?numero=$numero&banco=$banco";
-        
+
         foreach ($pchecks as $compid) {
-            
-        
+
+
             $valor = $_POST['comp'][$compid];
-            
+
 
             if (is_numeric($valor)) {
                 $sqltrans = "INSERT INTO medcautcomp (compid, mctipo, mcnumero, mcestado, banco, valor, archivo, usuario)"
                         . " VALUES ('$compid', '$medidas', '$numero', 1, '$banco', '$valor', '$archivo','$usuario'); ";
-                        
-           
+
+
                 //if (sqlsrv_query( $mysqli,$sqltrans, array(), array('Scrollable' => 'buffered'))){
-                        
+
                 //     }else{
                 // echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
                 //     }
-                $ninscri++; 
+                $ninscri++;
             }
         }
         $genarchiv[$banco] = array('ruta' => $archivo, 'numero' => $numero);
@@ -142,9 +142,9 @@ if ($result == "") {
     $where .= " AND CAST(resolucion_sancion.ressan_fecha AS DATE) BETWEEN '$fechainimp' AND '$fechafinmp'";
 
     $query = "SELECT Tcomparendos_comparendo AS comparendo, CAST(Tcomparendos_fecha AS DATE) fechacomp, Tcomparendos_origen AS origen, CAST(ressan_fecha AS DATE) AS fechares, Tcomparendos_ID AS compid, (ressan_ano + '-' + ressan_numero + '-' + sigla) AS numero, Tcomparendos_idinfractor AS identif, (nombres + ' ' + apellidos) AS nombre, ressan_archivo AS archivo, ressan_id AS resid FROM comparendos
-INNER JOIN resolucion_sancion ON ressan_compid = Tcomparendos_ID AND ressan_tipo = 16 
-INNER JOIN resolucion_sancion_tipo ON ressan_tipo = id 
-INNER JOIN ciudadanos ON CAST(Tcomparendos_idinfractor AS VARCHAR(30)) = numero_documento 
+INNER JOIN resolucion_sancion ON ressan_compid = Tcomparendos_ID AND ressan_tipo = 16
+INNER JOIN resolucion_sancion_tipo ON ressan_tipo = id
+INNER JOIN ciudadanos ON CAST(Tcomparendos_idinfractor AS VARCHAR(30)) = numero_documento
 WHERE 1 = 1 $where  ORDER BY fechacomp DESC, fechares, ressan_numero DESC";
 $registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
@@ -175,68 +175,68 @@ $registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffere
                 <form name="form" id="form" method="GET" >
                     <table id="table" align="center" bgcolor="#FFFFFF" width="70%" >
                         <tr>
-                         
+
                         <tr>
-                            
-                             <div class="col-md-6"> 
-                             <div class="form-group form-float">  
+
+                             <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <label>No. de Comparendo</label>
-                                 <input class="form-control"name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo $_GET['comparendo']; ?>' />
+                                 <input class="form-control"name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo @$_GET['comparendo']; ?>' />
                                     </div>
             </div>
         </div>
-                            
-                             <div class="col-md-6">         
-                             <div class="form-group form-float">    
+
+                             <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <label>Numero de MP</label>
-                                 <input class="form-control"name='numero' type='text' id='numero' size="15"  value='<?php echo $_GET['numero']; ?>' />
+                                 <input class="form-control"name='numero' type='text' id='numero' size="15"  value='<?php echo @$_GET['numero']; ?>' />
                                  </div>
             </div>
         </div>
-                          
-                             <div class="col-md-6">         
-                             <div class="form-group form-float">    
-                             <div class="form-line"> 
-                             <label>Fecha Inicial Comp.</label>
-                             <input class="form-control"name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechainicial']; ?>" />
-                             
-               </div>
-            </div>
-        </div>
-                          
-                             <div class="col-md-6">            
-                             <div class="form-group form-float">          
-                             <div class="form-line"> 
-                             <label>Fecha Fin Comp.</label>
-                             <input class="form-control"name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechafinal']; ?>" />
-                             
-                                                      
-               </div>
-            </div>
-        </div>
-               
-                <div class="col-md-6">         
-                             <div class="form-group form-float">    
+
+                             <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
-                           
-                   
-                                  <label>Fecha Inicial MP</label>
-                                  <input class="form-control"name="fechainimp" type="date" id="fechainimp" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechainimp']; ?>" />
-                                  
-                                                           
+                             <label>Fecha Inicial Comp.</label>
+                             <input class="form-control"name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechainicial']; ?>" />
+
                </div>
             </div>
         </div>
-               
-               
-                            
-                             <div class="col-md-6">  
-                             <div class="form-group form-float">        
+
+                             <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
+                             <label>Fecha Fin Comp.</label>
+                             <input class="form-control"name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinal']; ?>" />
+
+
+               </div>
+            </div>
+        </div>
+
+                <div class="col-md-6">
+                             <div class="form-group form-float">
+                             <div class="form-line">
+
+
+                                  <label>Fecha Inicial MP</label>
+                                  <input class="form-control"name="fechainimp" type="date" id="fechainimp" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechainimp']; ?>" />
+
+
+               </div>
+            </div>
+        </div>
+
+
+
+                             <div class="col-md-6">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                  <label>Fecha Fin MP</label>
-                                 <input class="form-control"name="fechafinmp" type="date" id="fechafinmp" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechafinmp']; ?>" />
+                                 <input class="form-control"name="fechafinmp" type="date" id="fechafinmp" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinmp']; ?>" />
                                   </div>
             </div>
         </div>
@@ -250,69 +250,71 @@ $registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffere
                         <tr>
                             <td>
                                 <fieldset>
-                  
+
                                     <?php if ($result == "") : ?>
                                         <h4><font color='green' size='+1'>Se genero correctamente las incripciones de medidas cautelares <a href="../informes/infmedcaut.php" target="_blank">Ver Archivos</a>.</font></h4>
                                         <ul>
                                             <?php foreach ($genarchiv as $archivo): ?>
-                                                <li><a href="<?php echo $archivo['ruta']; ?>" target="_blank"><b>C.E. No.<?php echo $archivo['numero'] . "-" . date('y'); ?></b></a></li>
+                                                <li><a href="<?php echo $archivo['ruta']; ?>" target="_blank"><b>C.E. No.<?php echo @$archivo['numero'] . "-" . date('y'); ?></b></a></li>
                                             <?php endforeach; ?>
                                         </ul>
                                     <?php else: ?>
-                                        <h4><font color='red' size='+1'>Ocurrio un error al generar los registros de embargo, Intente de nuevo.<br/>Error: <?php echo $result; ?></font></h4>
+                                        <h4><font color='red' size='+1'>Ocurrio un error al generar los registros de embargo, Intente de nuevo.<br/>Error: <?php echo @$result; ?></font></h4>
                                     <?php endif; ?>
                                 </fieldset>
                             </td>
                         </tr>
                     </table>
                     </div>
-                <?php elseif ($_GET['generar']) : ?>
+                <?php elseif (isset($_GET['generar'])) : ?>
                     <form name="form1" id="form" method="POST" >
-                      
-                            <?php $cantidad = sqlsrv_num_rows($registros); ?>
+
+                            <?php $cantidad = $registros ? sqlsrv_num_rows($registros) : 0; ?>
                             <?php if ($cantidad > 0) : ?>
 <div align='center' colspan='8'><span class="Recaudada">El numero de oficio aumentara en uno a partir del numero enviado por cada banco selecionado,
                                             evite el uso de numero anteriores en generacion de multiples bancos, el numero de generado en el documento seria CE (numero)-(YY).</span></div>
-                               
+
                                     <?php
-                                 
-                                   $qry1="SELECT ISNULL(MAX(mcnumero), 0) + 1 AS numero FROM medcautcomp WHERE YEAR(fecha) = $year" 
+
+                                   $qry1="SELECT ISNULL(MAX(mcnumero), 0) + 1 AS numero FROM medcautcomp WHERE YEAR(fecha) = $year";
                                    $resultnum=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
                                    $numrow = sqlsrv_fetch_array($resultnum, SQLSRV_FETCH_ASSOC);
                                     ?>
-                                     <div class="col-md-4">  
-                             <div class="form-group form-float">        
+                                     <div class="col-md-4">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                     <label>Numero de Oficio</label>
                                     <td><input class="form-control"type="number" name="oficio" id="oficio" value="<?php echo $numrow['numero']; ?>" style="width: 100%;" required/>
-                                    
+
                                         </div>
             </div>
         </div>
-                                    
-                                     <div class="col-md-4">  
-                             <div class="form-group form-float">        
+
+                                     <div class="col-md-4">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                     <label>Tipo de Medida</label>
-                                 
+
                                    <?php
     $Query = "SELECT id, nombre FROM mmctipos ORDER BY nombre";
     $Resultb=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
 
-    $Combo = "<select name='medidas' id='medidas'  style='width: 80%;' required>";
-    $Combo .= "<option value='0'>Todos</option>";
+    if($Resultb){
+        $Combo = "<select name='medidas' id='medidas'  style='width: 80%;' required>";
+        $Combo .= "<option value='0'>Todos</option>";
 
-    while ($columnas = $Resultb->fetch_array()) {
-        $Combo .= "<option value='" . $columnas[0] . "'>" . trim($columnas[1]) . "</option>";
+        while ($columnas = $Resultb->fetch_array()) {
+            $Combo .= "<option value='" . $columnas[0] . "'>" . trim($columnas[1]) . "</option>";
+        }
+
+        echo $Combo .= "</select>";
     }
-
-    echo $Combo .= "</select>";
     ?>
         </div>
             </div>
         </div>
-                              <div class="col-md-4">  
-                             <div class="form-group form-float">        
+                              <div class="col-md-4">
+                             <div class="form-group form-float">
                              <div class="form-line">
                                     <label>Bancos</label>
                               <br>
@@ -320,19 +322,21 @@ $registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffere
     $Query = "SELECT id, nombre FROM bancos WHERE Tbancos_activo = 1 ORDER BY nombre";
     $Resultb=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
 
-    $Combo = "<select name='bancos[]' id='bancos'  style='width: 80%;' multiple required>";
-    $Combo .= "<option value='0'>Todos</option>";
+    if($Resultb) {
+        $Combo = "<select name='bancos[]' id='bancos'  style='width: 80%;' multiple required>";
+        $Combo .= "<option value='0'>Todos</option>";
 
-    while ($columnas = $Resultb->fetch_array()) {
-        $Combo .= "<option value='" . $columnas[0] . "'>" . trim($columnas[1]) . "</option>";
+        while ($columnas = $Resultb->fetch_array()) {
+            $Combo .= "<option value='" . $columnas[0] . "'>" . trim($columnas[1]) . "</option>";
+        }
+
+        echo $Combo .= "</select>";
     }
-
-    echo $Combo .= "</select>";
     ?>
            </div>
             </div>
         </div>
-        
+
   <table id="table " align="center" bgcolor="#FFFFFF" width="100%" style="border-collapse: collapse;">
                                     <th width="10%">Comparendo</th>
                                     <th width="10%">Fecha Comp.</th>
@@ -345,7 +349,7 @@ $registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffere
                                 </tr>
                                 <?php $count = 0; ?>
                                 <?php while ($row = sqlsrv_fetch_array($registros, SQLSRV_FETCH_ASSOC)){
-                             
+
                                 ?>
                                     <?php
                                     $count++;
@@ -373,11 +377,11 @@ $registros=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffere
                                         <td align='center'><?php echo $row['fechares']; ?></td>
                                         <td align='center'><input class="form-control"type="number" name="comp[<?php echo $row['compid'] ?>]" value="" disabled style="max-width: 100px"/></td>
                                         <td align='center'>
-                                        
+
 <div class="form-check">
  <input class="form-control" type="checkbox" name="check[]" id="check[]" value="<?php echo $row['compid'] ?>"/>
   <label class="form-check-label" for="check[]">
- 
+
   </label>
 
 </div>
@@ -433,10 +437,10 @@ $('input[type=checkbox]').change(function () {
 
 });
             });
-          
+
         </script>
 
-<?php include 'scripts.php'; 
+<?php include 'scripts.php';
 
 
 ?>

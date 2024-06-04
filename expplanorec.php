@@ -1,5 +1,5 @@
 <?php
-include 'conexion.php';
+include 'menu.php';
 $row_param = ParamGen();
 $row_paramWS = ParamWebService();
 
@@ -9,16 +9,16 @@ $fechhoy = date('Y-m-d');
 $psedes = BuscarSedes();
 $ndivipo = trim($psedes['divipo']);
 // set_time_limit(0);
-if ($_POST['webservice']) {
+if (isset($_POST['webservice'])) {
     $registrosCorrectos = "";
     $registrosConError = "";
     $afectacionBD = "";
     foreach ($_POST['idcomp'] as $idcomp) {
         if ($_POST['idliq'][$idcomp]) {
-            $query_compexp = "SELECT TOP 1 RECFAPL, RECHORA, RECFTRAN, RECCANAL, RECORIGEN, RECEFECTIVO, 
-                            RECCHEQUE, RECTOTAL, RECDOCUMENTO, RECPOLCA, RECNIP, RECTIPOREC, RECSECRET, 
-                            RECNUM, NUMERO_CUTOAS, ID_TIPO_DOC, INTERESES, DESCUENTO, VADICIONAL, 
-                            numero, resolucion_id, comparendo 
+            $query_compexp = "SELECT TOP 1 RECFAPL, RECHORA, RECFTRAN, RECCANAL, RECORIGEN, RECEFECTIVO,
+                            RECCHEQUE, RECTOTAL, RECDOCUMENTO, RECPOLCA, RECNIP, RECTIPOREC, RECSECRET,
+                            RECNUM, NUMERO_CUTOAS, ID_TIPO_DOC, INTERESES, DESCUENTO, VADICIONAL,
+                            numero, resolucion_id, comparendo
                         FROM VExportRecaudo WHERE doc = '$idcomp' AND RECNUM = '" . $_POST['idliq'][$idcomp] . "'";
             $compexp=sqlsrv_query( $mysqli,$query_compexp, array(), array('Scrollable' => 'buffered'));
             $num = sqlsrv_num_rows($compexp);
@@ -88,19 +88,19 @@ if ($_POST['webservice']) {
 }
 
 
-if ($_POST['generar']) {
+if (isset($_POST['generar'])) {
     ini_set("memory_limit", "256M");
     set_time_limit(0);
     $rs2=sqlsrv_query( $mysqli,"SELECT MAX(Trecaudos_arch_ID) AS id FROM Trecaudos_arch", array(), array('Scrollable' => 'buffered'));
     $row2 = $rs2->fetch_row();
     $id2 = trim($row2[0]) + 1;
-    
+
     // Generar archivo plano
     $nombre_archivo = $id2 . "_" . $ndivipo . "rec.txt";
     $path = "Archivos/" . $nombre_archivo;
     $tipo_archivo = "text/plain";
     $fp = fopen($path, 'w');
-    
+
     if ($fp) {
         $menspost .= "
             <tr>
@@ -113,24 +113,24 @@ if ($_POST['generar']) {
         $consec = 1;
         $valor = $ndivipo . "," . date("d/m/Y", strtotime($_POST['fecha_ini'])) . "," . date("d/m/Y", strtotime($_POST['fecha_fin'])) . "," . $ndivipo . ",1" . "\r\n";
         $valortotal = 0;
-        
+
         foreach ($_POST['idcomp'] as $idcomp) {
             if ($_POST['idliq'][$idcomp]) {
-                $query_compexp = "SELECT TOP 1 RECFAPL, RECHORA, RECFTRAN, RECCANAL, RECORIGEN, RECEFECTIVO, 
-                            RECCHEQUE, RECTOTAL, RECDOCUMENTO, RECPOLCA, RECNIP, RECTIPOREC, RECSECRET, 
-                            RECNUM, NUMERO_CUTOAS, ID_TIPO_DOC, INTERESES, DESCUENTO, VADICIONAL, comparendo, numero 
+                $query_compexp = "SELECT TOP 1 RECFAPL, RECHORA, RECFTRAN, RECCANAL, RECORIGEN, RECEFECTIVO,
+                            RECCHEQUE, RECTOTAL, RECDOCUMENTO, RECPOLCA, RECNIP, RECTIPOREC, RECSECRET,
+                            RECNUM, NUMERO_CUTOAS, ID_TIPO_DOC, INTERESES, DESCUENTO, VADICIONAL, comparendo, numero
                         FROM VExportRecaudo WHERE doc = '$idcomp' AND RECNUM = '" . $_POST['idliq'][$idcomp] . "'";
-                
+
                 $compexp=sqlsrv_query( $mysqli,$query_compexp, array(), array('Scrollable' => 'buffered'));
                 $num = sqlsrv_num_rows($compexp);
                 $row_compexp = sqlsrv_fetch_array($compexp, SQLSRV_FETCH_ASSOC);
-                
+
                 if ($num > 0) {
                     $numero = array_pop($row_compexp);
                     $ncomp = array_pop($row_compexp);
                     $valor .= $consec . ',' . implode(',', $row_compexp);
                     $valortotal += $row_compexp['RECTOTAL'];
-                    
+
                     if ($row_compexp['RECTIPOREC'] == 4) {
                         $tipo = "Acuerdo de Pago: " . $numero . ' - Cuota: ' . $row_compexp['NUMERO_CUTOAS'];
                     } elseif ($row_compexp['RECTIPOREC'] == 3 || $row_compexp['RECTIPOREC'] == 6) {
@@ -138,7 +138,7 @@ if ($_POST['generar']) {
                     } else {
                         $tipo = "Comparendo: " . $row_compexp['RECDOCUMENTO'];
                     }
-                    
+
                     $valor .= "\r\n";
                     $menspost2 .= "
                         <tr>
@@ -154,12 +154,12 @@ if ($_POST['generar']) {
                 }
             }
         }
-        
+
         $valor1 = str_replace(array("\n", "\r"), "", $valor);
         for ($k = 0; $k < strlen($valor1); $k++) {
             $sumaascii2 += ord($valor1[$k]);
         }
-        
+
         $rsumaascii = $sumaascii2 % 10000;
         $mensp .= "N&uacute;mero de registros " . ($consec - 1);
         $mensp .= " Valor Total de registros " . $valortotal;
@@ -171,7 +171,7 @@ if ($_POST['generar']) {
         $tamano_archivo = filesize($path);
 
         $totalsql .= "INSERT INTO Trecaudos_arch (Trecaudos_arch_archivo, Trecaudos_arch_nombre, Trecaudos_arch_tipo, Trecaudos_arch_tamano, Trecaudos_arch_descrip, Trecaudos_arch_md5, Trecaudos_arch_expimp, Trecaudos_arch_user, Trecaudos_arch_fecha) VALUES ('$path', '$nombre_archivo', '$tipo_archivo', '$tamano_archivo', '$mensp', '$md5', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
-        
+
         $result1=sqlsrv_query( $mysqli,$totalsql, array(), array('Scrollable' => 'buffered'));
         $menspost2 .= "
             <tr>
@@ -189,7 +189,7 @@ if ($_POST['generar']) {
                 <td align='center' class='Recaudada'>&nbsp;</td>
                 <td align='center' class='Recaudada'>&nbsp;</td>
             </tr>";
-        
+
         $sql2 .= " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Texportplano', 'INSERT', '" . $id2 . "', '$mensp', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
         $sql2 .= " INSERT INTO Trecaudos_control (Trecaudos_control_nlinea, Trecaudos_control_tabla, Trecaudos_control_tipo, Trecaudos_control_idarch, Trecaudos_control_mens, Trecaudos_control_expimp, Trecaudos_control_user, Trecaudos_control_fecha) VALUES ('$consec', 'Trecaudos_arch', 'INSERT', '" . $id2 . "', '$mensp', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
         $sql2 .= " INSERT INTO Trecaudos_ec (Trecaudos_ec_numcuenta, Trecaudos_ec_fechadesde, Trecaudos_ec_fechahasta, Trecaudos_ec_divipo, Trecaudos_ec_tiporecaudo, Trecaudos_ec_numrec, Trecaudos_ec_sumrec, Trecaudos_ec_oficio, Trecaudos_ec_codchequeo, Trecaudos_ec_idarch, Trecaudos_ec_pdf, Trecaudos_ec_expimp, Trecaudos_ec_user, Trecaudos_ec_fecha) VALUES ('$ndivipo', '" . $_POST['fecha_ini'] . "', '" . $_POST['fecha_fin'] . "', '$ndivipo', '1', '" . ($consec - 1) . "', '$valortotal', '" . $_POST['oficio'] . "', '" . $rsumaascii . "', '" . $id2 . "', '$mensp', '2', '" . $_SESSION['MM_Username'] . "', '$fechaini')";
@@ -214,7 +214,7 @@ if ($_POST['generar']) {
 } // Fin de generar
 
 
-if ($_POST['buscar']) {
+if (isset($_POST['buscar'])) {
     if ($_POST['fecha_ini'] == '') {
         $fecha_ini = '1900-01-01';
     } else {
@@ -242,7 +242,7 @@ if ($_POST['buscar']) {
     </div>
     <br>
 
-                            <form name="form1" id="form1"  action="expplanorec.php" method="post" > 
+                            <form name="form1" id="form1"  action="expplanorec.php" method="post" >
                                 <table width="100%" align='center' bgcolor='#FFFFFF' class="table">
                                     <tr>
                                         <td align="center" colspan="4"><h2>Seleccione Rango de Fechas</h2><hr /></td>
@@ -250,12 +250,12 @@ if ($_POST['buscar']) {
                                     <tr>
                                         <td><strong>Fecha Inicial:</strong></td>
                                         <td>
-                                            <input name='fecha_ini' type='text' id='fecha_ini' size='10' maxlength='10' value='<?php echo $_POST['fecha_ini']; ?>' required/>
+                                            <input name='fecha_ini' type='date' id='fecha_ini' size='10' maxlength='10' value='<?php echo @$_POST['fecha_ini']; ?>' required/>
                                             <button type="submit" id="cal-fecha_ini"><img src="../images/imagemenu/fecha.png" alt="Fecha" width="15" height="16"  onmouseover="Tip('Haga clic para seleccionar la fecha')" onmouseout="UnTip()" /></button>
                                         </td>
                                         <td><strong>Fecha Final:</strong></td>
                                         <td>
-                                            <input name='fecha_fin' type='text' id='fecha_fin' size='10' maxlength='10' value='<?php echo $_POST['fecha_fin']; ?>'  required/>
+                                            <input name='fecha_fin' type='date' id='fecha_fin' size='10' maxlength='10' value='<?php echo @$_POST['fecha_fin']; ?>'  required/>
                                             <button type="submit" id="cal-fecha_fin"><img src="../images/imagemenu/fecha.png" alt="Fecha" width="15" height="16"  onmouseover="Tip('Haga clic para seleccionar la fecha')" onmouseout="UnTip()" /></button>
                                         </td>
                                     </tr>
@@ -268,7 +268,7 @@ if ($_POST['buscar']) {
                             </form>
                         </td>
                     </tr>
-                    <?php if ($_POST['webservice']) : ?>
+                    <?php if (isset($_POST['webservice'])) : ?>
                         <tr>
                             <td colspan="10" align="center" class="t_normal_n">Detalle registros enviado a SIMIT</td>
                         </tr>
@@ -276,7 +276,7 @@ if ($_POST['buscar']) {
                             <td colspan="10" align="left" class="t_normal_n">Registros Enviados Correctamente</td>
                         </tr>
                         <tr>
-                            <td colspan="10" align="left"><?php echo $registrosCorrectos; ?></td>
+                            <td colspan="10" align="left"><?php echo @$registrosCorrectos; ?></td>
                         </tr>
                         <tr>
                             <td colspan="10">&nbsp;</td>
@@ -285,7 +285,7 @@ if ($_POST['buscar']) {
                             <td colspan="10" align="left" class="t_normal_n">Registros Enviados con respueta de Error</td>
                         </tr>
                         <tr>
-                            <td colspan="10" align="left"><?php echo $registrosConError; ?></td>
+                            <td colspan="10" align="left"><?php echo @$registrosConError; ?></td>
                         </tr>
                         <tr>
                             <td colspan="10">&nbsp;</td>
@@ -306,7 +306,7 @@ if ($_POST['buscar']) {
                             <td colspan="10">&nbsp;</td>
                         </tr>
                     <?php endif;  //Fin de webservice   ?>
-                    <?php if ($_POST['generar']) : ?>
+                    <?php if (isset($_POST['generar'])) : ?>
                         <tr>
                             <td colspan="10" align="center" class="t_normal_n">Detalle archivo plano SIMIT</td>
                         </tr>
@@ -359,7 +359,7 @@ if ($_POST['buscar']) {
                             <td colspan="10">&nbsp;</td>
                         </tr>
                     <?php endif;  //Fin de generar     ?>
-                    <?php if ($_POST['buscar']) : ?>
+                    <?php if (isset($_POST['buscar'])) : ?>
                         <?php if (mssql_num_rows($comp) > 0) : ?>
                             <form name="form" id="form" method="post" action="" onSubmit="return ValidaExporRec()">
                                 <tr class="contenido2">
@@ -437,7 +437,7 @@ if ($_POST['buscar']) {
                                 <td colspan="10" align="left">No hay datos para mostrar</td>
                             </tr>
                         <?php endif; ?>
-                    <?php endif; //Fin si buscar      ?> 
+                    <?php endif; //Fin si buscar      ?>
                     <tr>
                         <td colspan="10" align="left">&nbsp;</td>
                     </tr>

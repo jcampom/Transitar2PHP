@@ -1,5 +1,8 @@
-<?php include 'menu.php'; 
-$tipo_tramite = $_POST['tipo_tramite'];
+<?php include 'menu.php';
+$tipo_tramite = "";
+if(isset($_POST['tipo_tramite'])) {
+  $tipo_tramite = $_POST['tipo_tramite'];
+}
 ?>
 
 <style>
@@ -45,6 +48,9 @@ ul#tramites-seleccionados {
   .valor-concepto {
     text-align: right;
   }
+  #placa {
+    text-transform: uppercase;
+  }
 </style>
 <div class="card container-fluid">
     <div class="header">
@@ -59,12 +65,12 @@ ul#tramites-seleccionados {
                     <div class="form-line">
                         <!--<label for="tramite">Tipo de liquidación</label>-->
                         <select class="form-control" id="tipo_tramite" name="tipo_tramite" data-live-search="true" onchange="this.form.submit()">
-                           
+
                             <option style='margin-left: 15px;' value=''>Seleccionar Tipo de Tramite...</option>
-                            
-                  
+
+
                             <?php
-                            
+
                             // Obtener los datos de la tabla tramites
                             $sqlTramites = "SELECT id, nombre FROM tipo_tramite where id NOT IN(3,7,8)";
                             $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
@@ -73,7 +79,7 @@ ul#tramites-seleccionados {
                                     if($tipo_tramite == $row['id']){
                                     echo "<option style='margin-left: 15px;' selected value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                     }else{
-                                    echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";    
+                                    echo "<option style='margin-left: 15px;' value='" . $row["id"] . "'>" . $row["nombre"] . "</option>";
                                     }
                                 }
                             }
@@ -84,11 +90,11 @@ ul#tramites-seleccionados {
                 </div>
                 </center>
             </div>
-        
+
         </div>
-        
+
         </div>
-        
+
 
 <?php
 if(!empty($tipo_tramite)){
@@ -121,7 +127,7 @@ include 'funcion_ciudadanos.php';
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tramite...</option>
                             <?php } ?>
-                            <?php                           
+                            <?php
 								// Obtener los datos de la tabla tramites
 								$sqlTramites = "SELECT id, nombre FROM tramites where tipo_documento = '$tipo_tramite' order by nombre";
 								$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
@@ -134,10 +140,10 @@ include 'funcion_ciudadanos.php';
                         </select>
                     </div>
                 </div>
-            
+
             </div>
             <?php if($tipo_tramite == 1){ ?>
-                
+
 
 
 <div class="col-md-6" style="display:none" id="placa2">
@@ -182,7 +188,7 @@ include 'funcion_ciudadanos.php';
     }
 </script>
 
-            
+
               <div class="col-md-6" style="display:none" id="matricula1">
                 <div class="form-group form-float">
                     <div class="form-line">
@@ -190,7 +196,7 @@ include 'funcion_ciudadanos.php';
 						<select class="form-control" id="tipo_servicio" onchange="sustrato_placas()" name="tipo_servicio" data-live-search="true" >
 							<option style='margin-left: 15px;' value=''>Seleccionar Tipo de servicio...</option>
                             <?php
-                            
+
                             // Obtener los datos de la tabla tipo_servicio
 							$sqlTramites = "SELECT id, nombre FROM tipo_servicio";
 							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
@@ -203,8 +209,8 @@ include 'funcion_ciudadanos.php';
                         </select>
                     </div>
                 </div>
-            
-            </div> 
+
+            </div>
             <div class="col-md-6" style="display:none" id="matricula2">
                 <div class="form-group form-float">
                     <div class="form-line">
@@ -224,8 +230,8 @@ include 'funcion_ciudadanos.php';
                         </select>
                     </div>
                 </div>
-            </div> 
-            
+            </div>
+
             <div class="col-md-6" style="display:none" id="matricula3">
                 <div class="form-group form-float">
                     <div class="form-line">
@@ -245,21 +251,21 @@ include 'funcion_ciudadanos.php';
                         </select>
                     </div>
                 </div>
-            </div> 
-            
+            </div>
+
               <div id="div_sustrato"></div>
                 <?php }else if($tipo_tramite == 2){  ?>
-                   <div class="col-md-12"> 
+                   <div class="col-md-12">
                     <div class="col-md-6">
                 <div class="form-group form-float">
                     <div class="form-line">
                         <label >Tipo Servicio</label>
             <select class="form-control" id="tipo_servicio" name="tipo_servicio" data-live-search="true">
-                          
+
                             <option style='margin-left: 15px;' value=''>Seleccionar tipo de servicio...</option>
-                  
+
                             <?php
-                            
+
                             // Obtener los datos de la tabla tramites
 							$sqlTramites = "SELECT id, nombre FROM tipo_servicio ";
 							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
@@ -272,7 +278,7 @@ include 'funcion_ciudadanos.php';
                         </select>
                     </div>
                 </div>
-            </div> 
+            </div>
 			<div class="col-md-6">
 				<div class="form-group form-float">
                     <div class="form-line">
@@ -280,7 +286,7 @@ include 'funcion_ciudadanos.php';
 						<select class="form-control" id="clase_vehiculo" name="clase_vehiculo" data-live-search="true">
                             <option style='margin-left: 15px;' value=''>Seleccionar clase de vehiculo...</option>
                             <?php
-                            
+
                             // Obtener los datos de la tabla tramites
 							$sqlTramites = "SELECT id, nombre FROM clase_vehiculo ";
 							$resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
@@ -299,10 +305,10 @@ include 'funcion_ciudadanos.php';
 <button type="button" id="agregar-tramite" class="btn btn-success"><i class="fa fa-plus" aria-hidden="true"></i></button>
      <br>     <br>
         </div>
-        
+
         </div>
         <?php } ?>
-        
+
 <?php if($tipo_tramite == 1 or $tipo_tramite == 2 or $tipo_tramite == 9){ ?>
 <div class="card container-fluid">
     <div class="header">
@@ -312,7 +318,7 @@ include 'funcion_ciudadanos.php';
 	<ul id="tramites-seleccionados"></ul>
 	<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
-    
+
  <?php }else if($tipo_tramite == 4){   ?>
  <div class="card container-fluid">
     <div class="header">
@@ -323,7 +329,7 @@ include 'funcion_ciudadanos.php';
 
 	<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
- 
+
 	<?php }else if($tipo_tramite == 6){   ?>
 		<div class="card container-fluid">
 			<div class="header">
@@ -333,7 +339,7 @@ include 'funcion_ciudadanos.php';
 		<div id="dt-seleccionados"></div>
 		<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
- 
+
  <?php }else if($tipo_tramite == 5){   ?>
  <div class="card container-fluid">
     <div class="header">
@@ -345,19 +351,19 @@ include 'funcion_ciudadanos.php';
 <div id="conceptos-tramite" class="conceptos-container"></div>
 
     </div>
- 
+
  <?php } ?>
     <div id="total_pago"></div>
-    
+
 
     <input id="totaliq" hidden>
-    
+
     <div class="card container-fluid">
     <div class="header">
         <h2>Datos Liquidación</h2>
     </div>
     <br>
-      
+
     <div align="right">
          <div align="right">
   <div class="form-check form-check-inline" style="float:left">
@@ -401,13 +407,13 @@ include 'funcion_ciudadanos.php';
 
 
     <br><br><br><br><br><br><br><br>
-    
-    
+
+
 
 
 <script>
 $(document).ready(function() {
-    
+
 
   $("input[name='nota_credito']").on('change', function() {
       var identificacion = $('#numero_documento').val();
@@ -415,8 +421,8 @@ $(document).ready(function() {
     if ($(this).val() === 'si') {
       // Muestra el campo de entrada
       $("#inputDiv").show();
-      
-      
+
+
 
       // Realiza el llamado AJAxX para obtener el valor
       $.ajax({
@@ -426,10 +432,10 @@ $(document).ready(function() {
         success: function(data) {
           // Suponiendo que la respuesta es un objeto JSON con un campo llamado 'valor'
   var valor = data;
-  
+
      // Formatea el número sin decimales
  var valorFormateado = Number(valor).toLocaleString('es-ES', { maximumFractionDigits: 0 });
-    
+
    $("#total_nota_credito").text(valorFormateado);
 // Establece el valor máximo en el campo de entrada
         $("#valor_nota").attr("max", valor);
@@ -443,8 +449,8 @@ obtenerTramitesSeleccionados2();
           console.log("Error al obtener los datos: ", error);
         }
       });
-     
-      
+
+
     } else {
 var valor = 0;
 
@@ -455,21 +461,21 @@ var valor = 0;
         $("#valor_nota").val(valor);
     }
   });
-  
-  
+
+
  // Escucha el evento 'input' en el campo de entrada
     $("#valor_nota").on('input', function() {
       var valorIngresado = parseInt($(this).val()); // Convierte a número
       var valorMaximo = parseInt($(this).attr("max")); // Obtiene el valor máximo
 
       if (valorIngresado > valorMaximo ) {
-          
+
         // Muestra un alert y establece el valor al máximo permitido
         alert("El valor ingresado supera el máximo permitido: " + valorMaximo);
         $(this).val(valorMaximo);
       }
     });
- 
+
 
   var tramitesSeleccionados = [];
 
@@ -477,17 +483,27 @@ $('#agregar-tramite').click(function() {
   var selectedTramite = $('#tramite').find('option:selected');
   var tramiteId = selectedTramite.val();
   var tramiteNombre = selectedTramite.text();
+  if(tramiteNombre == 'Seleccionar Tramite...') {
+    console.log('campo vacio de seleccionar tramite')
+    alert('Por favor seleccione un tramite')
+    return;
+  }
   var claseVehiculo = '';
   var tipoVehiculo ='';
   var placa = '';
 
+  if($('#placa').val() == '') {
+    alert('Por favor digite una placa')
+    return;
+  }
+
   if (tramiteId !== '') {
     if (tramiteId === '1') {
       claseVehiculo = $('#clase_vehiculo').val();
-      
+
       tipoVehiculo = $('#tipo_servicio').val();
       placa = $('#placa').val();
-	  console.log('placa====',placa);
+	    console.log('placa====' + placa);
       // Validar campos obligatorios
       if (claseVehiculo === '' || $('#tipo_servicio').val() === '' || $('#clasificacion_vehiculo').val() === '' ) {
         var camposVacios = [];
@@ -516,7 +532,9 @@ $('#agregar-tramite').click(function() {
     tramiteElement.attr('data-tramite-id', tramiteId); // Agregar atributo data con el ID del trámite
     tramiteElement.attr('data-clase-id', claseVehiculo); // Agregar atributo data con el ID de la clase de vehiculo
     tramiteElement.attr('data-tipo-id', tipoVehiculo); // Agregar atributo data con el ID del tipo de vehiculo
-	tramiteElement.attr('data-placa-id', placa); // Agregar atributo data con el ID de la placa
+	  tramiteElement.attr('data-placa-id', placa); // Agregar atributo data con el ID de la placa
+    tramiteElement.css('cursor', 'pointer');
+
 
     removeButton.click(function() {
       tramiteElement.remove(); // Eliminar el elemento del trámite
@@ -534,8 +552,8 @@ $('#agregar-tramite').click(function() {
     // Mostrar el elemento adicional (mostrarConceptos) cuando se agrega un trámite
     $('#mostrarConceptos').show();
   }
-  
-  
+
+
 obtenerTramitesSeleccionados();
 obtenerTramitesSeleccionados2();
 select_tramites();
@@ -552,7 +570,7 @@ select_tramites();
       conceptosContainer.empty();
       conceptosContainer.removeData('tramite-id');
     } else {
-        
+
       cargarConceptos(tramiteId, conceptosContainer,claseVehiculo,tipoVehiculo);
     }
   });
@@ -560,7 +578,7 @@ select_tramites();
   function cargarConceptos(tramiteId, conceptosContainer, claseVehiculo, tipoVehiculo) {
       var tramitesSeleccionados = [];
       //var placa = $('#placa').val();
-	  var placa = $('#sustrato_placa').val(); 
+	  var placa = $('#sustrato_placa').val();
 
       $('#tramites-seleccionados .tramite-item').each(function() {
           var tramiteId2 = $(this).attr('data-tramite-id');
@@ -598,7 +616,7 @@ select_tramites();
               sistematizacion: sistematizacion,
               placa: placa,
               tipoVehiculo: tipoVehiculo,
-              tramitesSeleccionados: tramitesSeleccionados
+              tramitesSeleccionado: tramitesSeleccionados[0].tramiteId
           },
           success: function(response) {
               var conceptos = JSON.parse(response);
@@ -611,7 +629,7 @@ select_tramites();
           }
       });
   }
-  
+
 // Objeto para almacenar los valores modificados de los conceptos
 var valoresModificados = {};
 
@@ -621,15 +639,15 @@ function mostrarConceptos(conceptos, conceptosContainer, tramiteId) {
   for (var i = 0; i < conceptos.length; i++) {
     var concepto = conceptos[i];
 
-  
+
 
     // Si el concepto requiere una entrada manual, mostrar un campo de entrada
     if (concepto.valor_modificable == "True") {
-        
+
           // Crear un elemento div para el nombre del concepto
     var nombreTramiteElement = $('<div>').addClass('nombre-tramite').html('<strong>Concepto: </strong>' + concepto.nombre + '<div style="text-align:right"><b> </b></div>');
     conceptosContainer.append(nombreTramiteElement);
-    
+
       var inputValor = $('<input>').addClass('input-valor form-control').attr('type', 'number').attr('placeholder', 'Ingrese el valor');
       conceptosContainer.append(inputValor);
 
@@ -716,7 +734,7 @@ function obtenerTramitesSeleccionados() {
 	console.log('JLCM:liquidaciones.php:712:obtenerTramitesSeleccionados');
 	var tramitesSeleccionados = [];
 	//var placa = $('#placa').val();
-	var placa = $('#sustrato_placa').val(); 
+	var placa = $('#sustrato_placa').val();
 
   $('#tramites-seleccionados .tramite-item').each(function() {
     var tramiteId = $(this).attr('data-tramite-id');
@@ -753,13 +771,13 @@ function obtenerTramitesSeleccionados() {
     data: { tramitesSeleccionados: tramitesSeleccionados, placa:placa },
     success: function(response) {
       $('#total_liquidacion').html(response); // Mostrar el total en el div "total_liquidacion"
-      
+
         // Selecciona el contenido del elemento <b>
     var contenidoHtml = $(response).text();
 
     // Elimina la coma del contenido
     var numeroSinComa = contenidoHtml.replace(",", "");
-      
+
       $('#totaliq').val(numeroSinComa);
     },
     error: function() {
@@ -774,9 +792,9 @@ function select_tramites() {
   var tramitesSeleccionados = [];
 
   $('#tramites-seleccionados .tramite-item').each(function() {
-      
+
     var tramiteId = $(this).attr('data-tramite-id');
- 
+
     tramitesSeleccionados.push({
       tramiteId: tramiteId,
     });
@@ -813,7 +831,7 @@ function sustrato_placas() {
       $('#div_sustrato').html(response); // Mostrar el total en el div "total_liquidacion"
     },
     error: function() {
-     
+
     }
   });
 }
@@ -821,26 +839,26 @@ function sustrato_placas() {
 function obtenerTramitesSeleccionados2() {
     var tramitesSeleccionados = [];
     //var placa = $('#placa').val();
-	var placa = $('#sustrato_placa').val(); 
+	var placa = $('#sustrato_placa').val();
     var valor_nota = $('#valor_nota').val();
     $('#tramites-seleccionados .tramite-item').each(function() {
         var tramiteId = $(this).attr('data-tramite-id');
         var claseVehiculo = $(this).attr('data-clase-id');
 		var tipoServicio = $('#tipo_servicio').val();
 		var tipoVehiculo = $(this).attr('data-tipo-id');
-		
+
 		console.log('JLCM:liquidaciones.php:823:obtenerTramitesSeleccionados2 tramiteId=' + tramiteId + ',claseVehiculo=' + claseVehiculo + ',tipoVehiculo=' + tipoVehiculo + ', placa:' + placa + ', valor_nota=' + valor_nota);
 		if (tipoVehiculo === '') {
 			tramitesSeleccionados.push({
 				tramiteId: tramiteId,
 				claseVehiculo: claseVehiculo
-			});			
+			});
 		}else{
 			tramitesSeleccionados.push({
 				tramiteId: tramiteId,
 				claseVehiculo: claseVehiculo,
 				tipoVehiculo:tipoVehiculo
-			});				
+			});
 		}
 
     });
@@ -876,18 +894,20 @@ function obtenerTramitesSeleccionados2() {
 
 <?php if($tipo_tramite == 1 or $tipo_tramite == 2 or $tipo_tramite == 9){ ?>
 $('#guardar-liquidacion').click(function() {
+
+  console.log("Nuero de documento del ciudadano: " + ciudadanoDoc)
   // Obtener los valores des los campos
   //alert('guardar-liquidacion #2');
   var tipoTramite = <?php echo $tipo_tramite; ?>;
-  var ciudadano = $('#numero_documento').val();
+  var ciudadano = ciudadanoDoc;
   var placa = $('#placa').val();
   if (placa === "") {
-   var placa = $('#placa3').val();   
+   var placa = $('#placa3').val();
   }
   var tipoServicio = $('#tipo_servicio').val();
   var claseVehiculo = $('#clase_vehiculo').val();
   var valor_nota = $('#valor_nota').val();
-  
+
   var clasificacionVehiculo = $('#clasificacion_vehiculo').val();
   var tramite = $('#tramite').val();
   // Validar campos obligatorios
@@ -916,7 +936,7 @@ $('#guardar-liquidacion').click(function() {
       alert('Tienes que seleccionar un tramite.');
       return;
     }
-    
+
 	// Agregar los valores modificados al objeto data
 	var dataToSend = {
 		tipoTramite: tipoTramite,
@@ -948,10 +968,11 @@ $('#guardar-liquidacion').click(function() {
     success: function(response) {
 		// Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
 		//   location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
-		
+
 		// Abrir la URL en una nueva pestaña
 		//alert(response);
-		window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
+    alert('La liquidación se generó exitosamente')
+		window.open('./imprimir_liquidacion.php?id=' + response, '' ,'height=700,width=750,toolbar=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no ,modal=yes');
 		location.href = './liquidaciones.php';
     },
     error: function() {
@@ -1012,9 +1033,9 @@ $(document).ready(function() {
   // Manejador de eventos para el cambio en los checkboxes
   $(document).on('change', 'input[type="checkbox"]', function() {
     var comparendo = $(this).closest('tr').find('.comparendo-link').data('comparendo');
-    
+
     var valor_comparendo = $(this).closest('tr').find('.comparendo-link').data('comparendo');
-    
+
     var tramiteId = 39;
 
     if (this.checked) {
@@ -1056,8 +1077,8 @@ $(document).ready(function() {
       alert('Tienes que seleccionar un comparendo.');
       return;
     }
-    
-    
+
+
     // Enviar los campos y tramites seleccionados al archivo PHP
     guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseVehiculo, clasificacionVehiculo, tramitesSeleccionados);
   });
@@ -1069,7 +1090,8 @@ $(document).ready(function() {
 function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseVehiculo, clasificacionVehiculo, tramitesSeleccionados) {
 	// Obtener todos los tramites seleccionados
 	var tramitesIds = [];
-	var comparendos = []; 
+	var comparendos = [];
+  let tipoDocumento = $('#tipo_documento').val()
 	tramitesSeleccionados.forEach(function(element) {
 	//  tramitesIds.push(element.tramiteId);
 	comparendos.push(element.comparendo);
@@ -1083,12 +1105,12 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
     method: 'POST',
     data: {
       tipoTramite: tipoTramite,
-      ciudadano: ciudadano,
-      placa: placa,
+      ciudadano: ciudadanoDoc,
+      placa: tipoDocumento == 100 ? ciudadano : placa,
       tipoServicio: tipoServicio,
       claseVehiculo: claseVehiculo,
       clasificacionVehiculo: clasificacionVehiculo,
-      tramitesSeleccionados: comparendos,
+      tramitesSeleccionados: JSON.stringify(comparendos),
       valor_nota: valor_nota
     },
     success: function(response) {
@@ -1096,9 +1118,9 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
 		// location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
 
 		// Abrir la URL en una nueva pestaña
-		//alert(response);
-		window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
-		location.href = './liquidaciones.php';
+	//	alert(response);
+		window.open('./imprimir_liquidacion.php?id=' + response, '' ,'height=700,width=750,toolbar=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no ,modal=yes');
+//		location.href = './liquidaciones.php';
     },
     error: function() {
       alert('Error al guardar los trámites.');
@@ -1118,11 +1140,11 @@ $(document).ready(function() {
   // Manejador de eventos para el cambio en los checkboxes
   $(document).on('change', 'input[type="checkbox"]', function() {
     var dt = $(this).closest('tr').find('.dt-link').data('dt');
-    
+
     var tramite = $(this).closest('tr').find('.dt-link').data('tramite');
-    
+
     var valor_dt = $(this).closest('tr').find('.dt-link').data('dt');
-    
+
     var tramiteId = $(this).closest('tr').find('.dt-link').data('tramite');
 
     if (this.checked) {
@@ -1141,8 +1163,8 @@ $(document).ready(function() {
       }
     }
   });
-  
- 
+
+
 
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
@@ -1177,7 +1199,7 @@ $(document).ready(function() {
 function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseVehiculo, clasificacionVehiculo, tramitesSeleccionados) {
 	// Obtener todos los tramites seleccionados
 	var tramitesIds = [];
-	var dt = []; 
+	var dt = [];
 	tramitesSeleccionados.forEach(function(element) {
 	//  tramitesIds.push(element.tramiteId);
 	dt.push(element.dt);
@@ -1209,7 +1231,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
     success: function(response) {
       // Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
     //  location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
-    
+
      // Abrir la URL en una nueva pestaña
     window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
     location.href = './liquidaciones.php';
@@ -1232,13 +1254,13 @@ $(document).ready(function() {
   // Manejador de eventos para el cambio en los checkboxes
   $(document).on('change', 'input[type="checkbox"]', function() {
     var ap = $(this).closest('tr').find('.ap-link').data('ap');
-    
+
     var tramite = $(this).closest('tr').find('.ap-link').data('tramite');
-    
+
     var valor_ap = $(this).closest('tr').find('.ap-link').data('ap');
-    
+
     var tramiteId = $(this).closest('tr').find('.ap-link').data('tramite');
-    
+
     var cuota = $(this).closest('tr').find('.ap-link').data('cuota');
 
     if (this.checked) {
@@ -1258,8 +1280,8 @@ $(document).ready(function() {
       }
     }
   });
-  
-  
+
+
 
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
@@ -1278,8 +1300,8 @@ $(document).ready(function() {
       alert('Favor llenar todos los campos obligatorios2.');
       return;
     }
-    
- 
+
+
 
     // Enviar los campos y tramites seleccionados al archivo PHP
     guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseVehiculo, clasificacionVehiculo, tramitesSeleccionados);
@@ -1291,21 +1313,21 @@ $(document).ready(function() {
 // Función para guardar la liquidación con tramitesSeleccionados como parámetro
 function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseVehiculo, clasificacionVehiculo, tramitesSeleccionados) {
   // Obtener todos los tramites seleccionados
-  
+
     // Verificar si tramitesSeleccionados está vacío
     if (tramitesSeleccionados.length === 0) {
       alert('Tienes que seleccionar un acuerdo.');
       return;
     }
-    
+
   var tramitesIds = [];
-  var ap = []; 
+  var ap = [];
   tramitesSeleccionados.forEach(function(element) {
   //  tramitesIds.push(element.tramiteId);
     ap.push(element.ap);
   });
-  
-  
+
+
 	// Convertir el arreglo a una cadena JSON
 	var tramitesSeleccionadosJson = JSON.stringify(tramitesSeleccionados);
 	var valor_nota = $('#valor_nota').val();
@@ -1334,7 +1356,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
     },
     success: function(response) {
       // Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
-  
+
        // Abrir la URL en una nueva pestaña
     window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
     location.href = './liquidaciones.php';

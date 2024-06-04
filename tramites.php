@@ -1,10 +1,10 @@
-<?php include 'menu.php'; 
+<?php include 'menu.php';
 if(!empty($_POST['tipo_tramite'])){
-	$tipo_tramite = $_POST['tipo_tramite'];
+	$tipo_tramite = $_POST['tipo_tramite'] ?? '';
 }else{
-	$tipo_tramite = $_GET['tipo_tramite'];
+	$tipo_tramite = $_GET['tipo_tramite'] ?? '';
 }
-$liquidacion = $_POST['liquidacion'];
+$liquidacion = $_POST['liquidacion'] ?? '';
 if(!empty($_POST['liquidacion2'])){
 	$tipo_tramite2 = $_POST['tipo_tramite2'];
 	$liquidacion2 = $_POST['liquidacion2'];
@@ -146,7 +146,7 @@ if(!empty($_POST['liquidacion2'])){
 			$valoresInsert = "'" . implode("', '", array_values($valores)) . "'";
 			$insertQuery = "SET NOCOUNT ON";
 			$insertQuery = $insertQuery .";". "INSERT INTO $tabla ($camposInsert,fecha,usuario,liquidacion,tramite) VALUES ($valoresInsert,'$fecha','$idusuario','$liquidacion2','$tramite')";
-			$insertQuery = $insertQuery .";". "SELECT scope_identity() as lastid"; 
+			$insertQuery = $insertQuery .";". "SELECT scope_identity() as lastid";
 			// Ejecutar la consulta de inserción
 			$stmt = sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'));
 			if ($stmt){
@@ -262,7 +262,7 @@ ul#tramites-seleccionados {
                 <div class="form-group form-float">
                     <div class="form-line">
                         <!--<label for="tramite">Tipo de liquidación</label>-->
-                        
+
                               <label for="tramite">Tipo de tramite</label>
                         <select class="form-control" id="tipo_tramite" name="tipo_tramite" data-live-search="true" onchange="this.form.submit()">
                             <?php if(!empty($tipo_tramite)){ ?>
@@ -275,9 +275,9 @@ ul#tramites-seleccionados {
                       echo ucwords($row_tramites2['nombre']); ?></option>
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tipo de Tramite...</option>
-                            
-                            <?php } 
-                            
+
+                            <?php }
+
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT id, nombre FROM tipo_tramite where id  IN(1,2)";
 $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
@@ -291,16 +291,16 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                             ?>
                         </select>
                         </form>
-                        
+
                     </div>
                 </div>
-  
+
             </div>
-         <?php if(!empty($tipo_tramite)){ 
-         
-         
+         <?php if(!empty($tipo_tramite)){
+
+
          ?>
-         
+
          <form action="tramites.php" method="POST">
             <div class="col-md-4">
                 <div class="form-group form-float">
@@ -317,10 +317,10 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                       echo ucwords($row_tramites2['nombre']); ?></option>
                             <?php }else{ ?>
                             <option style='margin-left: 15px;' value=''>Seleccionar Tramite...</option>
-                            
+
                             <?php } ?>
                             <?php
-                            
+
                             // Obtener los datos de la tabla tramites
 $sqlTramites = "SELECT * FROM tramites where tipo_documento = '$tipo_tramite'";
 $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' => 'buffered'));
@@ -334,8 +334,8 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                     </div>
                 </div>
              </div>
-             
-      
+
+
           <div class="col-md-4">
                 <div class="form-group form-float">
                     <div id="select_tramites" class="form-line">
@@ -345,65 +345,68 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
              </div>
              <button type="submit" class="btn btn-success waves-effect"><i class="fa fa-search"></i></button><br><br>
          </div>
-         
+
          <input name="tipo_tramite2" hidden value="<?php echo $tipo_tramite; ?>">
-    
+
         </form>
 
-         
 
-             
+
+
              <?php } ?>
-        
+
         </div>
-        
+
         </div>
-        
-        
+
+
         <?php
-        
+
           $consulta_liquidaciones="SELECT * FROM liquidaciones where id = '$liquidacion'";
 
             $resultado_liquidaciones=sqlsrv_query( $mysqli,$consulta_liquidaciones, array(), array('Scrollable' => 'buffered'));
 
             $row_liquidaciones=sqlsrv_fetch_array($resultado_liquidaciones, SQLSRV_FETCH_ASSOC);
-            
-            $estado = $row_liquidaciones['estado'];
-            
+            $estado = 0;
+
+            if($row_liquidaciones > 0) {
+                $estado = $row_liquidaciones['estado'];
+            }
+
         if($estado == 3){ ?>
         <div class="card container-fluid">
     <div class="header">
         <h2>Liquidacion</h2>
     </div>
     <br>
-    <form action="tramites.php" method="POST">  
-   
-    <?php       
-    
+    <form action="tramites.php" method="POST">
+
+    <?php
+
     $tramite = $_POST['tramite'];
-    
+
             $consulta_detalle_liquidaciones="SELECT * FROM detalle_conceptos_liquidaciones where liquidacion = '$liquidacion' and tramite = '$tramite'";
 
             $resultado_detalle_liquidaciones=sqlsrv_query( $mysqli,$consulta_detalle_liquidaciones, array(), array('Scrollable' => 'buffered'));
 
 
-            
+
    if (sqlsrv_num_rows($resultado_detalle_liquidaciones) > 0) {
-       
+
        $activo = sqlsrv_fetch_array($resultado_detalle_liquidaciones, SQLSRV_FETCH_ASSOC);
-            
-         if($activo['estado'] == 0){ 
-             
-            
+
+         if($activo['estado'] == 0){
+
+
             ?>
                <input name="tipo_tramite2" hidden value="<?php echo $_POST['tipo_tramite2']; ?>">
          <input name="liquidacion2" hidden value="<?php echo $liquidacion; ?>">
           <input name="tramite2" hidden  value="<?php echo $tramite; ?>">
-         
 
-          
+
+
           <?php
-          
+
       $tipo_tramite = $_POST['tipo_tramite2'];
           if($tipo_tramite == 2){ // formulario RNC?>
     <?php include 'funcion_ciudadanos.php'; ?>
@@ -429,8 +432,8 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
             <div class="form-group form-float">
                 <div class="form-line">
                     <label for="numero_documento">Organismo Expide:</label>
-         
-                    
+
+
    <select  data-live-search="true"  id="organismo_expide_ensenanza" required name="organismo_expide_ensenanza" class="form-control">
                         <option style="margin-left: 15px;" value="" >Seleccione...</option>
                      <?php
@@ -466,7 +469,7 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
             <div class="form-group form-float">
                 <div class="form-line">
                     <label for="numero_documento">Organismo Expide:</label>
-                
+
                       <select  data-live-search="true" required id="organismo_expide_medico" name="organismo_expide_medico" class="form-control">
                         <option style="margin-left: 15px;" value="" >Seleccione...</option>
                      <?php
@@ -496,7 +499,7 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                  <option style="margin-left: 15px;" value="A2" >A2</option>
                  <option style="margin-left: 15px;" value="B3" >B3</option>
                  <option style="margin-left: 15px;" value="C3" >C3</option>
-                 
+
                     </select>
                 </div>
             </div>
@@ -521,7 +524,7 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
             <div class="form-group form-float">
                 <div class="form-line">
                     <label for="numero_documento">Organismo Expide (Nueva):</label>
-  
+
                       <select  data-live-search="true" required id="organismo_expide_licencia" name="organismo_expide_licencia" class="form-control">
                         <option style="margin-left: 15px;" value="" >Seleccione...</option>
                      <?php
@@ -537,7 +540,7 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                 </div>
             </div>
         </div>
-        
+
             <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
@@ -555,7 +558,7 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                 </div>
             </div>
         </div>
-        
+
            <div class="col-md-12">
                     <div class="col-md-6">
              <div class="form-check">
@@ -588,7 +591,7 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                     OTRAS NO ESPECIFICADAS
                 </label>
             </div>
-            
+
             </div>
                  <div class="col-md-6">
             <div class="form-check">
@@ -616,11 +619,11 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
                 </label>
             </div>
             </div>
-            
-        
+
+
                </div>
 
-        
+
                  <div class="col-md-12">
                      <br>
              <button type="submit" class="btn btn-success">
@@ -628,25 +631,25 @@ $resultTramites=sqlsrv_query( $mysqli,$sqlTramites, array(), array('Scrollable' 
         </button>
              <br><br>
         </div>
- 
 
-<?php }elseif($tipo_tramite == 1){ 
+
+<?php }elseif($tipo_tramite == 1){
 
 
 
 if($tramite == 1){ //MATRICULA INICIAL
-	
+
 include 'funcion_ciudadanos.php';
 ?>
 
-        
+
 <div class="card container-fluid">
     <div class="header">
         <h2>Datos Vehiculo</h2>
     </div>
     <br><br>
             <p id="resultado"></p>
-   
+
       <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
@@ -655,7 +658,7 @@ include 'funcion_ciudadanos.php';
                 </div>
             </div>
         </div>
-        
+
     <div class="col-md-4">
         <div class="form-group form-float">
             <div class="form-line">
@@ -731,7 +734,7 @@ include 'funcion_ciudadanos.php';
      <div id="carroceria">
           <select  id="marca" name="marca" class="form-control">
                      <option  value="">Seleccione...</option>
-              
+
                 </select>
                 </div>
             </div>
@@ -802,7 +805,7 @@ include 'funcion_ciudadanos.php';
   </div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
     <div class="form-group form-float">
         <div class="form-line">
@@ -1089,14 +1092,14 @@ include 'funcion_ciudadanos.php';
     </div>
 </div>
 
- 
+
              <button type="submit" id="submit" onclick="insertar()" class="btn btn-success">
             <i class="fa fa-save" aria-hidden="true"></i> Guardar
         </button>
     </div>
     <script>
- 
- 
+
+
  $(document).ready(function() {
   // Evento de cambio para el selector de marca
   $('#marca').change(function() {
@@ -1112,7 +1115,7 @@ include 'funcion_ciudadanos.php';
 
 $('#linea').html(response);
 
-      
+
       },
       error: function() {
         console.log('Error al obtener las líneas de vehículos.');
@@ -1120,7 +1123,7 @@ $('#linea').html(response);
     });
   });
 
- 
+
 
   // Evento de cambio para el selector de clase
   $('#clase').change(function() {
@@ -1144,38 +1147,38 @@ $('#linea').html(response);
    </script>
 <?php
 
-  
-  
+
+
 }elseif($tramite == 2){ //INSCRIPCION PRENDA (Pignoracion)
 
 generar_formulario(46);
-	
+
 }elseif($tramite == 3){ //LEVANTAMIENTO PRENDA (Despignoracion)
-	
+
 generar_formulario(47);
 
 }elseif($tramite == 4){ //MODIFICACION ACREEDOR PRENDARIO
 
 generar_formulario(48);
-	
+
 }elseif($tramite == 5){ //TRASPASO DE PROPIEDAD
 generar_formulario(49);
 }elseif($tramite == 6){ //TRASLADO DE CUENTA
-generar_formulario(50);	
+generar_formulario(50);
 }elseif($tramite == 8){ //RADICACION DE CUENTA
 
-	
+
 include 'funcion_ciudadanos.php';
 ?>
 
-        
+
 <div class="card container-fluid">
     <div class="header">
         <h2>Datos Vehiculo</h2>
     </div>
     <br><br>
             <p id="resultado"></p>
-   
+
       <div class="col-md-4">
             <div class="form-group form-float">
                 <div class="form-line">
@@ -1184,7 +1187,7 @@ include 'funcion_ciudadanos.php';
                 </div>
             </div>
         </div>
-        
+
     <div class="col-md-4">
         <div class="form-group form-float">
             <div class="form-line">
@@ -1260,7 +1263,7 @@ include 'funcion_ciudadanos.php';
      <div id="carroceria">
           <select  id="marca" name="marca" class="form-control">
                      <option  value="">Seleccione...</option>
-              
+
                 </select>
                 </div>
             </div>
@@ -1331,7 +1334,7 @@ include 'funcion_ciudadanos.php';
   </div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
     <div class="form-group form-float">
         <div class="form-line">
@@ -1618,14 +1621,14 @@ include 'funcion_ciudadanos.php';
     </div>
 </div>
 
- 
+
              <button type="submit" id="submit" onclick="insertar()" class="btn btn-success">
             <i class="fa fa-save" aria-hidden="true"></i> Guardar
         </button>
     </div>
     <script>
- 
- 
+
+
  $(document).ready(function() {
   // Evento de cambio para el selector de marca
   $('#marca').change(function() {
@@ -1641,7 +1644,7 @@ include 'funcion_ciudadanos.php';
 
 $('#linea').html(response);
 
-      
+
       },
       error: function() {
         console.log('Error al obtener las líneas de vehículos.');
@@ -1649,7 +1652,7 @@ $('#linea').html(response);
     });
   });
 
- 
+
 
   // Evento de cambio para el selector de clase
   $('#clase').change(function() {
@@ -1673,122 +1676,122 @@ $('#linea').html(response);
    </script>
 <?php
 
-  
-  
+
+
 }elseif($tramite == 9){ //CANCELACION DE MATRICULA
-generar_formulario(51);	
+generar_formulario(51);
 }elseif($tramite == 13){ //CAMBIO DE SERVICIO
-generar_formulario(52);	
+generar_formulario(52);
 }elseif($tramite == 14){ //CAMBIO DE MOTOR
 generar_formulario(53);
 }elseif($tramite == 15){ //CAMBIO DE CARROCERIA
-generar_formulario(54);	
+generar_formulario(54);
 }elseif($tramite == 16){ //CONVERSION A GAS NATURAL VEHICULAR
-generar_formulario(55);	
+generar_formulario(55);
 }elseif($tramite == 18){ //CAMBIO DE COLOR
-generar_formulario(56);	
+generar_formulario(56);
 }elseif($tramite == 20){ //REGRABACION DE MOTOR
-generar_formulario(57);	
+generar_formulario(57);
 }elseif($tramite == 21){ //DUPLICADO DE LICENCIA DE TRANSITO
-generar_formulario(58);		
+generar_formulario(58);
 }elseif($tramite == 22){ //REMATRICULA
-generar_formulario(59);		
+generar_formulario(59);
 }elseif($tramite == 23){ //CERTIFICADO DE TRADICION
-generar_formulario(60);	
+generar_formulario(60);
 }elseif($tramite == 34){ //DUPLICADO DE PLACAS
-generar_formulario(61);		
+generar_formulario(61);
 }elseif($tramite == 53){ //REGRABACION DE CHASIS
-generar_formulario(62);		
+generar_formulario(62);
 }elseif($tramite == 54){ //ADAPTACION A VEHICULO DE ENSEÑANZA
 generar_formulario(44);
 }elseif($tramite == 55){ //BLINDAJE Y DESMONTAJE DE BLINDAJE
-generar_formulario(63);	
+generar_formulario(63);
 }elseif($tramite == 56){ //PERMISO DE CIRCULACION RESTRINGIDA
-generar_formulario(64);	
+generar_formulario(64);
 }elseif($tramite == 57){ //MEDIDAS CAUTELARES
-	
-	
+
+
 }elseif($tramite == 71){ //CERTIFICADO DE TRADICION HISTORICO
-generar_formulario(65);	
+generar_formulario(65);
 
 }elseif($tramite == 126){ //REGRABACION DE SERIE
-generar_formulario(66);	
+generar_formulario(66);
 }elseif($tramite == 128){ //TRASPASO A PERSONA INDETERMINADA
 generar_formulario(49);
 }elseif($tramite == 129){ //LEVANTAMIENTO MEDIDA CAUTELAR
-	
+
 }elseif($tramite == 130){ //DEVOLUCION DE TRASLADO
-generar_formulario(67);		
+generar_formulario(67);
 }elseif($tramite == 131){ //REVOCATORIA DE TRASPASO A PERSONA INDETERMINADA
-generar_formulario(68);		
+generar_formulario(68);
 }elseif($tramite == 132){ //EMBARGO Y DESEMBARGO
-generar_formulario(69);		
-	
+generar_formulario(69);
+
 }elseif($tramite == 151){ //INSCRIPCION PRENDA (Pignoracion) MATRICULA INICIAL...
 generar_formulario(46);
 }elseif($tramite == 158){ //INSCRIPCION PRENDA (Pignoracion) MATRICULA INICIAL...
 generar_formulario(46);
 }elseif($tramite == 159){ //MODIFICACION PRENDA
-generar_formulario(46);	
+generar_formulario(46);
 }
 
-?>    
+?>
 
 
 
-    
-    
- 
- 
- <?php } ?>      
+
+
+
+
+ <?php } ?>
     <?php
 
 }else{
-echo "<b><font color='red'>El tramite ya fue ejecutado</font></b>";    
+echo "<b><font color='red'>El tramite ya fue ejecutado</font></b>";
 }
    }else{
-       
-     echo "<b><font color='red'>El tramite que quiere realizar no se encuentra dentro de la liquidación</font></b>";  
+
+     echo "<b><font color='red'>El tramite que quiere realizar no se encuentra dentro de la liquidación</font></b>";
    }
-    ?>    
-        
+    ?>
+
       </div>
 
-     <?php }elseif($estado > 0 && $estado != 3){ 
-                  
+     <?php }elseif($estado > 0 && $estado != 3){
+
             $consulta_estado="SELECT * FROM liquidacion_estados where id = '$estado'";
 
             $resultado_estado=sqlsrv_query( $mysqli,$consulta_estado, array(), array('Scrollable' => 'buffered'));
 
             $row_estado=sqlsrv_fetch_array($resultado_estado, SQLSRV_FETCH_ASSOC);
-            
-           
-              
+
+
+
               ?>
-              
+
                   <div class="card container-fluid">
     <div class="header">
         <h2>Liquidacion</h2>
     </div>
-    
+
     <?php  echo "<br><b>La liquidacion esta: <font color='red'>".$row_estado['nombre']."</b><br><br>"; ?>
               </div>
-              
-      <?php }elseif(!empty($_POST['liquidacion'])){  ?>         
-            
-              
+
+      <?php }elseif(!empty($_POST['liquidacion'])){  ?>
+
+
                 <div class="card container-fluid">
     <div class="header">
         <h2>Liquidacion</h2>
     </div>
 
 <?php
- 
+
  echo "<br><font color='red'><b>La liquidacion no existe</b><br><br>";
 
  ?>
  </div>
- 
+
  <?php } ?>
        </form>
 
@@ -1820,12 +1823,12 @@ echo "<b><font color='red'>El tramite ya fue ejecutado</font></b>";
         });
     });
 });
-         </script>     
-              
-              
-              
-              
-              
-       
-        
+         </script>
+
+
+
+
+
+
+
         <?php include 'scripts.php'; ?>

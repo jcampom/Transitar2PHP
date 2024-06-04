@@ -52,7 +52,7 @@
 </script>
 
 
-<?php // plugins formulario por pasos 
+<?php // plugins formulario por pasos
 ?>
 <!-- Jquery Validation Plugin Css -->
 <script src="interno/plugins/jquery-validation/jquery.validate.js" interno />
@@ -64,7 +64,7 @@
 
 <script src="interno/js/pages/forms/form-wizard.js" interno />
 </script>
-<?php // Fin del formuluario por pasos 
+<?php // Fin del formuluario por pasos
 ?>
 
 <!-- Jquery DataTable Plugin Js -->
@@ -119,38 +119,32 @@ buttons: [
 } );
 
 jQuery(document).ready(function() {
-jQuery('#admin2').DataTable({
-
-responsive: true,
-dom: 'lBfrtip',
-
-buttons: [
-'excel', 'csv', 'pdf', 'print', 'copy',
-],
-"language": {
-    //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-"url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
-},
-
-} );
-} );
+    jQuery('#admin2').DataTable({
+        responsive: true,
+        dom: 'lBfrtip',
+        buttons: [
+        'excel', 'csv', 'pdf', 'print', 'copy',
+        ],
+        "language": {
+            //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
+        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+        },
+    });
+});
 
 jQuery(document).ready(function() {
-jQuery('#admin').DataTable({
-
-responsive: true,
-dom: 'lBfrtip',
-
-buttons: [
-'excel', 'csv', 'pdf', 'print', 'copy',
-],
-"language": {
-    //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-"url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
-},
-
-} );
-} );
+    jQuery('#admin').DataTable({
+        responsive: true,
+        dom: 'lBfrtip',
+        buttons: [
+        'excel', 'csv', 'pdf', 'print', 'copy',
+        ],
+        "language": {
+            //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
+        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+        },
+    });
+});
 
 jQuery(document).ready(function() {
 jQuery('#enrutado').DataTable({
@@ -181,11 +175,11 @@ buttons: [
   <script src="static/js/notifications.js?v=2.8.6"></script>
 <?php endif ?>
 <style>
-    
+
     .label.bg-yellow {
         color: #333 !important;
     }
-    
+
 </style>
 <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
 

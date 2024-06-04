@@ -1,11 +1,9 @@
 <?php
-die('\nJLCM:crear_usuarios.php : 	Hola#1');
 include 'menu.php';
 
-echo '\nJLCM:crear_usuarios.php : _GET["activo"]  = '. $_GET["activo"];
-echo '\nJLCM:crear_usuarios.php : _GET["eliminar"] = '. $_GET["eliminar"];
+// echo '\nJLCM:crear_usuarios.php : _GET["activo"]  = '. $_GET["activo"];
+// echo '\nJLCM:crear_usuarios.php : _GET["eliminar"] = '. $_GET["eliminar"];
 print_r($_POST);
-die();
 
 if(!empty($_GET["activo"])){
     $editar="UPDATE usuarios SET estado = '".$_GET['cambio']."' where id = '".$_GET['activo']."' and empresa = '$empresa'";
@@ -34,26 +32,26 @@ if($existe == 0){
 
       $existe=sqlsrv_fetch_array($resultado_consulta, SQLSRV_FETCH_ASSOC);
       if($existe == 0){
-          
+
   $query="INSERT INTO usuarios(nombre, direccion, celular, identificacion, usuario, password, tipo, fecha,empresa, estado,perfil) VALUES ('".$_POST['nombre']."','".$_POST['direccion']."','".$_POST['celular']."','".$_POST['identificacion']."','".$_POST['usuario']."','".$_POST['password']."','EMPRESA','$fecha','$empresa','1','".$_POST['perfil']."')";
 
     $resultado=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
-    
+
 if ($resultado) {
 
 } else {
     echo 'Hubo un error al insertar en la tabla de usuarios: ' . serialize(sqlsrv_errors());
 }
-    
+
      echo '<div class="alert alert-success"><strong>¡Bien Hecho! </strong> El Usuario ha sido registrado con éxito </div>';
       }else{
-        echo '<div class="alert alert-danger"><strong>¡ESPERA! </strong> El usuario ya se encuentra registrado, verifica el Usuario </div>';  
+        echo '<div class="alert alert-danger"><strong>¡ESPERA! </strong> El usuario ya se encuentra registrado, verifica el Usuario </div>';
       }
 }else{
    echo '<div class="alert alert-danger"><strong>¡ESPERA! </strong> El Usuario ya se encuentra registrado, verifica el numero de identificación </div>';
 }
  } ?>
-     
+
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
@@ -64,8 +62,8 @@ if ($resultado) {
             <div class="body">
 
                 <form action="crear_usuarios.php"  method="POST">
-                
-                      
+
+
 
  <div class="col-md-6">
                         <div class="form-group form-float">
@@ -75,7 +73,7 @@ if ($resultado) {
                         </div>
                             </div>
                           </div>
- 
+
                         <div class="col-md-6">
                             <div class="form-group form-float">
                             <div class="form-line">
@@ -100,7 +98,7 @@ if ($resultado) {
                                 </div>
                                     </div>
                                   </div>
-                            
+
                                           <div class="col-md-6">
                                             <div class="form-group form-float">
                                             <div class="form-line">
@@ -109,7 +107,7 @@ if ($resultado) {
                                             </div>
                                                 </div>
                                               </div>
-                                              
+
                                                 <div class="col-md-6">
                                             <div class="form-group form-float">
                                             <div class="form-line">
@@ -139,7 +137,7 @@ if ($resultado) {
 
       </select>
      </div>
-    </div>    
+    </div>
     </div>
                                               			<button type="submit" class="btn btn-info waves-effect">GUARDAR</button>
                                               			<br><br>
@@ -152,7 +150,7 @@ if ($resultado) {
 
 
                     </fieldset>
-            
+
             </div>
         </div>
     </div>
@@ -169,44 +167,44 @@ if ($resultado) {
         <div class="table-responsive">
             <table class="table table-bordered table-striped " id="admin">
                 <thead>
-                    <tr> 
+                    <tr>
                     <th style="width:100px"></th>
-                    
+
                         <th>Nombre</th>
-       
+
                          <th>Ultima Conexion</th>
-                        
+
                          <th>Estado</th>
-                  
+
                         </tr>
                 </thead>
 
                 <tbody>
                   <?php
-              
+
                   $consulta="SELECT * FROM usuarios where empresa = '$empresa' ";
 
                     $resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 
                    while($row=sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)){ ?>
                     <tr><th>
-                    <?php if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?>    
+                    <?php if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?>
                 <a onclick="return confirm('Estas seguro de eliminar este usuario?');" href="crear_usuarios.php?id=<?php echo $row['id'] ?>&eliminar=1"> <button type="button" class="btn btn-danger" style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" ><i class="fa fa-times" style="margin:3px"></i></button></a>
                    <?php } ?>
-                   
-                      <?php if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?> 
+
+                      <?php if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) { ?>
                       <a  href="perfil_usuarios.php?id=<?php echo $row['id'] ?>"> <button style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" type="button" class="btn btn-info" ><i class="fa fa-pencil-alt"></i></button></a>
-                      
+
                       <?php } ?>
-       
+
                           <?php if($row['estado'] == 1){ ?>
                         <a  href="crear_usuarios.php?activo=<?php echo $row['id'] ?>&cambio=0"> <button style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" type="button" class="btn btn-danger" ><i class="fa fa-ban"></i></button>
                           <?php }else if($row['estado'] == 0){ ?>
-                          
+
                                  <a  href="crear_usuarios.php?activo=<?php echo $row['id'] ?>&cambio=1"> <button style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" type="button" class="btn btn-success" ><i class="fa fa-check-circle"></i></button>
                                  <?php }  ?>
-                                 
-                                 
+
+
                         </a>
 
                       </th>
@@ -215,9 +213,9 @@ if ($resultado) {
                      echo $row['identificacion'];
                        ?>
                       </td>
-                    
-                      <td><?php echo $row['ultima_conexion'];?> </td>
-                      
+
+                      <td><?php echo $row['ultima_conexion'] -> format('Y-m-d');?> </td>
+
                       <td><?php  if($row['estado'] == 1){
                           echo "<font color='green'>ACTIVADO</font>";
                       }else if($row['estado'] == 0){

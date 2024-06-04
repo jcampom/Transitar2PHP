@@ -2,26 +2,28 @@
 include 'conexion.php';
 
 // Obtener el ID del trámite enviado por AJAX
-$tramiteId = $_GET['tramiteId'];
-$clase = $_GET['claseVehiculo'];
-$tipo_servicio = $_GET['tipoVehiculo'];
-$placa = $_GET['placa'];
+$tramiteId = $_GET['tramiteId'] ?? '';
+$clase = $_GET['claseVehiculo'] ?? '';
+$tipo_servicio = $_GET['tipoVehiculo'] ?? '';
+$placa = $_GET['placa'] ?? '';
 
 if(empty($clase)){
 	$consulta_vehiculo="SELECT * FROM vehiculos where numero_placa = '$placa'";
 	$resultado_vehiculo=sqlsrv_query( $mysqli,$consulta_vehiculo, array(), array('Scrollable' => 'buffered'));
-	$row_vehiculo=sqlsrv_fetch_array($resultado_vehiculo, SQLSRV_FETCH_ASSOC);
-	$clase = $row_vehiculo['clase'];
-	$tipo_servicio = $row_vehiculo['tipo_servicio'];
+	if(sqlsrv_num_rows($resultado_vehiculo)) {
+		$row_vehiculo=sqlsrv_fetch_array($resultado_vehiculo, SQLSRV_FETCH_ASSOC);
+		$clase = $row_vehiculo['clase'];
+		$tipo_servicio = $row_vehiculo['tipo_servicio'];
+	}
 }
 //echo "JLCM:obtener_conceptos.php:#17: --> clase=".$clase.", tipo_servicio=".$tipo_servicio;
-$sistematizacion = $_GET['sistematizacion'];
+$sistematizacion = $_GET['sistematizacion'] ?? '';
 
 // Realizar la consulta para obtener los conceptos asociados al trámite
 $sql = "SELECT * FROM detalle_tramites WHERE tramite_id = '$tramiteId'";
 $resultado = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
-$tramitesSeleccionados = $_GET['tramitesSeleccionados'];
+$tramitesSeleccionados = $_GET['tramitesSeleccionado'];
 
 // Crear un array para almacenar los conceptos
 $conceptos = array();
@@ -30,30 +32,30 @@ $valor_total = 0;
 $repetidos = array();
 if (sqlsrv_num_rows($resultado) > 0) {
     while ($row = sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)) {
-        
+
         if($tramiteId == 1){
-        
+
          $consulta_concepto="SELECT * FROM conceptos where id = '".$row['concepto_id']."' and clase_vehiculo = '$clase' and servicio_vehiculo = '$tipo_servicio' or id = '".$row['concepto_id']."' and clase_vehiculo = '0'  ";
-            
+
         }else{
-            
+
 			$consulta_concepto="SELECT * FROM conceptos where id = '".$row['concepto_id']."' and clase_vehiculo = '$clase' and servicio_vehiculo = '$tipo_servicio' ";
 
 			if($sistematizacion != 1){
 				$consulta_concepto .= " and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
 			}
-			
+
 			$consulta_concepto.=" or id = '".$row['concepto_id']."' and clase_vehiculo = '0' ";
 
 			if($sistematizacion != 1){
 				$consulta_concepto .= "  and nombre NOT LIKE '%SUSTRATO%' and nombre NOT LIKE '%SISTEMATIZACION%' and nombre NOT LIKE '%ELABORACION%'";
-			}    
+			}
         }
 		//echo "<br/>JLCM:obtener_conceptos.php:#52: --> consulta_concepto=".$consulta_concepto;
 		$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
-		
+
 		if (sqlsrv_num_rows($resultado_concepto)>0){
-			
+
 			$row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
 			$fecha_vigencia_inicial = date_format($row_concepto['fecha_vigencia_inicial'], 'Y/m/d');
 			$fecha_vigencia_final   = date_format($row_concepto['fecha_vigencia_final'], 'Y/m/d');
@@ -61,9 +63,9 @@ if (sqlsrv_num_rows($resultado) > 0) {
 			if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
 				$rango = $fecha_vigencia_final;
 			}else{
-				$rango = "2900-01-01"; 
+				$rango = "2900-01-01";
 			}
-			
+
 			if($row_concepto['id'] > 0 && $fecha >= $fecha_vigencia_inicial && $fecha <=  $rango && !in_array($row_concepto['id'], $repetidos)){
 				$consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
 				$resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
@@ -71,13 +73,13 @@ if (sqlsrv_num_rows($resultado) > 0) {
 				if($row_concepto['porcentaje'] > 0){
 					$valor = ($valor_total * $row_concepto['porcentaje']) / 100;
 				}else if($row_concepto['valor_SMLV_UVT'] == 0){
-					$valor = $row_concepto['valor_concepto'];  
+					$valor = $row_concepto['valor_concepto'];
 				}else if($row_concepto['valor_SMLV_UVT'] == 1){
 					$valor = $row_concepto['valor_concepto'] * $row_smlv['smlv'];
 				}else if($row_concepto['valor_SMLV_UVT'] == 2){
 					$valor = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
 				}
-			 
+
 				if($row_concepto['repetir'] == 0){
 					$repetidos[] = $row_concepto['id'];
 				}
@@ -94,14 +96,14 @@ if (sqlsrv_num_rows($resultado) > 0) {
 					'id' => $row['concepto_id'],
 					'nombre' => $row_concepto['nombre'],
 					'valor_modificable' => $row_concepto['valor_modificacble'],
-					'valor' => number_format(ceil($valor)),
-					'valor2' => ceil($valor)
+					'valor' => number_format(round($valor)),
+					'valor2' => round($valor)
 				);
 				$conceptos[] = $concepto;
-				
+
 			}
 	 	}
-   
+
 	}
 }
 
