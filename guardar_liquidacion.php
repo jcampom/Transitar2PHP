@@ -38,9 +38,9 @@ if ($tipoTramite == 4) {
 
         if($resultado_consulta) {
             $query = "SELECT id FROM liquidaciones WHERE fechayhora = '$fechayhora'";
-            $stmt = sqlsrv_query($mysqli, $consulta, array(), array('Scrollable' => 'buffered'));
+            $stmt = sqlsrv_query($mysqli, $query, array(), array('Scrollable' => 'buffered'));
             if($stmt) {
-                if ($row = sqlsrv_fetch_assoc($stmt)) {
+                if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                     $liquidacionId = $row['id'];
                 } else {
                     $liquidacionId = $rowLastId['lastid'];
@@ -214,7 +214,6 @@ if ($tipoTramite == 4) {
 							$valor_cobranza = round($valor_cobranza,0);
 
 							$ins_det_conc_liqs = "INSERT INTO detalle_conceptos_liquidaciones (liquidacion, tramite, concepto,valor,mora, comparendo,honorario,cobranza,terceros) VALUES ('$liquidacionId', '39', '" . $row_concepto['id'] . "','$valor_concepto','$valor_mora','$comparendos','$valor_honorario','$valor_cobranza','" . $row_concepto['terceros'] . "')";
-                            echo $ins_det_conc_liqs;
 							// Ejecutar la consulta
 							sqlsrv_query($mysqli, $ins_det_conc_liqs, array(), array( 'Scrollable' => 'buffered' ));
 
