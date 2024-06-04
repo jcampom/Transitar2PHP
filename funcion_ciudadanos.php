@@ -341,7 +341,7 @@
                             if(ciudadanoDoc == undefined  || ciudadanoDoc == "") {
                                 ciudadanoDoc = $('#ciudadano_document').val()
                             }
-                        }
+                        }});
 
                         $.ajax({
                             url: 'obtener_dt.php',
@@ -394,18 +394,18 @@
                     });
 
                     $.ajax({
-                    url: 'obtener_dt.php',
-                    method: 'POST',
-                    data: {
-                        numeroDocumento: numeroDocumento,
-                        tipoDocumento: tipoDocumento,
-                        tipoCiudadano: tipoCiudadano
-                    },
-                    success: function(response) {
+                        url: 'obtener_dt.php',
+                        method: 'POST',
+                        data: {
+                            numeroDocumento: numeroDocumento,
+                            tipoDocumento: tipoDocumento,
+                            tipoCiudadano: tipoCiudadano
+                        },
+                        success: function(response) {
 
-                        $('#dt-seleccionados').html(response);
-                    }
-                });
+                            $('#dt-seleccionados').html(response);
+                        }
+                    });
                 }
             },
             error: function() {

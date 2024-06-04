@@ -3,7 +3,7 @@
 $serverName = "SERVERD_DATACEN"; //serverName\instanceName
 
 // Since UID and PWD are not specified in the $connectionInfo array, the connection will be attempted using Windows Authentication.
-$connectionInfo = array( "Database"=>"u859387114_transitar");
+$connectionInfo = array( "Database"=>"u859387114_transitar", "UID"=>"root", "PWD"=>"14092005_Ba1_***");
 $mysqli = sqlsrv_connect( $serverName, $connectionInfo);
 
 if (!( $mysqli )) {
