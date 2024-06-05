@@ -999,7 +999,7 @@ function generar_formulario($formularioId) {
     global $mysqli;
 
     // Consultar la tabla "formularios" para obtener los detalles del formulario
-$consulta = "SELECT * FROM `formularios` WHERE `id` = $formularioId";
+$consulta = "SELECT * FROM formularios WHERE id = $formularioId";
 $resultado = sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
 $existe = sqlsrv_fetch_array( $resultado, SQLSRV_FETCH_ASSOC);
 
@@ -1013,7 +1013,7 @@ $nombre_tabla = $existe['nombre'];
     echo '</div>';
     echo '<br>';
 
-    $consultaCampos = "SELECT campo, tipo, requerido, dinamico FROM `detalle_formularios` WHERE formulario = $formularioId";
+    $consultaCampos = "SELECT campo, tipo, requerido, dinamico FROM detalle_formularios WHERE formulario = $formularioId";
     $resultadoCampos = sqlsrv_query( $mysqli,$consultaCampos, array(), array('Scrollable' => 'buffered'));
     $cantidad_campos = 0;
 

@@ -182,7 +182,7 @@ echo $row_banco['nombre']; ?>
   <div class="col-md-4">
                              <div class="form-group form-float">
                              <div class="form-line">
-<b>Fecha consignación : </b> <?php echo $row_recaudo['fecha']; ?>
+<b>Fecha consignación : </b> <?php echo $row_recaudo['fecha']->format('Y-m-d'); ?>
 
 </div></div></div>
 

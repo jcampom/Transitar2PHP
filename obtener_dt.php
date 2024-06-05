@@ -5,14 +5,87 @@ include 'logTransitar.php';
 
 // Obtener el número de documento enviado desde la solicitud AJAX
 $numeroDocumento = $_POST['numeroDocumento'];
+$tipoDocumento = $_POST['tipoDocumento'];
+$tipoCiudadano = $_POST['tipoCiudadano'];
 
-// Consulta a la tabla Derecho de transito
-$sql = "SELECT dt.TDT_ID, dt.TDT_placa, dt.TDT_ano, dt.TDT_estado, dt.TDT_tramite, dt.TDT_honorarios, dt.TDT_cobranza, dt.TDT_fecha, dt.TDT_user, dt.TDT_archivo, dt.TDT_doccobro,
-       v.id,  v.numero_documento, v.numero_placa, v.chasis, v.motor, v.marca, v.linea, v.clase, v.carroceria, v.color, v.tipo_servicio, v.modalidad, v.capacidad_pasajeros, v.capacidad_carga, v.cilindraje, v.modelo, v.chasis_independiente, v.serie, v.vin, v.numero_puertas, v.combustible, v.ejes, v.peso, v.concesionario, v.potencia, v.clasificacion, v.ano_fabricacion, v.origen, v.acta_importacion, v.declaracion, v.fecha_declaracion, v.pais_origen, v.fecha_propiedad, v.factura, v.fecha_factura, v.soat, v.fecha_vence_soat, v.tecnomecanica, v.fecha_vence_tecnomecanica, v.licencia_transito, v.sustrato, v.usuario 
-FROM derechos_transito dt
-INNER JOIN vehiculos v ON dt.TDT_placa = v.numero_placa
-where dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '1' or dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '8' or dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '5' 
-";
+// Consulta a la tabla comparendos
+if($tipoDocumento == 100) {
+	$sql = "SELECT dt.TDT_ID, dt.TDT_placa, dt.TDT_ano, dt.TDT_estado, dt.TDT_tramite, dt.TDT_honorarios, dt.TDT_cobranza, dt.TDT_fecha, dt.TDT_user, dt.TDT_archivo, dt.TDT_doccobro,
+		   v.id,  v.numero_documento, v.numero_placa, v.chasis, v.motor, v.marca, v.linea, v.clase, v.carroceria, v.color, v.tipo_servicio, v.modalidad, v.capacidad_pasajeros, v.capacidad_carga, v.cilindraje, v.modelo, v.chasis_independiente, v.serie, v.vin, v.numero_puertas, v.combustible, v.ejes, v.peso, v.concesionario, v.potencia, v.clasificacion, v.ano_fabricacion, v.origen, v.acta_importacion, v.declaracion, v.fecha_declaracion, v.pais_origen, v.fecha_propiedad, v.factura, v.fecha_factura, v.soat, v.fecha_vence_soat, v.tecnomecanica, v.fecha_vence_tecnomecanica, v.licencia_transito, v.sustrato, v.usuario 
+	FROM derechos_transito dt
+	INNER JOIN vehiculos v ON dt.TDT_placa = v.numero_placa
+	where dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '1' or dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '8' or dt.TDT_placa = '$numeroDocumento' and dt.TDT_estado = '5' 
+	";
+} else {
+	$sql = "SELECT 
+	dt.TDT_ID, 
+	dt.TDT_placa, 
+	dt.TDT_ano, 
+	dt.TDT_estado, 
+	dt.TDT_tramite, 
+	dt.TDT_honorarios, 
+	dt.TDT_cobranza, 
+	dt.TDT_fecha, 
+	dt.TDT_user, 
+	dt.TDT_archivo, 
+	dt.TDT_doccobro, 
+	v.id, 
+	v.numero_documento, 
+	v.numero_placa, 
+	v.chasis, 
+	v.motor, 
+	v.marca, 
+	v.linea, 
+	v.clase, 
+	v.carroceria, 
+	v.color, 
+	v.tipo_servicio, 
+	v.modalidad, 
+	v.capacidad_pasajeros, 
+	v.capacidad_carga, 
+	v.cilindraje, 
+	v.modelo, 
+	v.chasis_independiente, 
+	v.serie, 
+	v.vin, 
+	v.numero_puertas, 
+	v.combustible, 
+	v.ejes, 
+	v.peso, 
+	v.concesionario, 
+	v.potencia, 
+	v.clasificacion, 
+	v.ano_fabricacion, 
+	v.origen, 
+	v.acta_importacion, 
+	v.declaracion, 
+	v.fecha_declaracion, 
+	v.pais_origen, 
+	v.fecha_propiedad, 
+	v.factura, 
+	v.fecha_factura, 
+	v.soat, 
+	v.fecha_vence_soat, 
+	v.tecnomecanica, 
+	v.fecha_vence_tecnomecanica, 
+	v.licencia_transito, 
+	v.sustrato, 
+	v.usuario 
+  FROM 
+	vehiculos v
+	LEFT JOIN ciudadanos c ON  c.numero_documento = v.numero_documento
+	INNER JOIN derechos_transito dt ON dt.TDT_placa = v.numero_placa 
+  where 
+	c.numero_documento = '$numeroDocumento' 
+	and dt.TDT_estado = '1' 
+	or c.numero_documento = '$numeroDocumento' 
+	and dt.TDT_estado = '8' 
+	or c.numero_documento = '$numeroDocumento' 
+	and dt.TDT_estado = '5'
+	and c.tipo_ciudadano = '$tipoCiudadano'
+	and c.tipo_documento = '$tipoDocumento'
+   ";
+}
 
 registrarLogTransitar($mysqli,basename(__FILE__), array('1',$sql));
 
@@ -56,11 +129,15 @@ if (sqlsrv_num_rows($result) > 0) {
 
 				$ano_actual = substr($fecha, 0, 4);
 				$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
-				if (sqlsrv_num_rows($resultado_concepto) > 0) {
-
+				if ($resultado_concepto && sqlsrv_num_rows($resultado_concepto) > 0) {
+					
 					$row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
-
+					
+					// echo $consulta_concepto."<br/>";
+					// print_r($row_concepto);
 					$id_concepto = $row_concepto['id'];
+					$valor = 0;
+					$valor_concepto = 0;
 
 					if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
 						$rango = $row_concepto['fecha_vigencia_final'];

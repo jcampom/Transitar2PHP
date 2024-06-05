@@ -129,7 +129,7 @@ if (sqlsrv_num_rows($result) > 0) {
 		$resultado_tramite=sqlsrv_query( $mysqli,$sql_tramite, array(), array('Scrollable' => 'buffered'));
 		$total = 0;
 		$totalComparendoGeneral = 0;
-		if (sqlsrv_num_rows($resultado_tramite) > 0) {
+		if (sqlsrv_fetch_array($resultado_tramite) > 0) {
 			while ($row_tramite = sqlsrv_fetch_array($resultado_tramite, SQLSRV_FETCH_ASSOC)) {
 				$consulta_concepto="SELECT * FROM conceptos where id = '".$row_tramite['concepto_id']."'";
 				$resultado_concepto=sqlsrv_query( $mysqli,$consulta_concepto, array(), array('Scrollable' => 'buffered'));
@@ -140,40 +140,40 @@ if (sqlsrv_num_rows($result) > 0) {
 					$rango = "2900-01-01";
 				}
 
+				
 				if($row_concepto['id'] > 0 && $fecha >=  $row_concepto['fecha_vigencia_inicial'] && $fecha <=  $rango ){
+					
+					$consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
+					$resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
+					
+					$row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
 
-				$consulta_smlv="SELECT * FROM smlv where ano = '$ano'";
-				$resultado_smlv=sqlsrv_query( $mysqli,$consulta_smlv, array(), array('Scrollable' => 'buffered'));
+					if($row_concepto['valor_SMLV_UVT'] == 0){
+						$valor_concepto = $row_concepto['valor_concepto'];
+					}else if($row_concepto['valor_SMLV_UVT'] == 1){
+						$valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv_original']/ 30 );
+					}else if($row_concepto['valor_SMLV_UVT'] == 2){
+						$valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
+					}
 
-				$row_smlv=sqlsrv_fetch_array($resultado_smlv, SQLSRV_FETCH_ASSOC);
+					if($row_concepto['operacion'] == 2){
+						$valor_concepto = -$valor_concepto;
+					}
 
-				if($row_concepto['valor_SMLV_UVT'] == 0){
-					$valor_concepto = $row_concepto['valor_concepto'];
-				}else if($row_concepto['valor_SMLV_UVT'] == 1){
-					$valor_concepto = ($row_concepto['valor_concepto']) * ($row_smlv['smlv_original']/ 30 );
-				}else if($row_concepto['valor_SMLV_UVT'] == 2){
-					$valor_concepto = $row_concepto['valor_concepto'] * $row_smlv['uvt_original'];
+					if($row_concepto['id'] == 1000000022){
+						$valor_concepto = $valor;
+					}
+
+					if($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] ==1){
+						$valor_concepto = $valor_concepto;
+					}elseif($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] != 1){
+						$valor_concepto = 0;
+					}
+
+					$total += $valor_concepto;
 				}
-
-				if($row_concepto['operacion'] == 2){
-					$valor_concepto = -$valor_concepto;
-				}
-
-				if($row_concepto['id'] == 1000000022){
-					$valor_concepto = $valor;
-				}
-
-				if($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] ==1){
-					$valor_concepto = $valor_concepto;
-				}elseif($row_concepto['id'] == 1000004526 && $row['Tcomparendos_sancion'] != 1){
-					$valor_concepto = 0;
-				}
-
-				$total += $valor_concepto;
-
 			}
 		}
-	}
 
 // Realizar la consulta para obtener los conceptos asociados al ammnistias
 	$sql_tramite = "SELECT * FROM detalle_tramites WHERE tramite_id = '59'";
@@ -239,7 +239,7 @@ if (sqlsrv_num_rows($result) > 0) {
 	<td>".number_format($valor)."</td></a>
 	<td>
 	<div class='form-check'>
-	  <input class='form-check-input' type='checkbox' data-comparendo='".($total + $valor_mora + $total2)."' value='".$row['Tcomparendos_comparendo']."' id='pago".$row['Tcomparendos_comparendo']."' onchange='calculaValorComparendo(this, ".($total + $valor_mora + $total2 + $valor_honorario + $valor_cobranza + $valor).")'>
+	  <input class='form-check-input' type='checkbox' data-comparendo='".($total + $valor_mora + $total2)."' value='".$row['Tcomparendos_comparendo']."' id='pago".$row['Tcomparendos_comparendo']."' onchange='calculaValorComparendo(this, ".($valor_mora + $valor_honorario + $valor + $total).")'>
 	  <label class='form-check-label' for='pago".$row['Tcomparendos_comparendo']."'>
 
 	  </label>
@@ -247,8 +247,8 @@ if (sqlsrv_num_rows($result) > 0) {
 	  </label>
 	</td>
 	<tr>
-	<th colspan='8' style='text-align: right; font-size: 14px;'>Total comparendo: $ ".number_format($total + $valor_mora + $total2 + $valor_honorario + $valor_cobranza + $valor)."</th>
-
+	<th colspan='8' style='text-align: right; font-size: 14px;'>Total comparendo: $ ".number_format($valor_comparendo + $total)."</th>
+	$ |||
 	";
 
         // Agregar el elemento de lista al resultado final

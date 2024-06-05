@@ -330,7 +330,7 @@ include 'funcion_ciudadanos.php';
 	<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
 
-	<?php }else if($tipo_tramite == 6){   ?>
+	<?php }else if($tipo_tramite == 101){   ?>
 		<div class="card container-fluid">
 			<div class="header">
 				<h2>Derechos de transito</h2>
