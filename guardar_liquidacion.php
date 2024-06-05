@@ -10,7 +10,8 @@ $tipoServicio          = $_POST['tipoServicio'] ?? '';
 $claseVehiculo         = $_POST['claseVehiculo'] ?? '';
 $nota_credito          = $_POST['valor_nota'] ?? '';
 $clasificacionVehiculo = $_POST['clasificacionVehiculo'] ?? '';
-$tramitesSeleccionados = $tipoTramite == 4 ? json_decode($_POST['tramitesSeleccionados']) : $_POST['tramitesSeleccionados'] ?? '';
+$tramitesSeleccionados = ($tipoTramite == 4 || $tipoTramite == 101 || $tipoTramite == 6) 
+? json_decode($_POST['tramitesSeleccionados']) : $_POST['tramitesSeleccionados'] ?? '';
 
 if (empty($claseVehiculo)) {
     $consulta_vehiculo = "SELECT * FROM vehiculos where numero_placa = '$placa'";
@@ -301,18 +302,33 @@ if ($tipoTramite == 4) {
 		}
 	}
 	//termina de guardar concepto del comparendo
-} else if ($tipoTramite == 6) {
+} else if ($tipoTramite == 101) {
 
     // Realizar el guardado en la tabla 'liquidaciones'
 
     // Realizar la inserción en la tabla liquidaciones
     $consulta = "SET NOCOUNT ON;INSERT INTO liquidaciones (tipo_tramite, ciudadano, placa, tipo_servicio, clase_vehiculo, clasificacion_vehiculo, usuario, fecha, fechayhora, empresa,nota_credito)
                VALUES ('$tipoTramite', '$ciudadano', '$placa', '$tipoServicio', '$claseVehiculo', '$clasificacionVehiculo', '$idusuario', '$fecha', '$fechayhora', '$empresa','$nota_credito');SELECT scope_identity() as lastid";
-
     // Ejecutar la consulta
-	$resultado_consulta = sqlsrv_query($mysqli, $consulta, array(), array('Scrollable' => 'buffered'));
-	$row = sqlsrv_fetch_array( $resultado_consulta, SQLSRV_FETCH_ASSOC);
-	$liquidacionId = $row['lastid'];
+    $resultado_consulta = sqlsrv_query($mysqli, $consulta, array(), array('Scrollable' => 'buffered'));
+               
+    print_r(sqlsrv_errors());
+	
+    $rowLastId = sqlsrv_fetch_array( $resultado_consulta, SQLSRV_FETCH_ASSOC);
+	$liquidacionId = "";
+    if($resultado_consulta) {
+        $query = "SELECT id FROM liquidaciones WHERE fechayhora = '$fechayhora'";
+        $stmt = sqlsrv_query($mysqli, $query, array(), array('Scrollable' => 'buffered'));
+        if($stmt) {
+            if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                $liquidacionId = $row['id'];
+            } else {
+                $liquidacionId = $rowLastId['lastid'];
+            }
+        } else {
+            $liquidacionId = $rowLastId['lastid'];
+        }
+    }
 
     // Realizar el guardado en la tabla 'detalle_liquidaciones' para cada trámite seleccionado
 
@@ -406,7 +422,9 @@ if ($tipoTramite == 4) {
                 ));
 
 
-
+                $valor_concepto = 0;
+                $valor = 0;
+                $total = 0;
                 if (sqlsrv_num_rows($resultado_concepto) > 0) {
                     $row_concepto = sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
                     if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {

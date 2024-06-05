@@ -347,7 +347,7 @@
                             url: 'obtener_dt.php',
                             method: 'POST',
                             data: {
-                                numeroDocumento: numeroDocumento,
+                                numeroDocumento: tipoDocumento == 100 ? numeroDocumento : ciudadanoDoc,
                                 tipoDocumento: tipoDocumento,
                                 tipoCiudadano: tipoCiudadano
                             },
@@ -356,7 +356,40 @@
                             }
                         });
 
+                        
+                        $.ajax({
+                            url: 'obtener_acuerdos_pago.php',
+                            method: 'POST',
+                            data: {
+                                numeroDocumento: tipoDocumento == 100 ? numeroDocumento : ciudadanoDoc,
+                                tipoDocumento: tipoDocumento,
+                                tipoCiudadano: tipoCiudadano
+                            },
+                            success: function(response) {
+
+                                $('#ap-seleccionados').html(response);
+                            }
+                        });
+
                 } else {
+                    $('#nombres').val("");
+                    $('#apellidos').val("");
+                    $('#direccion').val("");
+                    $('#telefono').val("");
+                    $('#celular').val("");
+                    $('#email').val("");
+                    $('#fecha_expedicion').val("");
+                    $('#fecha_nacimiento').val("");
+                    $('#ciudadano').val("");
+                    $('#numero_documento_actual').val("");
+
+                    $('#donante_organos').val("").trigger('change');
+                    $('#grupo_sanguineo').val("").trigger('change');
+                    $('#pais_nacimiento').val("").trigger('change');
+                    $('#ciudad_nacimiento').val("").trigger('change');
+                    $('#ciudad_residencia').val("").trigger('change');
+                    $('#sexo').val("").trigger('change');
+
                     $.ajax({
                         url: 'obtener_comparendos.php',
                         method: 'POST',
@@ -372,24 +405,6 @@
                             if(ciudadanoDoc == undefined || ciudadanoDoc == "") {
                                 ciudadanoDoc = $('#ciudadano_document').val()
                             }
-
-                            $('#nombres').val("");
-                            $('#apellidos').val("");
-                            $('#direccion').val("");
-                            $('#telefono').val("");
-                            $('#celular').val("");
-                            $('#email').val("");
-                            $('#fecha_expedicion').val("");
-                            $('#fecha_nacimiento').val("");
-                            $('#ciudadano').val("");
-                            $('#numero_documento_actual').val("");
-
-                            $('#donante_organos').val("").trigger('change');
-                            $('#grupo_sanguineo').val("").trigger('change');
-                            $('#pais_nacimiento').val("").trigger('change');
-                            $('#ciudad_nacimiento').val("").trigger('change');
-                            $('#ciudad_residencia').val("").trigger('change');
-                            $('#sexo').val("").trigger('change');
                         }
                     });
 
@@ -404,6 +419,20 @@
                         success: function(response) {
 
                             $('#dt-seleccionados').html(response);
+                        }
+                    });
+
+                    $.ajax({
+                        url: 'obtener_acuerdos_pago.php',
+                        method: 'POST',
+                        data: {
+                            numeroDocumento: numeroDocumento,
+                            tipoDocumento: tipoDocumento,
+                            tipoCiudadano: tipoCiudadano 
+                        },
+                        success: function(response) {
+
+                            $('#ap-seleccionados').html(response);
                         }
                     });
                 }
@@ -576,15 +605,7 @@ if (tipoDocumento === "" || nombres === "" || direccion === "" || numeroDocument
         $('#numero_documento').on('blur', function() {
             var numeroDocumento = $(this).val();
             if (numeroDocumento !== '') {
-                $.ajax({
-                    url: 'obtener_acuerdos_pago.php',
-                    method: 'POST',
-                    data: {numeroDocumento: numeroDocumento },
-                    success: function(response) {
-
-                        $('#ap-seleccionados').html(response);
-                    }
-                });
+                
             } else {
 
                 $('#ap-seleccionados').empty();

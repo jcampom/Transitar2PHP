@@ -340,7 +340,7 @@ include 'funcion_ciudadanos.php';
 		<div id="conceptos-tramite" class="conceptos-container"></div>
     </div>
 
- <?php }else if($tipo_tramite == 5){   ?>
+ <?php }else if($tipo_tramite == 6){   ?>
  <div class="card container-fluid">
     <div class="header">
         <h2>Acuerdos de pago</h2>
@@ -1118,9 +1118,9 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
 		// location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
 
 		// Abrir la URL en una nueva pestaña
-	//	alert(response);
-		window.open('./imprimir_liquidacion.php?id=' + response, '' ,'height=700,width=750,toolbar=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no ,modal=yes');
-//		location.href = './liquidaciones.php';
+		  alert(response);
+      window.open('./imprimir_liquidacion.php?id=' + response, '' ,'height=700,width=750,toolbar=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no ,modal=yes');
+  		location.href = './liquidaciones.php';
     },
     error: function() {
       alert('Error al guardar los trámites.');
@@ -1133,7 +1133,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
 
 
 //agregamos derecho de transito a pagar con los checkbox
-<?php if($tipo_tramite == 6){ ?>
+<?php if($tipo_tramite == 101){ ?>
 $(document).ready(function() {
   var tramitesSeleccionados = [];
 
@@ -1169,7 +1169,7 @@ $(document).ready(function() {
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
     // Obtener los valores de los campos
-	alert('guardar-liquidacion #4');
+	//alert('guardar-liquidacion #4');
     var tipoTramite = <?php echo $tipo_tramite; ?>;
     var ciudadano = $('#numero_documento').val();
     var placa = $('#placa').val();
@@ -1225,7 +1225,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
       tipoServicio: tipoServicio,
       claseVehiculo: claseVehiculo,
       clasificacionVehiculo: clasificacionVehiculo,
-      tramitesSeleccionados: dt,
+      tramitesSeleccionados: JSON.stringify(dt),
       valor_nota: valor_nota
     },
     success: function(response) {
@@ -1233,8 +1233,9 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
     //  location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
 
      // Abrir la URL en una nueva pestaña
-    window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
-    location.href = './liquidaciones.php';
+      alert('La liquidación se generó exitosamente')
+      window.open('./imprimir_liquidacion.php?id=' + response, '' ,'height=700,width=750,toolbar=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no ,modal=yes');
+      location.href = './liquidaciones.php';
     },
     error: function() {
       alert('Error al guardar los trámites.');
@@ -1247,7 +1248,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
 
 
 //agregamos acuerdos de pago a pagar con los checkbox
-<?php if($tipo_tramite == 5){ ?>
+<?php if($tipo_tramite == 6){ ?>
 $(document).ready(function() {
   var tramitesSeleccionados = [];
 
@@ -1286,7 +1287,7 @@ $(document).ready(function() {
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
     // Obtener los valores de los campos
-	alert('guardar-liquidacion #1');
+	//alert('guardar-liquidacion #1');
     var tipoTramite = <?php echo $tipo_tramite; ?>;
     var ciudadano = $('#numero_documento').val();
     var placa = $('#placa').val();
@@ -1351,15 +1352,16 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
       tipoServicio: tipoServicio,
       claseVehiculo: claseVehiculo,
       clasificacionVehiculo: clasificacionVehiculo,
-      tramitesSeleccionados: tramitesSeleccionadosJson,
+      tramitesSeleccionados: JSON.stringify(tramitesSeleccionadosJson),
       valor_nota: valor_nota
     },
     success: function(response) {
       // Redireccionar a la página de impresión con el ID de la liquidación devuelto en la respuesta
 
        // Abrir la URL en una nueva pestaña
-    window.open('./imprimir_liquidacion.php?id=' + response, '_blank');
-    location.href = './liquidaciones.php';
+      alert('La liquidación se generó exitosamente')
+      window.open('./imprimir_liquidacion.php?id=' + response, '' ,'height=700,width=750,toolbar=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no ,modal=yes');
+      location.href = './liquidaciones.php';
     },
     error: function() {
       alert('Error al guardar los trámites.');

@@ -8,13 +8,38 @@ include 'conexion.php';
 
 // Obtener el número de documento enviado desde la solicitud AJAX
 $numeroDocumento = $_POST['numeroDocumento'];
+$tipoDocumento = $_POST['tipoDocumento'];
+$tipoCiudadano = $_POST['tipoCiudadano'];
+
 
 @$numero_acuerdo = $_POST['numero_acuerdo'];
 
-     $consulta_acuerdo="SELECT * FROM acuerdos_pagos where trim(TAcuerdop_identificacion) = '$numeroDocumento'
-     and TAcuerdop_estado = '1' or trim(TAcuerdop_identificacion) = '$numeroDocumento'
-     and TAcuerdop_estado = '3' group by TAcuerdop_numero";
-
+if($tipoDocumento == 100) {
+     $consulta_acuerdo="SELECT 
+     a.* 
+   FROM 
+     acuerdos_pagos a 
+     left join ciudadanos c on a.TAcuerdop_identificacion = c.numero_documento
+     inner join vehiculos v on v.numero_documento = c.numero_documento
+   where 
+     v.numero_placa = '$numeroDocumento' 
+     and TAcuerdop_estado = '1' 
+     or v.numero_placa = '$numeroDocumento' 
+     and TAcuerdop_estado = '3'";
+} else {
+     $consulta_acuerdo="SELECT 
+     a.* 
+   FROM 
+     acuerdos_pagos a 
+     left join ciudadanos c on a.TAcuerdop_identificacion = c.numero_documento 
+   where 
+     c.numero_documento = '$numeroDocumento' 
+     and TAcuerdop_estado = '1' 
+     or c.numero_documento = '$numeroDocumento' 
+     and TAcuerdop_estado = '3' 
+     and c.tipo_ciudadano = '$tipoCiudadano' 
+     and c.tipo_documento = '$tipoDocumento'";
+}
      
 
             $resultado_acuerdo=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
@@ -22,6 +47,11 @@ $numeroDocumento = $_POST['numeroDocumento'];
             $resultado_acuerdo2=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
 
             $row_acuerdo=sqlsrv_fetch_array($resultado_acuerdo, SQLSRV_FETCH_ASSOC);
+
+            if(sqlsrv_num_rows($resultado_acuerdo) == 0) {
+              echo "No se encontraron datos";
+              return;
+            }
 
             if($row_acuerdo['TAcuerdop_periodicidad'] == 1){
                 $periodo = "Semanal";
@@ -37,7 +67,8 @@ $numeroDocumento = $_POST['numeroDocumento'];
 
 $select = "
        <div class='col-md-3'>
-    <select data-live-search='true' id='numero_acuerdo' name='numero_acuerdo' class='form-control'>
+    <select data-live-search='true' id='numero_acuerdo' name='numero_acuerdo' class='form-control' 
+    data-numero-documento='".$row_acuerdo['TAcuerdop_identificacion']."' data-tipo-documento='".$tipoDocumento."' data-tipo-ciudadano='".$tipoCiudadano."'>
                         <option style='margin-left: 15px;'>".$numero_acuerdo."...</option>
                 ";
                 while ($rowMenu = sqlsrv_fetch_array($resultado_acuerdo2, SQLSRV_FETCH_ASSOC)) {
@@ -74,6 +105,7 @@ if (sqlsrv_num_rows($result) > 0) {
     $sistematizacion = 0;
     while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
 
+        $valor_concepto = 0;
 
         if($row['TAcuerdop_periodicidad'] == 1){
                 $estado = "Generado";
@@ -223,20 +255,31 @@ $(document).ready(function() {
 
   });
 
-    $('#numero_acuerdo').change(function() {
-  var numero_acuerdo = $(this).val();
-  var numeroDocumento = <?php echo $numeroDocumento ?>;
-   $.ajax({
-                    url: 'obtener_acuerdos_pago.php',
-                    method: 'POST',
-                    data: {numeroDocumento: numeroDocumento,numero_acuerdo:numero_acuerdo },
-                    success: function(response) {
+  $('#numero_acuerdo').change(function() {
+    var numero_acuerdo = $(this).val();
+    var selectElement = document.getElementById('numero_acuerdo');
 
-                        $('#ap-seleccionados').html(response);
-                    }
-                });
+    // Obtener el valor del atributo data-numer-documento
+    var numeroDocumento = selectElement.getAttribute('data-numero-documento');
+    var tipoCiudadano = selectElement.getAttribute('data-tipo-ciudadano');
+    var tipoDocumento = selectElement.getAttribute('data-tipo-documento');
+    console.log(numeroDocumento);
+    console.log("Se selecciono algo");
+    $.ajax({
+      url: 'obtener_acuerdos_pago.php',
+      method: 'POST',
+      data: {
+        numeroDocumento: numeroDocumento,
+        numero_acuerdo:numero_acuerdo,
+        tipoCiudadano,
+        tipoDocumento
+      },
+      success: function(response) {
+        $('#ap-seleccionados').html(response);
+      }
+  });
 
-    });
+  });
 
 
 });
