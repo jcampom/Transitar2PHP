@@ -3,6 +3,7 @@ include 'menu.php';
 
 // Procesar el formulario al hacer clic en "Guardar Cambios"
 if (isset($_POST['guardar'])) {
+    $errorMsg = '';
     foreach ($_POST['detalle_id'] as $detalle_id) {
         $campo = $_POST['campo_' . $detalle_id];
         $tipo = $_POST['tipo_' . $detalle_id];
@@ -14,16 +15,18 @@ if (isset($_POST['guardar'])) {
         
 
         // Realizar la actualización en la base de datos
-        $sql_actualizar = "UPDATE detalle_formularios SET campo = '$campo', tipo = '$tipo', label = '$titulo', requerido = '$requerido', dinamico = '$tabla', file = '$file', multiple = '$multiple' WHERE id = '$detalle_id'";
+        $sql_actualizar = "UPDATE detalle_formularios SET campo = '$campo', tipo = '$tipo', label = '$titulo', requerido = '$requerido', dinamico = '$tabla', [file] = '$file', multiple = '$multiple' WHERE id = '$detalle_id'";
       
-        if (sqlsrv_query( $mysqli,$sql_actualizar, array(), array('Scrollable' => 'buffered'))) {
-    // echo "Actualización exitosa";
-} else {
-    echo "Error al actualizar: " . serialize(sqlsrv_errors());
-}
+        if (!sqlsrv_query( $mysqli,$sql_actualizar, array(), array('Scrollable' => 'buffered'))) {
+            $errorMsg .= serialize(sqlsrv_errors()) . " ";
+        }
     }
 
-    // Redirigir a la misma página para mostrar los cambios actualizados
+    if ($errorMsg == '') {
+        echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Actualización exitosa.</div>';
+    } else {
+        echo '<div class="alert alert-danger"><strong>¡Oops!</strong> Error al actualizar: '. $errorMsg.' </div>';
+    }
 
 }
 // Obtener el ID del formulario seleccionado
@@ -85,12 +88,14 @@ if (isset($_GET['id'])) {
                    
                         // Realizar una consulta a la base de datos para obtener la lista de tablas
                         $query = "Select Table_name as TableName From Information_schema.Tables";
-                        $result = sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
+                        $result = sqlsrv_query($mysqli, $query, array(), array('Scrollable' => 'buffered'));
 
-                        while ($row2 = $result->fetch_array()) {
-                       
+                        if ($result) {
+                            while ($row2 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
                                 echo '<option style="margin-left: 15px;" value="' . $row2[0] . '">' . $row2[0] . '</option>';
+                            }
                         }
+
                
                   echo  '</select>';
             echo '</div>';
@@ -129,7 +134,9 @@ if (isset($_GET['id'])) {
             echo '<input type="hidden" name="detalle_id[]" value="' . $row['id'] . '">';
         }
 
-        echo '<div class="col-md-12"><button type="submit" class="btn btn-primary" name="guardar">Guardar Cambios</button><br><br></div>';
+        echo '<div class="col-md-12"><button type="submit" class="btn btn-primary" name="guardar">Guardar Cambios</button> &nbsp;&nbsp;&nbsp;
+        <a class="btn btn-warning" href="crear_formularios.php">Volver</a>
+        <br><br></div>';
         echo '</form>';
         echo '</div>';
     } else {
