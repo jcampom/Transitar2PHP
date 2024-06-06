@@ -223,7 +223,7 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
                     <label for="tabla">Seleccionar Tabla:</label>
                     <select required id="tabla" class="form-control" name="tabla" onchange="this.form.submit()" data-live-search="true">
                         <?php
-                        $tabla = $_POST["tabla"];
+                        $tabla = $_POST["tabla"] ?? '';
                         if (empty($_POST['tabla'])) { ?>
                             <option style="margin-left: 15px;" value="">Seleccione una tabla</option>
                         <?php } else { ?>
@@ -234,9 +234,11 @@ foreach ($_POST as $nombreCampo => $valorCampo) {
                         $query = "SHOW TABLES ";
                         $result=sqlsrv_query( $mysqli,$query, array(), array('Scrollable' => 'buffered'));
 
-                        while ($row = $result->fetch_array()) {
-                            if ($row[0] != "$tabla")
-                                echo '<option style="margin-left: 15px;" value="' . $row[0] . '">' . $row[0] . '</option>';
+                        if($result) {
+                            while ($row = $result->fetch_array()) {
+                                if ($row[0] != "$tabla")
+                                    echo '<option style="margin-left: 15px;" value="' . $row[0] . '">' . $row[0] . '</option>';
+                            }
                         }
                         ?>
                     </select>
