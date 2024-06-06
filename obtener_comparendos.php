@@ -239,7 +239,7 @@ if (sqlsrv_num_rows($result) > 0) {
 	<td>".number_format($valor)."</td></a>
 	<td>
 	<div class='form-check'>
-	  <input class='form-check-input' type='checkbox' data-comparendo='".($total + $valor_mora + $total2)."' value='".$row['Tcomparendos_comparendo']."' id='pago".$row['Tcomparendos_comparendo']."' onchange='calculaValorComparendo(this, ".($valor_mora + $valor_honorario + $valor + $total).")'>
+	  <input class='form-check-input' type='checkbox' data-comparendo='".($total + $valor_mora + $total2)."' value='".$row['Tcomparendos_comparendo']."' id='pago".$row['Tcomparendos_comparendo']."' onchange='calculaValorComparendo(this, ".($total + $valor_mora + $total2 + $valor_honorario + $valor_cobranza).")'>
 	  <label class='form-check-label' for='pago".$row['Tcomparendos_comparendo']."'>
 
 	  </label>
@@ -247,7 +247,7 @@ if (sqlsrv_num_rows($result) > 0) {
 	  </label>
 	</td>
 	<tr>
-	<th colspan='8' style='text-align: right; font-size: 14px;'>Total comparendo: $ ".number_format($valor_comparendo + $total)."</th>
+	<th colspan='8' style='text-align: right; font-size: 14px;'>Total comparendo: $ ".number_format($total + $valor_mora + $total2 + $valor_honorario + $valor_cobranza)."</th>
 	$ |||
 	";
 

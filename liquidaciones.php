@@ -1287,7 +1287,7 @@ $(document).ready(function() {
   // Evento click para el botón guardar
   $('#guardar-liquidacion').click(function() {
     // Obtener los valores de los campos
-	//alert('guardar-liquidacion #1');
+	// vbalert('guardar-liquidacion #1');
     var tipoTramite = <?php echo $tipo_tramite; ?>;
     var ciudadano = $('#numero_documento').val();
     var placa = $('#placa').val();
