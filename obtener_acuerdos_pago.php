@@ -11,8 +11,13 @@ $numeroDocumento = $_POST['numeroDocumento'];
 $tipoDocumento = $_POST['tipoDocumento'];
 $tipoCiudadano = $_POST['tipoCiudadano'];
 
+$numero_acuerdo = $_POST['numero_acuerdo'] ?? '';
 
-@$numero_acuerdo = $_POST['numero_acuerdo'];
+if(!empty($numero_acuerdo)) {
+  $consulta_acuerdo2 = "SELECT * from acuerdos_pagos where TAcuerdop_numero = '$numero_acuerdo'";
+}
+
+
 
 if($tipoDocumento == 100) {
      $consulta_acuerdo="SELECT 
@@ -25,7 +30,9 @@ if($tipoDocumento == 100) {
      v.numero_placa = '$numeroDocumento' 
      and TAcuerdop_estado = '1' 
      or v.numero_placa = '$numeroDocumento' 
-     and TAcuerdop_estado = '3'";
+     and TAcuerdop_estado = '3'
+     or v.numero_placa = '$numeroDocumento' 
+     and TAcuerdop_estado = '4'";
 } else {
      $consulta_acuerdo="SELECT 
      a.* 
@@ -36,7 +43,9 @@ if($tipoDocumento == 100) {
      c.numero_documento = '$numeroDocumento' 
      and TAcuerdop_estado = '1' 
      or c.numero_documento = '$numeroDocumento' 
-     and TAcuerdop_estado = '3' 
+     and TAcuerdop_estado = '3'
+     or c.numero_documento = '$numeroDocumento' 
+     and TAcuerdop_estado = '4'
      and c.tipo_ciudadano = '$tipoCiudadano' 
      and c.tipo_documento = '$tipoDocumento'";
 }
@@ -270,7 +279,7 @@ $(document).ready(function() {
       method: 'POST',
       data: {
         numeroDocumento: numeroDocumento,
-        numero_acuerdo:numero_acuerdo,
+        numero_acuerdo: numero_acuerdo,
         tipoCiudadano,
         tipoDocumento
       },

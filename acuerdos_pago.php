@@ -1,11 +1,11 @@
 <?php include 'menu.php';
 
 if(!empty($_POST)){
-$comparendo = $_POST['comparendo'];
+$comparendo = $_POST['comparendo'] ?? '';
 
-$cantidad_cuotas = $_POST['cantidad_cuotas'];
+$cantidad_cuotas = $_POST['cantidad_cuotas'] ?? '';
 
-$periodicidad = $_POST['periodicidad'];
+$periodicidad = $_POST['periodicidad'] ?? '';
     
 } 
 
@@ -30,22 +30,28 @@ $identificacion = $row_comparendo['Tcomparendos_idinfractor'];
 $codigo_comparendo = $row_comparendo['Tcomparendos_codinfraccion'];
 
 
-$fechacomp = $row_comparendo['Tcomparendos_fecha'];
+$fechacomp = $row_comparendo['Tcomparendos_fecha']->format('Y-m-d');
 
-$datos = calcularInteresCompa(valor_infraccion_comparendo($codigo_comparendo, $fechacomp), $row_comparendo['Tcomparendos_fecha'], $fecha, $diasint, $parametros_economicos['Tparameconomicos_porctInt']);
+$datos = calcularInteresCompa(valor_infraccion_comparendo($codigo_comparendo, $fechacomp), $row_comparendo['Tcomparendos_fecha']->format('Y-m-d'), $fecha, $diasint, $parametros_economicos['Tparameconomicos_porctInt']);
 
 $numero_folio = $_POST['numero_folio'];
 for ($i = 1; $i < $cantidad_cuotas2; $i++) { 
  
-  
 if($i == 1){
     $fecha_pago = $fecha;
+    if ($periodicidad == "Mensual") {
+        $periodicidad = 3;
+    } else {
+        $periodicidad = 2;
+    }
 }else{
-  if ($modalidad == "Mensual") {
-    $fecha_pago = date("Y-m-d", strtotime($fecha_pago . " +1 month"));
-  } else {
-    $fecha_pago = date("Y-m-d", strtotime($fecha_pago . " +15 days"));
-  }
+    if ($periodicidad == "Mensual") {
+        $periodicidad = 3;
+        $fecha_pago = date("Y-m-d", strtotime($fecha_pago . " +1 month"));
+    } else {
+        $fecha_pago = date("Y-m-d", strtotime($fecha_pago . " +15 days"));
+        $periodicidad = 2;
+    }
 }
 
   if ($i == 1) {
@@ -82,16 +88,31 @@ $honorario = 0;
 // echo $sistema ."<br>";
  
   }
-  
-      $insertQuery = "INSERT INTO acuerdos_pagos (TAcuerdop_numero, TAcuerdop_comparendo, TAcuerdop_valor, TAcuerdop_periodicidad, TAcuerdop_cuota, TAcuerdop_cuotas, TAcuerdop_identificacion, TAcuerdop_estado, TAcuerdop_fechapago, TAcuerdop_tipodoc, TAcuerdop_fecha, TAcuerdop_user, TAcuerdop_concepto, TAcuerdop_sistema, TAcuerdop_intmora, TAcuerdop_dintmora, TAcuerdop_honorario, TAcuerdop_cobranzas, TAcuerdop_solicitud) VALUES ('TAcuerdop_numero', '$comparendo', '$valor', '$periodicidad', '$i', '$cantidad_cuotas', '$identificacion', '4', '$fecha_pago', 'COM', '$fechayhora', '$idusuario', '0', '$sistema', '$mora', '$dias_mora', '$honorario', '0', '0')";
-     // Ejecutar la consulta de inserción
-     if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
-
- 
- 
-     } else {
-   echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
-     } 
+  $insertQuery = "INSERT INTO acuerdos_pagos (TAcuerdop_numero, TAcuerdop_comparendo, TAcuerdop_valor, TAcuerdop_periodicidad, TAcuerdop_cuota, TAcuerdop_cuotas, TAcuerdop_identificacion, TAcuerdop_estado, TAcuerdop_fechapago, TAcuerdop_tipodoc, TAcuerdop_fecha, TAcuerdop_user, TAcuerdop_concepto, TAcuerdop_sistema, TAcuerdop_intmora, TAcuerdop_dintmora, TAcuerdop_honorario, TAcuerdop_cobranzas, TAcuerdop_solicitud) VALUES ('TAcuerdop_numero', '$comparendo', '$valor', '$periodicidad', '$i', '$cantidad_cuotas', '$identificacion', '4', '$fecha_pago', 'COM', '$fechayhora', '$idusuario', '0', '$sistema', '$mora', '$dias_mora', '$honorario', '0', '0')";
+  // Ejecutar la consulta de inserción
+  if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
+        $acuerdoPago = 0;
+        $query = "SELECT top 1 *
+                    FROM (
+                        SELECT *, ROW_NUMBER() OVER (ORDER BY TAcuerdop_ID DESC) AS row_num
+                        FROM acuerdos_pagos
+                    ) AS sub";
+        $stmt = sqlsrv_query($mysqli, $query, array(), array('Scrollable' => 'buffered'));
+        if($stmt) {
+            if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                $acuerdoPago = $row['TAcuerdop_ID'];
+                $queryUpdate = "UPDATE acuerdos_pagos set TAcuerdop_numero = '$acuerdoPago' where TAcuerdop_ID = '$acuerdoPago'";
+                $updateStmt = sqlsrv_query($mysqli, $queryUpdate, array(), array('Scrollable' => 'buffered'));
+                if(!$updateStmt) {
+                    echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar acuerdo de pago. Error: ' . serialize(sqlsrv_errors()) . '</div>';
+                }
+            }
+        } else {
+            echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al generar acuerdo de pago. Error: ' . serialize(sqlsrv_errors()) . '</div>';
+        }
+    } else {
+        echo '<div class="alert alert-danger"><strong>¡Ups!</strong> Error al guardar los datos. Error: ' . serialize(sqlsrv_errors()) . '</div>';
+    } 
 
 }
 
@@ -186,7 +207,7 @@ $result_comparendos=sqlsrv_query( $mysqli,$sql_comparendos, array(), array('Scro
 while($row_comparendos = sqlsrv_fetch_array($result_comparendos, SQLSRV_FETCH_ASSOC)){ ?>
  </tr>
 <td> <?php echo $row_comparendos['Tcomparendos_comparendo']; ?> </td>	
-<td><?php echo $row_comparendos['Tcomparendos_fecha']; ?> </td>	
+<td><?php echo $row_comparendos['Tcomparendos_fecha']->format('Y-m-d'); ?> </td>	
 <td><?php echo $row_comparendos['Tcomparendos_codinfraccion']; ?> </td>	
 <td><?php echo $row_comparendos['Tcomparendos_placa']; ?></td>	
 <td><?php
@@ -249,7 +270,7 @@ $ano_comparendo = substr($fecha_notifica, 0, 4);
                     <label for="numero_documento">Periodicidad:</label>
                 
                       <select  data-live-search="true" required id="periodicidad" name="periodicidad" class="form-control">
-                        <option style="margin-left: 15px;" value="Mensual" >Menusal</option>
+                        <option style="margin-left: 15px;" value="Mensual" >Mensual</option>
                          <option style="margin-left: 15px;" value="Quincenal" >Quincenal</option>
                  
                     </select>
@@ -309,7 +330,7 @@ var comparendo = comparendo.value;
   }
 }else{
     
-$numero_folio = $_POST['numero_folio'];
+$numero_folio = $_POST['numero_folio'] ?? '';
 
 if(empty($numero_folio)){
     
@@ -380,9 +401,11 @@ for ($i = 1; $i < $cantidad_cuotas; $i++) { ?>
 <th><?php echo $fecha; 
 // Suma un mes a la fecha
 if($periodicidad == "Mensual"){
-$fecha = date('Y-m-d', strtotime($fecha . ' +1 month'));
+    $fecha = date('Y-m-d', strtotime($fecha . ' +1 month'));
+    $periodicidad = 3;
 }else{
-$fecha = date('Y-m-d', strtotime($fecha . ' +15 days'));
+    $fecha = date('Y-m-d', strtotime($fecha . ' +15 days'));
+    $periodicidad = 2;
 }
 
 

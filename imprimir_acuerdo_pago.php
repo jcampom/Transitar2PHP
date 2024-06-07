@@ -55,6 +55,7 @@ use Mpdf\Mpdf;
 // Crea una nueva instancia de mPDF
 $mpdf = new \Mpdf\Mpdf();
 
+
 include 'conexion.php';
 
 
@@ -133,9 +134,9 @@ body {
 
 
 <p align="justify">
-Que '.$ciudadano['nombres']. ' '.$ciudadano['apellidos'].' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento'].', ha sido notificado para presentarse ante este despacho para atender el proceso contravencional con ocasión de la orden de comparendo 9999999900000'.$comparendo.' de fecha '.$fecha_comparendo.'.<br><br>
-Que '.$ciudadano['nombres']. ' '.$ciudadano['apellidos'].' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento'].' ha solicitado se le concedan facilidades para el pago a plazos de la multa originada por la contravención a las normas de tránsito según orden de comparendo 9999999900000'.$comparendo.' de fecha '.$fecha_comparendo.'.<br><br>
-Que con la presentación de la solicitud y con la expedición del presente acto administrativo, '.$ciudadano['nombres']. ' '.$ciudadano['apellidos'].' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento'].' expresamente acepta la comisión de la infracción contenida en la orden de comparendo 9999999900000'.$comparendo.' de fecha '.$fecha_comparendo.', detallada de la siguiente forma:</p>
+Que '.utf8_decode($ciudadano['nombres']). ' '.utf8_decode($ciudadano['apellidos']).' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento'].', ha sido notificado para presentarse ante este despacho para atender el proceso contravencional con ocasión de la orden de comparendo 9999999900000'.$comparendo.' de fecha '.$fecha_comparendo.'.<br><br>
+Que '.utf8_decode($ciudadano['nombres']). ' '.utf8_decode($ciudadano['apellidos']).' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento'].' ha solicitado se le concedan facilidades para el pago a plazos de la multa originada por la contravención a las normas de tránsito según orden de comparendo 9999999900000'.$comparendo.' de fecha '.$fecha_comparendo.'.<br><br>
+Que con la presentación de la solicitud y con la expedición del presente acto administrativo, '.utf8_decode($ciudadano['nombres']). ' '.utf8_decode($ciudadano['apellidos']).' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento'].' expresamente acepta la comisión de la infracción contenida en la orden de comparendo 9999999900000'.$comparendo.' de fecha '.$fecha_comparendo.', detallada de la siguiente forma:</p>
 
 <br>
 </style>';
@@ -157,7 +158,7 @@ Que con la presentación de la solicitud y con la expedición del presente acto 
          $origen = "ORG. TRANS.";   
         }
         
-        $fechini = date("Y-m-d", strtotime($row_comparendo['Tcomparendos_fecha']));
+        $fechini = $row_comparendo['Tcomparendos_fecha']->format('Y-m-d');
         
             $html .= '<div style="background-color:#c5c5c5"><b> COMPARENDO No. '.$comparendo.' - <b>Ayudas Tec.: </b> '.$ayudas.' - <b>Fecha: </b>'.$fechini.' - <b>Origen: </b>'.$origen.' <b>Infracción: </b> '.$row_comparendo['Tcomparendos_codinfraccion'].' - <b>Placa: </b> '.$row_comparendo['Tcomparendos_placa'].'';
     
@@ -240,7 +241,7 @@ if (sqlsrv_num_rows($resultado_tramite) > 0) {
          $row_concepto=sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
             
          
-         
+         $valor_concepto = 0;
     
      if($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']){
           
@@ -392,8 +393,8 @@ Por lo antes expuesto, el(a) JUEZ DE EJECUCION FISCAL de el Instituto de Tránsi
 
 <div style="text-align: center;"><h2><b>RESUELVE</b></h2></div>
 <p align="justify">
-<b>ARTICULO PRIMERO:</b> Conceder a '.$ciudadano['nombres']. ' '.$ciudadano['apellidos'].' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento']. ' , un plazo de '.numeroEnLetras($cantidad_cuotas).' ('.$cantidad_cuotas.')  meses contados a partir del presente acto administrativo, para cancelar el saldo insoluto de la obligación a su cargo por valor de '.numero_letras($valor_total).' ($ '.number_format($valor_total).') m/cte. por concepto de multa impuesta por contravención a las normas de tránsito originada por la orden de comparendo 99999999000001964166 de fecha 31 de enero de 2016 y sancionada mediante Resolución No. 52, de septiembre 14 de 2023.<br><br>
-<b>ARTICULO SEGUNDO:</b> Aceptar a '.$ciudadano['nombres']. ' '.$ciudadano['apellidos'].' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento']. ', como parte de cuota inicial del presente acuerdo, el dinero embargado y que consta en títulos a favor del Organismo de Transito en la cuenta judicial del correspondiente.<br><br>
+<b>ARTICULO PRIMERO:</b> Conceder a '.utf8_decode($ciudadano['nombres']). ' '.utf8_decode($ciudadano['apellidos']).' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento']. ' , un plazo de '.numeroEnLetras($cantidad_cuotas).' ('.$cantidad_cuotas.')  meses contados a partir del presente acto administrativo, para cancelar el saldo insoluto de la obligación a su cargo por valor de '.numero_letras($valor_total).' ($ '.number_format($valor_total).') m/cte. por concepto de multa impuesta por contravención a las normas de tránsito originada por la orden de comparendo 99999999000001964166 de fecha 31 de enero de 2016 y sancionada mediante Resolución No. 52, de septiembre 14 de 2023.<br><br>
+<b>ARTICULO SEGUNDO:</b> Aceptar a '.utf8_decode($ciudadano['nombres']). ' '.utf8_decode($ciudadano['apellidos']).' identificado con Cedula de ciudadania No '.$ciudadano['numero_documento']. ', como parte de cuota inicial del presente acuerdo, el dinero embargado y que consta en títulos a favor del Organismo de Transito en la cuenta judicial del correspondiente.<br><br>
 <b>ARTICULO TERCERO:</b> Autorizar el pago de la suma citada en el artículo anterior en 7 cuotas cuyas fechas de vencimiento y valor, por cada cuota se debe generar de manera independiente el respectivo recibo de liquidación que debe ser cancelado a más tardar en la fecha de vencimiento señalada en el presente acto administrativo, en la cuenta autorizada por este despacho y presentarlo para su comprobación. El recibo de liquidación incluirá los costos por sistematización del Acuerdo de Pago según tarifas vigentes, se discriminan e imputan en la fecha indicada a continuación:<br><br>
 </p>
 ';
@@ -461,11 +462,12 @@ Dada en Cienaga, septiembre 14 de 2023.
 
 
 
-
+//echo $html;
 
 
 // // Agrega el contenido HTML al mPDF
- $mpdf->WriteHTML($html);
+$mpdf->charset_in = 'UTF-8';
+$mpdf->WriteHTML($html);
 
 // // Muestra el archivo PDF en el navegador
 $mpdf->Output('acuerdo_pago.pdf', 'I');
@@ -549,7 +551,7 @@ $mpdf->Output('acuerdo_pago.pdf', 'I');
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
                 }
-            });
+            }});
         }
     }
 

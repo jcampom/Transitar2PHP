@@ -239,7 +239,9 @@ function Restar_fechas($fecha, $ndias, $tipo = 0) {
 
 function Sumar_fechas($fecha, $ndias, $tipo = 0) {
     global $mysqli;
-
+    if ($fecha instanceof DateTime) {
+        $fecha = $fecha->format('Y-m-d');
+    }
     if (preg_match("/[0-9]{1,2}\/[0-9]{1,2}\/([0-9][0-9]){1,2}/", $fecha))
         list($anio, $mes, $dia) = explode("/", $fecha);
     if (preg_match("/[0-9]{1,2}-[0-9]{1,2}-([0-9][0-9]){1,2}/", $fecha))
@@ -297,7 +299,7 @@ function getCompDate($ncomparendo) {
         $fComp = "";
     }
 
-    return $fComp;
+    return $fComp->format('Y-m-d');
 }
 // Función para obtener la fecha de notificación de acuerdo al número de comparendo
 function getFnotifica($ncomparendo) {
@@ -315,7 +317,7 @@ function getFnotifica($ncomparendo) {
         $fechanotifica = getCompDate($ncomparendo); // Asumiendo que tienes una función llamada getCompDate() que obtiene la fecha de comparendo de otra tabla
     }
 
-    return $fechanotifica;
+    return $fechanotifica->format('Y-m-d');
 }
 
 function CalFechaCadComp($fecha2, $day, $maxiday) {
@@ -1137,7 +1139,10 @@ function numero_letras($numero) {
 }
 
 function fecha_letras($fecha) {
- $meses = array(
+    if ($fecha instanceof DateTime) {
+        $fecha = $fecha->format('Y-m-d');
+    }
+    $meses = array(
         'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
     );
 
