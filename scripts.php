@@ -198,6 +198,25 @@ jQuery(document).ready(function() {
     document.addEventListener('keydown', function() {
         reiniciarTemporizadorInactividad();
     });
+    document.addEventListener('load', function() {
+        reiniciarTemporizadorInactividad();
+    });
+    document.addEventListener('mousedown', function() {
+        reiniciarTemporizadorInactividad();
+    });
+    document.addEventListener('ouchstart', function() {
+        reiniciarTemporizadorInactividad();
+    });
+    document.addEventListener('Click', function() {
+        reiniciarTemporizadorInactividad();
+    });
+    document.addEventListener('scroll', function() {
+        reiniciarTemporizadorInactividad();
+    });
+    document.addEventListener('keypress', function() {
+        reiniciarTemporizadorInactividad();
+    });
+
 
     reiniciarTemporizadorInactividad();
 </script>
