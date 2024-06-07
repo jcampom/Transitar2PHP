@@ -81,42 +81,39 @@
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
 <script type="text/javascript">
 jQuery(document).ready(function() {
-jQuery('#render-data').DataTable({
-rowReorder: {
-selector: 'td:nth-child(2)'
-},
-responsive: true,
-"language": {
-"url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
-},
-"paging": true,
-"processing": true,
-'serverMethod': 'post',
-"ajax": "data.php",
-dom: 'lBfrtip',
-buttons: [
-'excel', 'csv', 'pdf', 'print', 'copy',
-],
-"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
-} );
-} );
+    jQuery('#render-data').DataTable({
+        rowReorder: {
+        selector: 'td:nth-child(2)'
+        },
+        responsive: true,
+        "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+        },
+        "paging": true,
+        "processing": true,
+        'serverMethod': 'post',
+        "ajax": "data.php",
+        dom: 'lBfrtip',
+        buttons: [
+        'excel', 'csv', 'pdf', 'print', 'copy',
+        ],
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+    });
+});
 
 jQuery(document).ready(function() {
-jQuery('#example').DataTable({
+    jQuery('#example').DataTable({
+        responsive: true,
+        dom: 'lBfrtip',
+        buttons: [
 
-responsive: true,
-dom: 'lBfrtip',
-
-buttons: [
-
-],
-"language": {
-    //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-"url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
-},
-
-} );
-} );
+        ],
+        "language": {
+            //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
+        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+        },
+    });
+});
 
 jQuery(document).ready(function() {
     jQuery('#admin2').DataTable({
@@ -147,21 +144,19 @@ jQuery(document).ready(function() {
 });
 
 jQuery(document).ready(function() {
-jQuery('#enrutado').DataTable({
+    jQuery('#enrutado').DataTable({
+        responsive: true,
+        dom: 'lBfrtip',
 
-responsive: true,
-dom: 'lBfrtip',
-
-buttons: [
-'excel', 'csv', 'pdf', 'print', 'copy',
-],
-"language": {
-    //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-"url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
-},
-
-} );
-} );
+        buttons: [
+        'excel', 'csv', 'pdf', 'print', 'copy',
+        ],
+        "language": {
+            //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
+        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+        },
+    });
+});
 </script>
 
 <!-- Autosize Plugin Js -->
@@ -182,6 +177,30 @@ buttons: [
 
 </style>
 <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+<script>
+    const minutos = 10 // Cambiar por los minutos deseados
+    const tiempoMaximoInactividad = minutos * 60000;
+    let temporizadorInactividad;
+
+    function reiniciarTemporizadorInactividad() {
+        clearTimeout(temporizadorInactividad);
+        
+        temporizadorInactividad = setTimeout(function() {
+            alert("¡Has estado inactivo durante demasiado tiempo! Por seguridad se cerrará su sesión");
+            window.location.href = 'cerrar.php';
+        }, tiempoMaximoInactividad);
+    }
+
+    document.addEventListener('mousemove', function() {
+        reiniciarTemporizadorInactividad();
+    });
+
+    document.addEventListener('keydown', function() {
+        reiniciarTemporizadorInactividad();
+    });
+
+    reiniciarTemporizadorInactividad();
+</script>
 
 
 
