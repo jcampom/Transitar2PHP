@@ -11,7 +11,7 @@ $claseVehiculo         = $_POST['claseVehiculo'] ?? '';
 $nota_credito          = $_POST['valor_nota'] ?? '';
 $clasificacionVehiculo = $_POST['clasificacionVehiculo'] ?? '';
 $tramitesSeleccionados = ($tipoTramite == 4 || $tipoTramite == 101 || $tipoTramite == 6) 
-? json_decode($_POST['tramitesSeleccionados']) : $_POST['tramitesSeleccionados'] ?? '';
+? json_decode($_POST['tramitesSeleccionados'], true) : $_POST['tramitesSeleccionados'] ?? '';
 
 if (empty($claseVehiculo)) {
     $consulta_vehiculo = "SELECT * FROM vehiculos where numero_placa = '$placa'";
@@ -517,7 +517,7 @@ if ($tipoTramite == 4) {
 
     //termina de guardar concepto de derecho de transito
 
-} else if ($tipoTramite == 5) {
+} else if ($tipoTramite == 6) {
 
     // Realizar el guardado en la tabla 'liquidaciones'
 
@@ -529,20 +529,8 @@ if ($tipoTramite == 4) {
 	while ($row = sqlsrv_fetch_array( $resultado_consulta, SQLSRV_FETCH_ASSOC)) {
 		$liquidacionId = $row['lastid'];
 	}
-
-
-
-    // Realizar el guardado en la tabla 'detalle_liquidaciones' para cada trámite seleccionado
-
-
-    $tramitesSeleccionadosJson = $_POST['tramitesSeleccionados'];
-
-    // Decodificar el JSON y convertirlo a un array asociativo
-    $tramitesSeleccionadosArray = json_decode($tramitesSeleccionadosJson, true);
-
-
     // Recorrer los tramites seleccionados y guardarlos en la tabla detalle_liquidaciones
-    foreach ($tramitesSeleccionadosArray as $ap) {
+    foreach ($tramitesSeleccionados as $ap) {
 
 
         $consulta_ap = "SELECT * FROM acuerdos_pagos where TAcuerdop_numero = '" . $ap['ap'] . "' and TAcuerdop_cuota = '" . $ap['cuota'] . "'";
@@ -607,7 +595,8 @@ if ($tipoTramite == 4) {
                 ));
 
 
-
+                $valor_concepto = 0;
+                $total = 0;
                 if (sqlsrv_num_rows($resultado_concepto) > 0) {
                     $row_concepto = sqlsrv_fetch_array($resultado_concepto, SQLSRV_FETCH_ASSOC);
                     if ($row_concepto['fecha_vigencia_final'] >= $row_concepto['fecha_vigencia_inicial']) {

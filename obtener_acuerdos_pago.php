@@ -53,7 +53,9 @@ if($tipoDocumento == 100) {
 
             $resultado_acuerdo=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
 
-            $resultado_acuerdo2=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
+            if(!empty($numero_acuerdo)) {
+              $resultado_acuerdo2=sqlsrv_query( $mysqli,$consulta_acuerdo, array(), array('Scrollable' => 'buffered'));
+            }
 
             $row_acuerdo=sqlsrv_fetch_array($resultado_acuerdo, SQLSRV_FETCH_ASSOC);
 
@@ -73,15 +75,20 @@ if($tipoDocumento == 100) {
             }
 
 
+$style = "";
+
+if(empty($numero_acuerdo)) {
+  $style = ' style="margin-bottom: 25px;"';
+}
 
 $select = "
-       <div class='col-md-3'>
+       <div class='col-md-3'".$style.">
     <select data-live-search='true' id='numero_acuerdo' name='numero_acuerdo' class='form-control' 
     data-numero-documento='".$row_acuerdo['TAcuerdop_identificacion']."' data-tipo-documento='".$tipoDocumento."' data-tipo-ciudadano='".$tipoCiudadano."'>
                         <option style='margin-left: 15px;'>".$numero_acuerdo."...</option>
                 ";
-                while ($rowMenu = sqlsrv_fetch_array($resultado_acuerdo2, SQLSRV_FETCH_ASSOC)) {
-$select .= " <option style='margin-left: 15px;' value='".$rowMenu['TAcuerdop_numero']."'>" . $rowMenu['TAcuerdop_numero'] . "</option>";
+                  while ($rowMenu = sqlsrv_fetch_array($resultado_acuerdo, SQLSRV_FETCH_ASSOC)) {
+                    $select .= " <option style='margin-left: 15px;' value='".$rowMenu['TAcuerdop_numero']."'>" . $rowMenu['TAcuerdop_numero'] . "</option>";                
                 }
 $select .= "
                     </select>
@@ -91,8 +98,9 @@ $select .= "
 
 
 // Consulta a la tabla Derecho de transito
-$sql = "SELECT * FROM acuerdos_pagos where TAcuerdop_numero = '$numero_acuerdo' and TAcuerdop_estado = '1' or TAcuerdop_numero = '$numero_acuerdo' and TAcuerdop_estado = '3'";
-$result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
+if(!empty($numero_acuerdo)) {
+$sql = "SELECT * FROM acuerdos_pagos where TAcuerdop_numero = '$numero_acuerdo' and TAcuerdop_estado = '1' or TAcuerdop_numero = '$numero_acuerdo' and TAcuerdop_estado = '3'  or TAcuerdop_numero = '$numero_acuerdo' and TAcuerdop_estado = '4'";
+$result = sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
 $response = "
 <br><br><br>
@@ -157,7 +165,7 @@ if (sqlsrv_num_rows($result) > 0) {
         $liElement = "
 <tr>
 <td> <a class='ap-link' href='#' data-ap='".trim($row['TAcuerdop_numero'])."' data-cuota='".trim($row['TAcuerdop_cuota'])."'>".$row['TAcuerdop_cuota']."/".$row['TAcuerdop_cuotas']."</a></td>
-<td>".$row['TAcuerdop_fechapago']."</td>
+<td>".$row['TAcuerdop_fechapago']->format('Y-m-d')."</td>
 <td>".$estado."</td>
 <td>".number_format($row['TAcuerdop_valor'])."</td>
 
@@ -195,10 +203,12 @@ Concepto : 	CUOTA ACUERDO DE PAGO <div style='text-align:right'> $  ".$row['TAcu
     }
 } else {
 
-if (sqlsrv_num_rows($resultado_acuerdo2) == 0) {
+if(!empty($numero_acuerdo)) {
+  if (sqlsrv_num_rows($resultado_acuerdo2) == 0) {
     // En caso de que no se encuentren resultados
     $response = "<li>No se encontraron acuerdos de pago.</li>";
 
+  }
 }
 }
 
@@ -209,6 +219,7 @@ $response .= "</table>
 
 // Devolver los resultados al cliente
 echo "$response";
+}
 ?>
 
 

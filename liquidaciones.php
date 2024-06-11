@@ -1328,10 +1328,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
     ap.push(element.ap);
   });
 
-
-	// Convertir el arreglo a una cadena JSON
-	var tramitesSeleccionadosJson = JSON.stringify(tramitesSeleccionados);
-	var valor_nota = $('#valor_nota').val();
+  var valor_nota = $('#valor_nota').val();
 	// Enviar los campos y tramites seleccionados al archivo PHP
 	console.log('guardar_liquidacion.php::1308::tipoTramite:  ' + tipoTramite);
 	console.log('guardar_liquidacion.php::1308::ciudadano:' + ciudadano);
@@ -1339,8 +1336,9 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
 	console.log('guardar_liquidacion.php::1308::tipoServicio:' + tipoServicio);
 	console.log('guardar_liquidacion.php::1308::claseVehiculo:' + claseVehiculo);
 	console.log('guardar_liquidacion.php::1308::clasificacionVehiculo:' + clasificacionVehiculo);
-	console.log('guardar_liquidacion.php::1308::tramitesSeleccionados:' + tramitesSeleccionadosJson);
+	console.log('guardar_liquidacion.php::1308::tramitesSeleccionados:' + tramitesSeleccionados);
 	console.log('guardar_liquidacion.php::1308::valor_nota:' + valor_nota);
+  console.log(JSON.stringify(tramitesSeleccionados))
 
   $.ajax({
     url: 'guardar_liquidacion.php',
@@ -1352,7 +1350,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
       tipoServicio: tipoServicio,
       claseVehiculo: claseVehiculo,
       clasificacionVehiculo: clasificacionVehiculo,
-      tramitesSeleccionados: JSON.stringify(tramitesSeleccionadosJson),
+      tramitesSeleccionados: JSON.stringify(tramitesSeleccionados),
       valor_nota: valor_nota
     },
     success: function(response) {
