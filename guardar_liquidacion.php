@@ -10,8 +10,8 @@ $tipoServicio          = $_POST['tipoServicio'] ?? '';
 $claseVehiculo         = $_POST['claseVehiculo'] ?? '';
 $nota_credito          = $_POST['valor_nota'] ?? '';
 $clasificacionVehiculo = $_POST['clasificacionVehiculo'] ?? '';
-$tramitesSeleccionados = ($tipoTramite == 4 || $tipoTramite == 101 || $tipoTramite == 6) 
-? json_decode($_POST['tramitesSeleccionados'], true) : $_POST['tramitesSeleccionados'] ?? '';
+$tramitesSeleccionados = ($tipoTramite || $tipoTramite == 101 || $tipoTramite == 6) 
+? json_decode($_POST['tramitesSeleccio == 4nados'], true) : $_POST['tramitesSeleccionados'] ?? '';
 
 if (empty($claseVehiculo)) {
     $consulta_vehiculo = "SELECT * FROM vehiculos where numero_placa = '$placa'";

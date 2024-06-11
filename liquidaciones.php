@@ -1118,7 +1118,7 @@ function guardar_liquidacion(tipoTramite, ciudadano, placa, tipoServicio, claseV
 		// location.href = 'https://transitar2.online/imprimir_liquidacion.php?id=' + response;
 
 		// Abrir la URL en una nueva pestaña
-		  alert(response);
+		  alert("La liquidación se generó exitosamente");
       window.open('./imprimir_liquidacion.php?id=' + response, '' ,'height=700,width=750,toolbar=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no ,modal=yes');
   		location.href = './liquidaciones.php';
     },

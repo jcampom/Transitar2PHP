@@ -42,7 +42,7 @@ if (sqlsrv_num_rows($result) > 0) {
 
 
         $fecha_notifica = getFnotifica($nombreInfractor);
-		$fecha_notifica = date_format($fecha_notifica,"Y-m-d");
+		// $fecha_notifica = date_format($fecha_notifica,"Y-m-d");
 
         if($row['Tcomparendos_ayudas'] == "true"){
 			$ayudas = "SI";
@@ -248,7 +248,6 @@ if (sqlsrv_num_rows($result) > 0) {
 	</td>
 	<tr>
 	<th colspan='8' style='text-align: right; font-size: 14px;'>Total comparendo: $ ".number_format($total + $valor_mora + $total2 + $valor_honorario + $valor_cobranza)."</th>
-	$ |||
 	";
 
         // Agregar el elemento de lista al resultado final
