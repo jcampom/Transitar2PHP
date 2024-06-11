@@ -48,7 +48,7 @@ if (isset($_GET['Comprobar'])) {
     $registros = sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
     
     // echo $Query;
-    if (sqlsrv_num_rows($registros) > 0) {
+    if ($registros && sqlsrv_num_rows($registros) > 0) {
         $Query1 = "SELECT COUNT(DISTINCT TAcuerdop_numero) AS CANT FROM acuerdos_pagos
                WHERE CAST(TAcuerdop_fecha AS DATE) BETWEEN '$fechainicial' AND '$fechafinal' $andwhere";
         $Result = sqlsrv_query( $mysqli,$Query1, array(), array('Scrollable' => 'buffered'));
@@ -115,7 +115,7 @@ if (isset($_GET['Comprobar'])) {
                                 <strong><?php echo $mesliq; ?></strong>
                             </td>
                         </tr>
-                    <?php if (sqlsrv_num_rows($registros) > 0) : ?>
+                    <?php if ($registros && sqlsrv_num_rows($registros) > 0) : ?>
 
                             <tr>
                          <strong><br />Acuerdo(s) de pago(s) encontrados</strong>

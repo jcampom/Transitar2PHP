@@ -189,7 +189,7 @@ if(isset($_POST['Comprobar'])){
 	$sql="";
 	$sqlc="";
 	$sqlp ="";
-	if((($_POST['fechainicial']<>'')||($_POST['fechafinal']<>'')||($_POST['placa']<>'')||($_POST['identificacion']<>'')||($_POST['comparendo']<>'')||($_POST['estado_deuda']<>''))){
+	if(((isset($_POST['fechainicial'])<>'')||(isset($_POST['fechafinal'])<>'')||(isset($_POST['placa'])<>'')||(isset($_POST['identificacion'])<>'')||(isset($_POST['comparendo'])<>'')||(isset($_POST['estado_deuda'])<>''))){
 		if($_POST['tipodeuda']==4){
 			$sqlc = "SELECT COUNT(*) AS total FROM comparendos C WHERE C.Tcomparendos_estado in (6, 11)";
 			$sqlp = "SELECT T.id, T.numero, T.fecha, T.estado, T.ident, T.valor, T.honorarios, T.cobranza, T.otro, T.fila
