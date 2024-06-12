@@ -23,7 +23,7 @@ $campos = $existe['campos'];
 $tabla = $existe['tabla'];
 $nombre_tabla = $existe['nombre'];
 
-if (isset($_GET['error']) && $_GET['error'] === 'campos_vacios') {
+if (isset($_GET['error']) && isset($_GET['error']) === 'campos_vacios') {
     echo '<div class="alert alert-danger"><strong>¡Ups!</strong> No se puede insertar campos vacíos.</div>';
 }
 
@@ -573,13 +573,13 @@ $valorCampo = explode(",", $valorCampo);
                 </thead>
                 <tbody>
                     <?php
-                    $limit = 10;
+                    $limit = 20;
                     // Consultar los registros de la tabla
-                    $consultaRegistros = "SELECT * FROM $tabla ";
+                    $consultaRegistros = "SELECT top ".$limit." * FROM $tabla ";
 					// Obtener los filtros enviados por GET
 					$filtros = array();
 					foreach ($_GET as $key => $value) {
-						if (!empty($value) && substr($key, -11) === '_filtro_ini' or !empty($value) && substr($key, -11) === '_filtro_fin' or !empty($value) && substr($key, -7) === '_filtro' or !empty($value) && substr($key, -7) === '_inicio' or !empty($value) && substr($key, -7) === '_fin123') {
+						//if (!empty($value) && substr($key, -11) === '_filtro_ini' or !empty($value) && substr($key, -11) === '_filtro_fin' or !empty($value) && substr($key, -7) === '_filtro' or !empty($value) && substr($key, -7) === '_inicio' or !empty($value) && substr($key, -7) === '_fin123') {
 							$campoFiltro = substr($key, 0, -7);
 							//$valorFiltro = $mysqli->real_escape_string($value);
 							$valorFiltro = $value;
@@ -599,18 +599,35 @@ $valorCampo = explode(",", $valorCampo);
 							} elseif( substr($key, -7) === '_filtro') {
 								$filtros[] = "$campoFiltro LIKE '%$valorFiltro%'";
 							}
-						}
+						//}
 					}
 
-					/* ojojojoj */
-					// Construir la consulta de registros con los filtros aplicados
-					$consultaRegistros = "SELECT * FROM $tabla ";
-					if (!empty($filtros)) {
-						$consultaRegistros .= " WHERE " . implode(" AND ", $filtros);
-					}
+					$paginaActual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+                    $registrosPorPagina = 10;
+                    $offset = $paginaActual == 1 ? 1 * $registrosPorPagina : ($paginaActual - 1) * $registrosPorPagina;
+
+                    // Consulta de registros con paginación
+                    $consultaRegistros = "
+                        SELECT * FROM (
+                            SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS RowNum
+                            FROM $tabla
+                            ". (!empty($filtros) ? "WHERE " . implode(" AND ", $filtros) : "") ."
+                        ) AS SubQuery
+                        WHERE RowNum BETWEEN (($paginaActual - 1) * $registrosPorPagina + 1) AND ($paginaActual * $registrosPorPagina)
+                    ";
+
+                    $consultaTotalRegistros = "SELECT COUNT(*) AS total FROM $tabla";
+                    if (!empty($filtros)) {
+                        $consultaTotalRegistros .= " WHERE " . implode(" AND ", $filtros);
+                    }
+
+                    $resultadoTotalRegistros = sqlsrv_query($mysqli, $consultaTotalRegistros);
+                    $totalRegistros = sqlsrv_fetch_array($resultadoTotalRegistros)['total'];
+                    $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
+                    //echo $consultaRegistros.'<br/><br/>';
                     $resultadoRegistros = sqlsrv_query( $mysqli,$consultaRegistros, array(), array('Scrollable' => 'buffered'));
 
-					////	echo $consultaRegistros;
+					//echo $consultaRegistros;
 
                     if ($resultadoRegistros && sqlsrv_num_rows($resultadoRegistros) > 0) {
                         while ($registro = sqlsrv_fetch_array( $resultadoRegistros, SQLSRV_FETCH_ASSOC)) {
@@ -700,10 +717,33 @@ $valorCampo = explode(",", $valorCampo);
 
                         echo '</tr>';
                     }
-     /*ojoojojoj */
+     /*ojoojojoj */$paginasMostradas = 10; // Cantidad de páginas mostradas en la barra de navegación
+                    $mitadPaginasMostradas = floor($paginasMostradas / 2);
+                    $paginaInicio = max(1, $paginaActual - $mitadPaginasMostradas);
+                    $paginaFin = min($totalPaginas, $paginaInicio + $paginasMostradas - 1);
 					?>
                 </tbody>
             </table>
+            <nav aria-label="Page navigation example" style="display: flex; justify-content: flex-end;">
+                <?php 
+                    echo '<ul class="pagination">';
+                    // Botón "Primera página"
+                    echo '<li class="page-item ' . ($paginaActual == 1 ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=1">&laquo;&laquo;</a></li>';
+                    // Botón "Página anterior"
+                    echo '<li class="page-item ' . ($paginaActual == 1 ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . ($paginaActual - 1) . '">&laquo;</a></li>';
+                    
+                    // Botones para las páginas
+                    for ($i = $paginaInicio; $i <= $paginaFin; $i++) {
+                        echo '<li class="page-item ' . ($paginaActual == $i ? 'active' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . $i . '">' . $i . '</a></li>';
+                    }
+                    
+                    // Botón "Página siguiente"
+                    echo '<li class="page-item ' . ($paginaActual == $totalPaginas ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . ($paginaActual + 1) . '">&raquo;</a></li>';
+                    // Botón "Última página"
+                    echo '<li class="page-item ' . ($paginaActual == $totalPaginas ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . $totalPaginas . '">&raquo;&raquo;</a></li>';
+                    echo '</ul>';
+                ?>
+            </nav>
         </div>
     </div>
 </div>

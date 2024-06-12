@@ -89,7 +89,7 @@ jQuery(document).ready(function() {
         "language": {
         "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
         },
-        "paging": true,
+        "paging": false,
         "processing": true,
         'serverMethod': 'post',
         "ajax": "data.php",
@@ -97,13 +97,14 @@ jQuery(document).ready(function() {
         buttons: [
         'excel', 'csv', 'pdf', 'print', 'copy',
         ],
-        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+        //"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
     });
 });
 
 jQuery(document).ready(function() {
     jQuery('#example').DataTable({
         responsive: true,
+        "paging": false,
         dom: 'lBfrtip',
         buttons: [
 
@@ -119,6 +120,7 @@ jQuery(document).ready(function() {
     jQuery('#admin2').DataTable({
         responsive: true,
         dom: 'lBfrtip',
+        "paging": false,
         buttons: [
         'excel', 'csv', 'pdf', 'print', 'copy',
         ],
@@ -133,6 +135,7 @@ jQuery(document).ready(function() {
     jQuery('#admin').DataTable({
         responsive: true,
         dom: 'lBfrtip',
+        "paging": false,
         buttons: [
         'excel', 'csv', 'pdf', 'print', 'copy',
         ],
@@ -146,6 +149,7 @@ jQuery(document).ready(function() {
 jQuery(document).ready(function() {
     jQuery('#enrutado').DataTable({
         responsive: true,
+        "paging": false,
         dom: 'lBfrtip',
 
         buttons: [
