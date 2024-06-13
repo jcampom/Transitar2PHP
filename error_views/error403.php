@@ -50,7 +50,7 @@
     <body>
         <div class="container">
             <h2><span>403</span><br>Prohibido</h2>
-            <p>¡Vaya! No Deberias estar aqui.<br /><br />No se permite el acceso a esta ruta del servidor.</p>
+            <p>¡Vaya! No Deberias estar aqui.<br /><br />No se permite el acceso a esta ruta.</p>
             <a href="#" onclick="regresarPaginaAnterior()">Volver</a>
             <a href="micuenta.php" class="mt">Menú principal</a>
         </div>

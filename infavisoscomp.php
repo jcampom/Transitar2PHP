@@ -53,7 +53,7 @@ if (isset($_GET['generar'])) {
                              <div class="form-line">
                                  
                                  <strong>No. de Comparendo</strong>
-                              <input class="form-control" name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo $_GET['comparendo']; ?>' />
+                              <input class="form-control" name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo @$_GET['comparendo']; ?>' />
                               
                               </div></div></div>
                               
@@ -61,7 +61,7 @@ if (isset($_GET['generar'])) {
                              <div class="form-group form-float">    
                              <div class="form-line">
                               <strong>Identificacion</strong>
-                              <input class="form-control" name='infractor' type='text' id='infractor' size="15"  value='<?php echo $_GET['infractor']; ?>' />
+                              <input class="form-control" name='infractor' type='text' id='infractor' size="15"  value='<?php echo @$_GET['infractor']; ?>' />
                        </div></div></div>
                        
                        
@@ -80,7 +80,7 @@ if (isset($_GET['generar'])) {
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <strong>Fecha final</strong>
-                            <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechafinal']; ?>" />
+                            <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinal']; ?>" />
                            </div></div></div>
                            
                            
@@ -91,8 +91,8 @@ if (isset($_GET['generar'])) {
                         </div></div></div>
                  
                     </form>
-                    <?php if ($_GET['generar']) { ?>
-                        <?php $cantidad = sqlsrv_num_rows($registros); ?>
+                    <?php if (isset($_GET['generar'])) { ?>
+                        <?php $cantidad = $registros ? sqlsrv_num_rows($registros) : 0; ?>
                         <?php if ($cantidad > 0) { ?>
                             <tr>
                                 <td colspan="5" align="center">

@@ -13,9 +13,13 @@ use PhpSpreadsheet\PhpSpreadsheet\Writer\Xlsx;
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ini_set("memory_limit", "1024M");
 
-if($_POST['parametros']==null || $_POST['parametros']==''){
-	$result=$_POST['salida1'];
+if(isset($_POST['parametros'])==null || isset($_POST['parametros'])==''){
+	$result=@$_POST['salida1'];
 } else {}
+if(!$result) {
+	include 'error_views/error403.php';
+	return;
+}
 
 
 

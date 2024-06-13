@@ -66,7 +66,7 @@ if (isset($_GET['generar'])) {
                                  <div class="col-md-6">   
                                  <div class="form-group form-float">      
                                  <div class="form-line"><label>No. de Comparendo</label>
-                            <input class="form-control" name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo $_GET['comparendo']; ?>' />
+                            <input class="form-control" name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo @$_GET['comparendo']; ?>' />
                             </div> </div> </div>
                                 <div class="col-md-6">   
                                 <div class="form-group form-float">               
@@ -102,7 +102,7 @@ if (isset($_GET['generar'])) {
      <div class="form-line">
          <label>Identificacion</label>
                     
-    <input class="form-control" name='infractor' type='text' id='infractor' size="15"  value='<?php echo $_GET['infractor']; ?>' />
+    <input class="form-control" name='infractor' type='text' id='infractor' size="15"  value='<?php echo @$_GET['infractor']; ?>' />
     </div> </div> </div>
     
      <div class="col-md-6">
@@ -127,13 +127,13 @@ if (isset($_GET['generar'])) {
                                  <div class="form-group form-float">    
                                  <div class="form-line">
                                      <label>Fecha Ins. inicial</label>
-                         <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechainicial']; ?>" />
+                         <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechainicial']; ?>" />
                              </div> </div> </div>
                                  <div class="col-md-6"> 
                                  <div class="form-group form-float">
                                <div class="form-line">
                                    <label>Fecha Ins. final</label>
-                               <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechafinal']; ?>" />
+                               <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinal']; ?>" />
                                    </div> </div> </div>
                                    
                                  <div class="col-md-6"> 
@@ -141,25 +141,26 @@ if (isset($_GET['generar'])) {
                                  <div class="form-line">
                                  <label>Fecha Lev. inicial</label>
                                  
-                                <input class="form-control" name="fechainilev" type="date" id="fechainilev" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechainilev']; ?>" />
+                                <input class="form-control" name="fechainilev" type="date" id="fechainilev" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechainilev']; ?>" />
                                     </div> </div> </div>
                                     
                                  <div class="col-md-6">
                                  <div class="form-group form-float">
                                  <div class="form-line">
                                  <label>Fecha Lev. final</label>
-                                 <input class="form-control" name="fechafinlev" type="date" id="fechafinlev" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechafinlev']; ?>" />
+                                 <input class="form-control" name="fechafinlev" type="date" id="fechafinlev" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinlev']; ?>" />
                                      </div> </div> </div>
                            
-                          <input class="form-control" name="generar" type="submit" id="generar" value="Generar"/><br /><?php echo $mesliq; ?>
+                          <input class="form-control" name="generar" type="submit" id="generar" value="Generar"/><br /><?php echo @$mesliq; ?>
                  
                     </form>
-                    <?php if ($_GET['generar']) :
+                    <?php if (isset($_GET['generar'])) :
 
 					?>
                         <?php 
-                         $cantidad = mysqli_num_rows($registros); ?>
-                        <?php if ($cantidad > 0) : ?>
+                        $cantidad = $registros ? sqlsrv_num_rows($registros) : 0; 
+                        $count2 =  0;
+                        if ($cantidad > 0) : ?>
                            
                                     <div id="table-data">
                                         <table class="table" id="admin">

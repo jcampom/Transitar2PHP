@@ -99,7 +99,7 @@ if (isset($_POST['generar'])) {
                              <div class="form-line">
                        <strong>Fecha creacion Inicial:</strong>
                        
-                       <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechainicial']; ?>" />
+                       <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechainicial']; ?>" />
                        </div></div></div>
                        
                        
@@ -109,21 +109,21 @@ if (isset($_POST['generar'])) {
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <strong>Fecha creacion Final:</strong>
-                            <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechafinal']; ?>" />
+                            <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechafinal']; ?>" />
                            </div></div></div>
                            
                                    <div class="col-md-6">         
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <strong>Documento asignación:</strong>
-                            <input class="form-control" name="documento_asignacion" type="text" id="documento_asignacion" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechafinal']; ?>" />
+                            <input class="form-control" name="documento_asignacion" type="text" id="documento_asignacion" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechafinal']; ?>" />
                            </div></div></div>
                            
                                      <div class="col-md-6">         
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <strong>Factura o remisión:</strong>
-                            <input class="form-control" name="factura" type="text" id="factura" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechafinal']; ?>" />
+                            <input class="form-control" name="factura" type="text" id="factura" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechafinal']; ?>" />
                            </div></div></div>
                            
                            
@@ -134,8 +134,8 @@ if (isset($_POST['generar'])) {
                         </div></div></div>
                  
                     </form>
-                    <?php if ($_POST['generar']) : ?>
-                        <?php $cantidad = sqlsrv_num_rows($registros); ?>
+                    <?php if (isset($_POST['generar'])) : ?>
+                        <?php $cantidad = $registros ? sqlsrv_num_rows($registros) : 0; ?>
                         <?php if ($cantidad > 0) : ?>
                             <tr>
                                 <td colspan="5" align="center">

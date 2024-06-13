@@ -61,7 +61,7 @@ if (isset($_GET['Comprobar'])) {
         $sql .= " ORDER BY resdt_fechares DESC";
 // echo $sql;
         $Result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
-        if (sqlsrv_num_rows($Result) > 0) {
+        if ($Result && sqlsrv_num_rows($Result) > 0) {
             $mesliq = "<div class='highlight2'>Se encontraron resoluciones bajo los filtros seleccionados</div>";
             $OK = 'OK';
         } else {
@@ -110,13 +110,15 @@ if (isset($_GET['Comprobar'])) {
     $Result=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
     $Combo = $Combo . "<select class='form-control' name='tipores' id='tipores'  style='width:150px' value=" . @$_GET['tipores'] . ">";
     $Combo = $Combo . "<option value='0'>Todos</option>";
-    while ($columnas = mysqli_fetch_array($Result)) {
-        if ($columnas[0] == @$_GET['tipores']) {
-            $seleccion = " selected ";
-        } else {
-            $seleccion = "";
+    if($Result) {
+        while ($columnas = sqlsrv_fetch_array($Result, SQLSRV_FETCH_ASSOC)) {
+            if ($columnas['id'] == @$_GET['tipores']) {
+                $seleccion = " selected ";
+            } else {
+                $seleccion = "";
+            }
+            $Combo = $Combo . "<option value='" . $columnas['id'] . "' " . $seleccion . ">" . str_replace(" DT", "", trim($columnas['nombre'])) . "</option>";
         }
-        $Combo = $Combo . "<option value='" . $columnas[0] . "' " . $seleccion . ">" . str_replace(" DT", "", trim($columnas[1])) . "</option>";
     }
     echo $Combo = $Combo . "</select>";
     ?>
@@ -135,13 +137,15 @@ if (isset($_GET['Comprobar'])) {
         $Result=sqlsrv_query( $mysqli,$Query, array(), array('Scrollable' => 'buffered'));
         $Combo = $Combo . "<select class='form-control' name='anio' id='anio'  style='width:150px' value=" . @$_GET['anio'] . ">";
         $Combo = $Combo . "<option value='0'>Todos</option>";
-        while ($columnas = mysqli_fetch_array($Result)) {
-            if ($columnas[0] == @$_GET['anio']) {
-                $seleccion = " selected ";
-            } else {
-                $seleccion = "";
+        if($Result) {
+            while ($columnas = sqlsrv_fetch_array($Result, SQLSRV_FETCH_ASSOC)) {
+                if ($columnas['resdt_anioini'] == @$_GET['anio']) {
+                    $seleccion = " selected ";
+                } else {
+                    $seleccion = "";
+                }
+                $Combo = $Combo . "<option value='" . $columnas['resdt_anioini'] . "' " . $seleccion . ">" . trim($columnas['resdt_anioini']) . "</option>";
             }
-            $Combo = $Combo . "<option value='" . $columnas[0] . "' " . $seleccion . ">" . trim($columnas[0]) . "</option>";
         }
         echo $Combo = $Combo . "</select>";
         ?>

@@ -36,19 +36,19 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
     
 }
             
-            if($_POST['tipo_ev']){
+            if(isset($_POST['tipo_ev'])){
              $query .= " and evd.tipo = '".$_POST['tipo_ev']."' ";  
             }
             
-            if($_POST['estado']){
+            if(isset($_POST['estado'])){
              $query .= " and evd.estado = '".$_POST['estado']."' ";  
             }
             
-            if($_POST['documento_asignacion']){
+            if(isset($_POST['documento_asignacion'])){
              $query .= " and ev.docasignacion = '".$_POST['documento_asignacion']."' ";  
             }
             
-            if($_POST['factura']){
+            if(isset($_POST['factura'])){
              $query .= " and ev.factura = '".$_POST['factura']."' ";  
             }
             
@@ -91,7 +91,7 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <strong>Liquidación:</strong>
-                            <input class="form-control" name="liquidacion" type="text" id="liquidacion" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechafinal']; ?>" />
+                            <input class="form-control" name="liquidacion" type="text" id="liquidacion" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechafinal']; ?>" />
                            </div></div></div>
                           
                           
@@ -100,7 +100,7 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <strong>Sustrato:</strong>
-                            <input class="form-control" name="sustrato" type="text" id="sustrato" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechafinal']; ?>" />
+                            <input class="form-control" name="sustrato" type="text" id="sustrato" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechafinal']; ?>" />
                            </div></div></div>
                            
                            </div>
@@ -111,7 +111,7 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
                              <div class="form-line">
                        <strong>Fecha creacion Inicial:</strong>
                        
-                       <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechainicial']; ?>" />
+                       <input class="form-control" name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechainicial']; ?>" />
                        </div></div></div>
                        
                        
@@ -121,7 +121,7 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <strong>Fecha creacion Final:</strong>
-                            <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo $_POST['fechafinal']; ?>" />
+                            <input class="form-control" name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_POST['fechafinal']; ?>" />
                            </div></div></div>
                            
                                  
@@ -134,8 +134,8 @@ if($_POST['tipo_liquidacion'] == 1){ //RNA
                         </div></div></div>
                  
                     </form>
-                    <?php if ($_POST['generar']) : ?>
-                        <?php $cantidad = sqlsrv_num_rows($registros); ?>
+                    <?php if (isset($_POST['generar'])) : ?>
+                        <?php $cantidad = $registros ? sqlsrv_num_rows($registros) : 0; ?>
                         <?php if ($cantidad > 0) : ?>
                             <tr>
                                 <td colspan="5" align="center">

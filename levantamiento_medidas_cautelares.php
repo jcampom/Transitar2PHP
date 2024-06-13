@@ -239,7 +239,7 @@ $numlev = 0;
                              <div class="form-group form-float">  
                              <div class="form-line">
                                  <label>No. de Comparendo</label>
-                                 <input class="form-control"name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo $_GET['comparendo']; ?>' />
+                                 <input class="form-control"name='comparendo' type='text' id='comparendo' size="15"  value='<?php echo @$_GET['comparendo']; ?>' />
                                     </div>
             </div>
         </div>
@@ -248,7 +248,7 @@ $numlev = 0;
                              <div class="form-group form-float">    
                              <div class="form-line">
                                  <label>Numero de MP</label>
-                                 <input class="form-control"name='numero' type='text' id='numero' size="15"  value='<?php echo $_GET['numero']; ?>' />
+                                 <input class="form-control"name='numero' type='text' id='numero' size="15"  value='<?php echo @$_GET['numero']; ?>' />
                                  </div>
             </div>
         </div>
@@ -257,7 +257,7 @@ $numlev = 0;
                              <div class="form-group form-float">    
                              <div class="form-line"> 
                              <label>Fecha Inicial Comp.</label>
-                             <input class="form-control"name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechainicial']; ?>" />
+                             <input class="form-control"name="fechainicial" type="date" id="fechainicial" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechainicial']; ?>" />
                              
                </div>
             </div>
@@ -267,7 +267,7 @@ $numlev = 0;
                              <div class="form-group form-float">          
                              <div class="form-line"> 
                              <label>Fecha Fin Comp.</label>
-                             <input class="form-control"name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechafinal']; ?>" />
+                             <input class="form-control"name="fechafinal" type="date" id="fechafinal" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinal']; ?>" />
                              
                                                       
                </div>
@@ -280,7 +280,7 @@ $numlev = 0;
                            
                    
                                   <label>Fecha Inicial MP</label>
-                                  <input class="form-control"name="fechainimp" type="date" id="fechainimp" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechainimp']; ?>" />
+                                  <input class="form-control"name="fechainimp" type="date" id="fechainimp" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechainimp']; ?>" />
                                   
                                                            
                </div>
@@ -293,7 +293,7 @@ $numlev = 0;
                              <div class="form-group form-float">        
                              <div class="form-line">
                                  <label>Fecha Fin MP</label>
-                                 <input class="form-control"name="fechafinmp" type="date" id="fechafinmp" size="15" style="vertical-align:middle" value="<?php echo $_GET['fechafinmp']; ?>" />
+                                 <input class="form-control"name="fechafinmp" type="date" id="fechafinmp" size="15" style="vertical-align:middle" value="<?php echo @$_GET['fechafinmp']; ?>" />
                                   </div>
             </div>
         </div>
@@ -371,12 +371,12 @@ $numlev = 0;
                     ?>
                     <tr bgcolor="<?php echo $color; ?>">
                         <td align='center'><?php echo $comparendo; ?></td>
-                        <td align='center'><?php echo $row['fechacomp']; ?></td>
+                        <td align='center'><?php echo $row['fechacomp']->format('Y-m-d'); ?></td>
                         <td align='center'><?php echo $row['infractor']; ?></td>
                         <td align='center'><?php echo toUTF8($row['nombre']); ?></td>
                         <td align='center'><?php echo $row['banco']; ?></td>
                         <td align='center'><?php echo $inscrip; ?></td>
-                        <td align='center'><?php echo $row['fechains']; ?></td>
+                        <td align='center'><?php echo $row['fechains']->format('Y-m-d'); ?></td>
                         <td align='center'><input type="checkbox" checked name="check[]" value="<?php echo $row['mcid'] ?>"/></td>
                     </tr>
                 <?php } ?>
