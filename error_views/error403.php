@@ -61,4 +61,15 @@
         }
 
     </script>
+    <?php
+    $directorio_actual = __DIR__;
+
+    $ruta_menu = $directorio_actual . '/../scripts.php';
+
+    if (file_exists($ruta_menu)) {
+        include $ruta_menu;
+    } else {
+        echo "El archivo menu.php no se encontró en la ruta especificada: $ruta_menu";
+    }
+    ?>
 </html>
