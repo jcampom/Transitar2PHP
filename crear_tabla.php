@@ -56,14 +56,13 @@ if (!empty($_POST)) {
         }
         $sql .= "$campo $tipoCampo$longitud";
         if ($campo === 'id') {
-            $sql .= ' AUTO_INCREMENT';
+            $sql .= ' IDENTITY(1,1) PRIMARY KEY';
         }
         $sql .= ",";
     }
     $sql = rtrim($sql, ","); // Eliminar la última coma
-    $sql .= ", PRIMARY KEY (id))";
-
-    if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))===TRUE){
+    $sql .= ")";
+    if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))){
         // Guardar los datos en la tabla "tablas"
         $usuario = $idusuario; // Reemplaza esto con el usuario actual
         $fecha = date('Y-m-d');
@@ -213,8 +212,26 @@ if (!empty($_POST)) {
             <tbody>
                 <?php
                 // Consultar los registros de la tabla "tablas"
+                $paginaActual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+                $registrosPorPagina = 10;
+                $offset = $paginaActual == 1 ? 1 * $registrosPorPagina : ($paginaActual - 1) * $registrosPorPagina;
                 $sql_tablas = "SELECT id, nombre, fecha FROM tablas";
-                $result_tablas=sqlsrv_query( $mysqli,$sql_tablas, array(), array('Scrollable' => 'buffered'));
+
+                $consultaRegistros = "SELECT * FROM (
+                    SELECT *,
+                     ROW_NUMBER() OVER (ORDER BY (SELECT id)) AS RowNum
+                     FROM (
+                        $sql_tablas
+                    ) AS SubQuery
+                   ) AS NumberedRows WHERE RowNum BETWEEN (($paginaActual - 1) * $registrosPorPagina + 1) AND ($paginaActual * $registrosPorPagina)
+                ";
+                $consultaTotalRegistros = "SELECT COUNT(*) as total FROM tablas";
+                
+                $resultadoTotalRegistros = sqlsrv_query($mysqli, $consultaTotalRegistros);
+                $totalRegistros = sqlsrv_fetch_array($resultadoTotalRegistros)['total'];
+                $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
+
+                $result_tablas=sqlsrv_query( $mysqli,$consultaRegistros, array(), array('Scrollable' => 'buffered'));
                 if (sqlsrv_num_rows($result_tablas) > 0) {
                     while ($row = sqlsrv_fetch_array($result_tablas, SQLSRV_FETCH_ASSOC)) {
                         echo "<tr>";
@@ -241,6 +258,32 @@ if (!empty($_POST)) {
                 ?>
             </tbody>
         </table>
+        <?php
+            $paginasMostradas = 10; // Cantidad de páginas mostradas en la barra de navegación
+            $mitadPaginasMostradas = floor($paginasMostradas / 2);
+            $paginaInicio = max(1, $paginaActual - $mitadPaginasMostradas);
+            $paginaFin = min($totalPaginas, $paginaInicio + $paginasMostradas - 1);
+            
+            echo '<nav aria-label="Page navigation example" style="display: flex; justify-content: flex-end;">';
+
+                echo '<ul class="pagination">';
+                // Botón "Primera página"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=1">&laquo;&laquo;</a></li>';
+                // Botón "Página anterior"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=' . ($paginaActual - 1) . '">&laquo;</a></li>';
+
+                // Botones para las páginas
+                for ($i = $paginaInicio; $i <= $paginaFin; $i++) {
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == $i ? 'active cursor-disabled' : '') . '"><a class="page-link border-rounded" href="?pagina=' . $i . '">' . $i . '</a></li>';
+                }
+
+                // Botón "Página siguiente"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=' . ($paginaActual + 1) . '">&raquo;</a></li>';
+                // Botón "Última página"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=' . $totalPaginas . '">&raquo;&raquo;</a></li>';
+                echo '</ul>';
+            echo '</nav>';
+            ?>
     </div>
 </div>
 

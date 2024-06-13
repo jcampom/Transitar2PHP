@@ -457,9 +457,26 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
                 </thead>
                 <tbody>
                     <?php
-                    // Consultar los menús registrados en la base de datos
+                    $paginaActual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+                    $registrosPorPagina = 10;
+                    $offset = $paginaActual == 1 ? 1 * $registrosPorPagina : ($paginaActual - 1) * $registrosPorPagina;
+
                     $sql_consultar_menu = "SELECT m.id, m.nombre, m.enlace, p.nombre AS padre, m.icono FROM menu_items m LEFT JOIN menu_items p ON m.padre_id = p.id";
-                    $result_consultar_menu=sqlsrv_query( $mysqli,$sql_consultar_menu, array(), array('Scrollable' => 'buffered'));
+                    $consultaRegistros = "SELECT * FROM (
+                        SELECT *,
+                         ROW_NUMBER() OVER (ORDER BY (SELECT id)) AS RowNum
+                         FROM (
+                            $sql_consultar_menu
+                        ) AS SubQuery
+                       ) AS NumberedRows WHERE RowNum BETWEEN (($paginaActual - 1) * $registrosPorPagina + 1) AND ($paginaActual * $registrosPorPagina)
+                    ";
+                    $consultaTotalRegistros = "SELECT COUNT(*) as total FROM menu_items m LEFT JOIN menu_items p ON m.padre_id = p.id";
+                    
+                    $resultadoTotalRegistros = sqlsrv_query($mysqli, $consultaTotalRegistros);
+                    $totalRegistros = sqlsrv_fetch_array($resultadoTotalRegistros)['total'];
+                    $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
+
+                    $result_consultar_menu=sqlsrv_query( $mysqli,$consultaRegistros, array(), array('Scrollable' => 'buffered'));
 
                     if (sqlsrv_num_rows($result_consultar_menu) > 0) {
                         while ($row = sqlsrv_fetch_array($result_consultar_menu, SQLSRV_FETCH_ASSOC)) {
@@ -487,6 +504,32 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
                     ?>
                 </tbody>
             </table>
+            <?php
+            $paginasMostradas = 10; // Cantidad de páginas mostradas en la barra de navegación
+            $mitadPaginasMostradas = floor($paginasMostradas / 2);
+            $paginaInicio = max(1, $paginaActual - $mitadPaginasMostradas);
+            $paginaFin = min($totalPaginas, $paginaInicio + $paginasMostradas - 1);
+            
+            echo '<nav aria-label="Page navigation example" style="display: flex; justify-content: flex-end;">';
+
+                echo '<ul class="pagination">';
+                // Botón "Primera página"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=1">&laquo;&laquo;</a></li>';
+                // Botón "Página anterior"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=' . ($paginaActual - 1) . '">&laquo;</a></li>';
+
+                // Botones para las páginas
+                for ($i = $paginaInicio; $i <= $paginaFin; $i++) {
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == $i ? 'active cursor-disabled' : '') . '"><a class="page-link border-rounded" href="?pagina=' . $i . '">' . $i . '</a></li>';
+                }
+
+                // Botón "Página siguiente"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=' . ($paginaActual + 1) . '">&raquo;</a></li>';
+                // Botón "Última página"
+                echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?pagina=' . $totalPaginas . '">&raquo;&raquo;</a></li>';
+                echo '</ul>';
+            echo '</nav>';
+            ?>
         </div>
     </div>
 
