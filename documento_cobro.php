@@ -3,11 +3,49 @@
 // ini_set('display_errors', 1);
 // error_reporting(E_ALL);
 include 'menu.php';
+
 $row_parame = ParamEcono();
-$psedes=BuscarSedes();$nrs=@$psedes['Tsedes_RS'];$nnit=@$psedes['Tsedes_NIT'];$ndir=@$psedes['Tsedes_DIR'];$ntel1=@$psedes['Tsedes_tel1'];$ntel2=@$psedes['Tsedes_tel2'];$ndivipo=@$psedes['Tsedes_divipo'];$_SESSION['snrs']=$nrs;$_SESSION['snnit']=$nnit;$_SESSION['sndir']=$ndir;$_SESSION['sntel1']=$ntel1;$_SESSION['sntel2']=$ntel2;$_SESSION['sndivipo']=$ndivipo;
-$parmliq=ParamLiquida();$nid=$parmliq['Tparametrosliq_ID'];$ndvl=$parmliq['Tparametrosliq_DVL'];$ndvt=$parmliq['Tparametrosliq_DVT'];$nlogo=$parmliq['Tparametrosliq_logo'];$nct=$parmliq['Tparametrosliq_ct'];$nleyenda1=$parmliq['Tparametrosliq_leyenda1'];$nleyenda2=$parmliq['Tparametrosliq_leyenda2'];$nleyenda3=$parmliq['Tparametrosliq_leyenda3'];$ncodinf=$parmliq['Tparametrosliq_inf'];$_SESSION['snid']=$nid;$_SESSION['sndvl']=$ndvl;$_SESSION['sndvt']=$ndvt;$_SESSION['snlogo']=$nlogo;
-$_SESSION['snct']=$nct;$_SESSION['snleyenda1']=$nleyenda1;$_SESSION['snleyenda2']=$nleyenda2;$_SESSION['snleyenda3']=$nleyenda3;$_SESSION['sncodinf']=$ncodinf;
-$fechaini=date('Y-m-d H:i:s');$fechhoy=date('Ymd');
+$psedes=BuscarSedes();
+
+$nrs=@$psedes['Tsedes_RS'];
+$nnit=@$psedes['Tsedes_NIT'];
+$ndir=@$psedes['Tsedes_DIR'];
+$ntel1=@$psedes['Tsedes_tel1'];
+$ntel2=@$psedes['Tsedes_tel2'];
+$ndivipo=@$psedes['Tsedes_divipo'];
+
+$_SESSION['snrs']=$nrs;
+$_SESSION['snnit']=$nnit;
+$_SESSION['sndir']=$ndir;
+$_SESSION['sntel1']=$ntel1;
+$_SESSION['sntel2']=$ntel2;
+$_SESSION['sndivipo']=$ndivipo;
+
+$parmliq=ParamLiquida();
+
+$nid=$parmliq['Tparametrosliq_ID'];
+$ndvl=$parmliq['Tparametrosliq_DVL'];
+$ndvt=$parmliq['Tparametrosliq_DVT'];
+$nlogo=$parmliq['Tparametrosliq_logo'];
+$nct=$parmliq['Tparametrosliq_ct'];
+$nleyenda1=$parmliq['Tparametrosliq_leyenda1'];
+$nleyenda2=$parmliq['Tparametrosliq_leyenda2'];
+$nleyenda3=$parmliq['Tparametrosliq_leyenda3'];
+$ncodinf=$parmliq['Tparametrosliq_inf'];
+
+$_SESSION['snid']=$nid;
+$_SESSION['sndvl']=$ndvl;
+$_SESSION['sndvt']=$ndvt;
+$_SESSION['snlogo']=$nlogo;
+$_SESSION['snct']=$nct;
+$_SESSION['snleyenda1']=$nleyenda1;
+$_SESSION['snleyenda2']=$nleyenda2;
+$_SESSION['snleyenda3']=$nleyenda3;
+$_SESSION['sncodinf']=$ncodinf;
+
+$fechaini=date('Y-m-d H:i:s');
+$fechhoy=date('Ymd');
+
 ?>    
 <script type="text/javascript" src="ajax.js"></script>
 <script type="text/javascript" src="funciones.js"></script>

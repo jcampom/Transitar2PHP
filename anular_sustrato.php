@@ -5,26 +5,24 @@ if(!empty($_POST)){
 
 if($_POST['sustrato'] == 3){
     // Se actualiza el placa
- $queryUpdate = "UPDATE placas SET Tplacas_estado = '4' WHERE Tplacas_placa = '".$_POST['numero']."'";
+    $queryUpdate = "UPDATE placas SET Tplacas_estado = '4' WHERE Tplacas_placa = '".$_POST['numero']."'";
+} else {
 
- 
-}else{
-
-if($_POST['sustrato'] == 1){
+    if($_POST['sustrato'] == 1){
   // Se actualiza el sustratos
- $queryUpdate = "UPDATE especies_venales_detalle SET estado = '6' WHERE id = '".$_POST['numero']."' and tipo = '3'";
-}
+        $queryUpdate = "UPDATE especies_venales_detalle SET estado = '6' WHERE id = '".$_POST['numero']."' and tipo = '3'";
+    }
  
- if($_POST['sustrato'] == 2){
-  // Se actualiza el sustratos
- $queryUpdate = "UPDATE especies_venales_detalle SET estado = '6' WHERE id = '".$_POST['numero']."'  and tipo = '4'";
-}
+    if($_POST['sustrato'] == 2){
+    // Se actualiza el sustratos
+        $queryUpdate = "UPDATE especies_venales_detalle SET estado = '6' WHERE id = '".$_POST['numero']."'  and tipo = '4'";
+    }
 
 }
 
 
     // Ejecutar la consulta de inserción
-    if (sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered')), array(), array('Scrollable' => 'buffered')) {
+    if (sqlsrv_query( $mysqli,$queryUpdate, array(), array('Scrollable' => 'buffered'))) {
         
        echo '<div class="alert alert-warning"><strong>¡Bien Hecho! </strong> el sustrato ha sido anulado con éxito</div>';
 

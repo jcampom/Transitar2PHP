@@ -118,7 +118,8 @@
                 //   echo $consulta;
 
                     $resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
-if(sqlsrv_num_rows($resultado) > 0 ){
+
+            if($resultado && sqlsrv_num_rows($resultado) > 0 ){
                    while($row=sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)){ ?>
                     <tr>
                         <td><?php echo $row['tercero']; ?></td>

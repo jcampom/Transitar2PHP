@@ -110,6 +110,10 @@
 
                         <?php
 
+                        $paginaActual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+                        $registrosPorPagina = 10;
+                        $offset = $paginaActual == 1 ? 1 * $registrosPorPagina : ($paginaActual - 1) * $registrosPorPagina;
+
                         if(!empty($_POST['fechainicial'])){
                         $fecha_inicio = $_POST['fechainicial'];
                         }else{
@@ -130,40 +134,68 @@
 
                   where r.fecha between '$fecha_inicio' and '$fecha_fin'
                   ";
+                  $consultaTotal = "SELECT count(*) as total FROM recaudos r
+
+                  INNER JOIN liquidaciones l on r.liquidacion = l.id
+                  LEFT JOIN tipo_tramite t on t.id = l.tipo_tramite
+
+                  where r.fecha between '$fecha_inicio' and '$fecha_fin'
+                  ";
 
                 //   echo $consulta;
 
                   if(!empty($_POST['liquidacion'])){
                    $consulta .=" and r.liquidacion = '".$_POST['liquidacion']."'";
+                   $consultaTotal .=" and r.liquidacion = '".$_POST['liquidacion']."'";
                   }
 
                    if(!empty($_POST['tipo_liquidacion'])){
                    $consulta .=" and l.tipo_tramite = '".$_POST['tipo_liquidacion']."'";
+                   $consultaTotal .=" and l.tipo_tramite = '".$_POST['tipo_liquidacion']."'";
                   }
 
                   if(!empty($_POST['medio_pago'])){
                    $consulta .=" and r.tipo_recaudo = '".$_POST['medio_pago']."'";
+                   $consultaTotal .=" and r.tipo_recaudo = '".$_POST['medio_pago']."'";
                   }
 
                   if(!empty($_POST['placa'])){
                    $consulta .=" and r.placa = '".$_POST['placa']."'";
+                   $consultaTotal .=" and r.placa = '".$_POST['placa']."'";
                   }
 
                   if(!empty($_POST['identificacion'])){
                    $consulta .=" and r.identificacion_pagador = '".$_POST['identificacion']."'";
+                   $consultaTotal .=" and r.identificacion_pagador = '".$_POST['identificacion']."'";
                   }
 
 
 
                 //   echo $consulta;
+                    $consultaRegistros = "SELECT * FROM (
+                            SELECT *,
+                             ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS RowNum
+                             FROM (
+                                $consulta
+                            ) AS SubQuery
+                           ) AS NumberedRows WHERE RowNum BETWEEN (($paginaActual - 1) * $registrosPorPagina + 1) AND ($paginaActual * $registrosPorPagina)
+                        ";
 
-                    $resultado=sqlsrv_query( $mysqli,$consulta, array(), array('Scrollable' => 'buffered'));
+                        $consultaTotalRegistros = $consultaTotal;
+
+                        $resultadoTotalRegistros = sqlsrv_query($mysqli, $consultaTotalRegistros);
+                        $totalRegistros = sqlsrv_fetch_array($resultadoTotalRegistros)['total'];
+                        $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
+
+                    $resultado=sqlsrv_query( $mysqli,$consultaRegistros, array(), array('Scrollable' => 'buffered'));
+
+                    if($resultado) {
 
                    while($row=sqlsrv_fetch_array($resultado, SQLSRV_FETCH_ASSOC)){ ?>
                     <tr>
                         <td><?php echo $row['liquidacion']; ?></td>
                          <td><?php echo $row['nombre']; ?></td>
-                         <td><?php echo $row['fecha']; ?></td>
+                         <td><?php echo $row['fecha']->format('Y-m-d'); ?></td>
                          <td><?php
                          if(!empty($row['placa'])){
                          echo $row['placa'];
@@ -179,11 +211,40 @@
                          <td><?php echo $row['identificacion_pagador']; ?></td>
                          <td><?php echo number_format($row['valor']); ?></td>
 
-                        <?php }
-
+                        <?php } } else {?>
+                            <tr>
+                                <td colspan="9">No se encontraron registros</td>
+                            <tr>
+                            <?php
+                        }
+                        $paginasMostradas = 10; // Cantidad de páginas mostradas en la barra de navegación
+                        $mitadPaginasMostradas = floor($paginasMostradas / 2);
+                        $paginaInicio = max(1, $paginaActual - $mitadPaginasMostradas);
+                        $paginaFin = min($totalPaginas, $paginaInicio + $paginasMostradas - 1);
                         ?>
 
                         </table>
+            <nav aria-label="Page navigation example" style="display: flex; justify-content: flex-end;">
+                <?php 
+
+                    echo '<ul class="pagination">';
+                    // Botón "Primera página"
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id=informe_recaudos&pagina=1">&laquo;&laquo;</a></li>';
+                    // Botón "Página anterior"
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id=informe_recaudos&pagina=' . ($paginaActual - 1) . '">&laquo;</a></li>';
+                    
+                    // Botones para las páginas
+                    for ($i = $paginaInicio; $i <= $paginaFin; $i++) {
+                        echo '<li class="page-item cursor-pointer ' . ($paginaActual == $i ? 'active cursor-disabled' : '') . '"><a class="page-link border-rounded" href="?id=informe_recaudos&pagina=' . $i . '">' . $i . '</a></li>';
+                    }
+                    
+                    // Botón "Página siguiente"
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id=informe_recaudos&pagina=' . ($paginaActual + 1) . '">&raquo;</a></li>';
+                    // Botón "Última página"
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id=informe_recaudos&pagina=' . $totalPaginas . '">&raquo;&raquo;</a></li>';
+                    echo '</ul>';
+                ?>
+            </nav>
 
   </div>
 
