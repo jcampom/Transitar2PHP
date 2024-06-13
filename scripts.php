@@ -83,21 +83,21 @@
 jQuery(document).ready(function() {
     jQuery('#render-data').DataTable({
         rowReorder: {
-        selector: 'td:nth-child(2)'
+            selector: 'td:nth-child(2)'
         },
         responsive: true,
-        "language": {
-        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
-        },
         "paging": false,
         "processing": true,
         'serverMethod': 'post',
         "ajax": "data.php",
         dom: 'lBfrtip',
         buttons: [
-        'excel', 'csv', 'pdf', 'print', 'copy',
+            'excel', 'csv', 'pdf', 'print', 'copy',
         ],
         //"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json",
+        },
     });
 });
 
@@ -107,11 +107,11 @@ jQuery(document).ready(function() {
         "paging": false,
         dom: 'lBfrtip',
         buttons: [
-
+            'excel', 'csv', 'pdf', 'print', 'copy',
         ],
         "language": {
             //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+            "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json",
         },
     });
 });
@@ -122,11 +122,12 @@ jQuery(document).ready(function() {
         dom: 'lBfrtip',
         "paging": false,
         buttons: [
-        'excel', 'csv', 'pdf', 'print', 'copy',
+            'excel', 'csv', 'pdf', 'print', 'copy',
         ],
         "language": {
             //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+            "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+
         },
     });
 });
@@ -137,11 +138,11 @@ jQuery(document).ready(function() {
         dom: 'lBfrtip',
         "paging": false,
         buttons: [
-        'excel', 'csv', 'pdf', 'print', 'copy',
+            'excel', 'csv', 'pdf', 'print', 'copy',
         ],
         "language": {
             //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+            "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json",
         },
     });
 });
@@ -153,11 +154,11 @@ jQuery(document).ready(function() {
         dom: 'lBfrtip',
 
         buttons: [
-        'excel', 'csv', 'pdf', 'print', 'copy',
+            'excel', 'csv', 'pdf', 'print', 'copy',
         ],
         "language": {
             //cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json
-        "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"
+            "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json",
         },
     });
 });

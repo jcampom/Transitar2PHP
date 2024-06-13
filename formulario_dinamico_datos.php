@@ -728,19 +728,19 @@ $valorCampo = explode(",", $valorCampo);
                 <?php 
                     echo '<ul class="pagination">';
                     // Botón "Primera página"
-                    echo '<li class="page-item ' . ($paginaActual == 1 ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=1">&laquo;&laquo;</a></li>';
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=1">&laquo;&laquo;</a></li>';
                     // Botón "Página anterior"
-                    echo '<li class="page-item ' . ($paginaActual == 1 ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . ($paginaActual - 1) . '">&laquo;</a></li>';
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == 1 ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . ($paginaActual - 1) . '">&laquo;</a></li>';
                     
                     // Botones para las páginas
                     for ($i = $paginaInicio; $i <= $paginaFin; $i++) {
-                        echo '<li class="page-item ' . ($paginaActual == $i ? 'active' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . $i . '">' . $i . '</a></li>';
+                        echo '<li class="page-item cursor-pointer ' . ($paginaActual == $i ? 'active cursor-disabled' : '') . '"><a class="page-link border-rounded" href="?id='.$formularioId.'&pagina=' . $i . '">' . $i . '</a></li>';
                     }
                     
                     // Botón "Página siguiente"
-                    echo '<li class="page-item ' . ($paginaActual == $totalPaginas ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . ($paginaActual + 1) . '">&raquo;</a></li>';
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . ($paginaActual + 1) . '">&raquo;</a></li>';
                     // Botón "Última página"
-                    echo '<li class="page-item ' . ($paginaActual == $totalPaginas ? 'disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . $totalPaginas . '">&raquo;&raquo;</a></li>';
+                    echo '<li class="page-item cursor-pointer ' . ($paginaActual == $totalPaginas ? 'disabled cursor-disabled' : '') . '"><a class="page-link" href="?id='.$formularioId.'&pagina=' . $totalPaginas . '">&raquo;&raquo;</a></li>';
                     echo '</ul>';
                 ?>
             </nav>

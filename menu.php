@@ -125,31 +125,48 @@ include 'sessiones/seguridadempresa.php';
         .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
                 text-decoration: none;
                 cursor: pointer;
-            }
         }
         .page-loader-wrapper .loader-message {
 
         }
 
         .loader-spinner {
-        width: 35px;
-        height: 35px;
-        border: 4px solid #178735;
-        border-bottom-color: transparent;
-        border-radius: 50%;
-        display: inline-block;
-        box-sizing: border-box;
-        animation: rotation 1s linear infinite;
+            width: 35px;
+            height: 35px;
+            border: 4px solid #178735;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
         }
 
         @keyframes rotation {
-        0% {
-            transform: rotate(0deg);
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        100% {
-            transform: rotate(360deg);
+
+        div.dataTables_wrapper div.dataTables_info {
+            padding-top: 8px;
+            white-space: nowrap;
+            display: none;
         }
-    }
+        .cursor-disabled {
+            pointer-events: none;
+        }
+        .cursor-disabled:hover {
+            cursor: not-allowed;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        .border-rounded {
+            border-radius: 3px; 
+        }
 
     </style>
 
