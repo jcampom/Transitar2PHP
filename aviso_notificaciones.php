@@ -32,7 +32,7 @@ if (!isset($_POST['generar'])) {
     $avisos = array();
     
     while ($rowdata = sqlsrv_fetch_array($result1, SQLSRV_FETCH_ASSOC)) {
-        $group = substr($rowdata['fecha'], 0, 7);
+        $group = $rowdata['fecha']->format('Y-m-d');
         $avisos[$group][] = $rowdata;
     }
     
@@ -189,7 +189,7 @@ if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))){
    
                         <td colspan="10" align="left">&nbsp;</td>
                     </tr>
-                    <?php if ($_POST['generar']): ?>
+                    <?php if (isset($_POST['generar'])): ?>
                         <tr>
                             <td colspan="10" align="center" class="t_normal_n">Detalle a Generacion</td>
                         </tr>
@@ -267,7 +267,7 @@ if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))){
                                                                     ?>
                                                                     <tr bgcolor="<?php echo $color; ?>">
                                                                         <td align='center'><?php echo $comparendo; ?></td>
-                                                                        <td align='center'><?php echo $row['fecha']; ?></td>
+                                                                        <td align='center'><?php echo $row['fecha']->format('Y-m-d'); ?></td>
                                                                         <td align='center'><?php echo $row['lugar']; ?></td>
                                                                         <td align='center'><?php echo $row['ident']; ?></td>
                                                                         <td align='center'><?php echo toUTF8($row['nombre']); ?></td>
