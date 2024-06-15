@@ -80,6 +80,7 @@ if(isset($_POST['eliminar']) == 1){
 <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 <script>
   window.onload = function () {
+    let customSelectedDates = []; // Array personalizado para manejar las fechas seleccionadas por nosotros
     const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
     const currentYear = new Date().getFullYear(); // Obtener el año actual
@@ -116,31 +117,37 @@ if(isset($_POST['eliminar']) == 1){
         inline: true,
         onReady: function (selectedDates, dateStr, instance) {
 
-			// Desmarca el día 1 si está seleccionad
-			const defaultDate2 = new Date(currentYear, index, 1);
-			instance.clear(defaultDate2);
+          // Desmarca el día 1 si está seleccionad
+          const defaultDate2 = new Date(currentYear, index, 1);
+          instance.clear(defaultDate2);
 
 
-			fetch('obtener_festivos.php?mes=' + (index + 1))
-			.then(response => response.json())
-			.then(data => {
-				  data.forEach(fecha => {
-					const dateObj = new Date(fecha);
+          fetch('obtener_festivos.php?mes=' + (index + 1))
+          .then(response => response.json())
+          .then(data => {
+              data.forEach(fecha => {
+              const dateObj = new Date(fecha);
 
 
 
-					if (dateObj.getFullYear() === currentYear && dateObj.getMonth() === index) {
+              if (dateObj.getFullYear() === currentYear && dateObj.getMonth() === index) {
 
-					  instance.jumpToDate(dateObj);
-					  instance.selectedDates.push(dateObj);
-					  instance.redraw();
-					//  alert('Día festivo encontrado: ' + dateObj.toDateString());
-					}
-				  });
-			})
-			.catch(error => console.error('Error:', error));
-		},
+                instance.jumpToDate(dateObj);
+                instance.selectedDates.push(dateObj);
+                instance.redraw();
+                //  alert('Día festivo encontrado: ' + dateObj.toDateString());
+              }
+            });
+          })
+          .catch(error => console.error('Error:', error));
+        },
       };
+
+      flatpickrConfig.onChange = function(selectedDates, dateStr, instance) {
+        document.getElementById('fecha').value = dateStr;
+      };
+
+
 
       flatpickr(calendarElement, flatpickrConfig);
 
