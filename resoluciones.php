@@ -1,5 +1,5 @@
 <?php include 'menu.php';
-
+$tiene_resolucion = 0;
 if(!empty($_POST)){
 @$plantilla = $_POST['plantilla'];
 
@@ -26,7 +26,7 @@ $resultado_plantilla=sqlsrv_query( $mysqli,$consulta_plantilla, array(), array('
  }
 
 
-$comparendo = $_GET['comparendo'];
+$comparendo = isset($_GET['comparendo']) ?? '';
 
 }
 
@@ -46,9 +46,9 @@ $comparendo = $_GET['comparendo'];
             if($resultado_tipo) {
               $row_tipo=sqlsrv_fetch_array($resultado_tipo, SQLSRV_FETCH_ASSOC);
 
-              $estados_permitidos = explode(",", $row_tipo['estados_permitidos']);
+              $estados_permitidos = isset($row_tipo['estados_permitidos']) ? explode(",", $row_tipo['estados_permitidos']) : array();
 
-              $tipo_resolucion = $row_tipo['tipo_resolucion'];
+              $tipo_resolucion = isset($row_tipo['tipo_resolucion']) ?? '';
             }
 
 if(!empty($_POST['contenido'])){
@@ -100,7 +100,7 @@ if(!empty($_POST['contenido'])){
   <script src="https://cdn.tiny.cloud/1/o38ianh9nzfprf0bhn6onvx8bpzf2y0n90jvy2ihyh5t7arj/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
  <div class="card container-fluid">
     <div class="header">
-        <h2>Resoluciones <?php echo $row_tipo['nombre']; ?></h2>
+        <h2>Resoluciones <?php echo @$row_tipo['nombre']; ?></h2>
     </div>
     <br>
 <form method="POST" action="resoluciones.php">
@@ -143,9 +143,12 @@ if(!empty($_POST['contenido'])){
 
     ?>">
 
-    <?php if(in_array($row_comparendo['Tcomparendos_estado'], $estados_permitidos)){
+    
 
-    if($row_tipo['resoluciones_creadas'] > 0){
+    <?php 
+    if(in_array($row_comparendo['Tcomparendos_estado'], $estados_permitidos)){
+
+    if($row_tipo && $row_tipo['resoluciones_creadas'] > 0){
         $consulta_resolucion="SELECT * FROM resolucion_sancion where ressan_comparendo = '$comparendo' and ressan_tipo = '".$row_tipo['resoluciones_creadas']."'";
 
             $resultado_resolucion=sqlsrv_query( $mysqli,$consulta_resolucion, array(), array('Scrollable' => 'buffered'));
@@ -200,7 +203,7 @@ if($row_tipo['resoluciones_creadas'] > 0){
 NO hubo resultados para ese comparendo.<br>
 El comparendo se encuentra en estado ".$row_comparendos_estados['nombre']."</b></h4></font>";
 
-if($row_tipo['resoluciones_creadas'] > 0){
+if($row_tipo && $row_tipo['resoluciones_creadas'] > 0){
    echo "<font color='red'><h4><b> No tiene resoluciones generadas.</b></h4></font>";
 }
   ?>
