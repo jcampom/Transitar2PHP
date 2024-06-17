@@ -40,7 +40,7 @@ if($row = mysql_fetch_array($result))
   //En caso que la contraseña sea incorrecta enviamos un msj y redireccionamos a login.php
   ?>
    <script languaje="javascript">
-    alert("Password Incorrecta");
+    alert("Usuario o contraseña incorrecta por favor verifica tus datos");
     location.href = "../logincelular.php";
    </script>
   <?php
@@ -52,7 +52,7 @@ else
  //en caso que el nombre de administrador es incorrecto enviamos un msj y redireccionamos a login.php
 ?>
  <script languaje="javascript">
-  alert("El nombre de usuario es incorrecto!");
+  alert("Usuario o contraseña incorrecta por favor verifica tus datos");
   location.href = "../logincelular.php";
  </script>
 <?php  

@@ -64,7 +64,7 @@ location.href = "../login.php";
 	}
 ?>
 <script languaje="javascript">
-alert("Password Incorrecta");
+alert("Usuario o contraseña incorrecta por favor verifica tus datos");
 location.href = "../login.php";
 </script>
 <?php
@@ -74,7 +74,7 @@ else
 	//en caso que el nombre de administrador es incorrecto enviamos un msj y redireccionamos a login.php
 ?>
  <script languaje="javascript">
-  alert("El nombre de usuario es incorrecto!");
+  alert("Usuario o contraseña incorrecta por favor verifica tus datos");
  location.href = "../login.php";
  </script>
 <?php

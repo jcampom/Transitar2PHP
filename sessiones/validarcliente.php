@@ -40,7 +40,7 @@ session_start();
 
 ?>
 <script languaje="javascript">
- alert("Su usuario a sido desactivado, comuniquese con el administrador");
+ alert("Su cuenta ha sido desactivada, comuniquese con el administrador");
 location.href = "../logincliente.php";
 </script>
 <?php
@@ -51,7 +51,7 @@ location.href = "../logincliente.php";
   //En caso que la contraseña sea incorrecta enviamos un msj y redireccionamos a logincliente.php
   ?>
    <script languaje="javascript">
-    alert("Password Incorrecta si necesitas ayuda para ingresar te puedes comunicar al siguiente Whatsapp 316 5722933");
+    alert("Usuario o contraseña incorrecta por favor verifica tus datos, si necesitas ayuda para ingresar te puedes comunicar al siguiente WhatsApp 316 5722933");
  location.href = "../logincliente.php";
    </script>
   <?php
@@ -63,7 +63,7 @@ else
  //en caso que el nombre de administrador es incorrecto enviamos un msj y redireccionamos a logincliente.php
 ?>
  <script languaje="javascript">
-  alert("El nombre de usuario es incorrecto! si necesitas ayuda para ingresar te puedes comunicar al siguiente Whatsapp 316 5722933");
+  alert("Usuario o contraseña incorrecta por favor verifica tus datos, si necesitas ayuda para ingresar te puedes comunicar al siguiente WhatsApp 316 5722933");
  location.href = "../logincliente.php";
  </script>
 <?php
