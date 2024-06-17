@@ -634,12 +634,12 @@ $valorCampo = explode(",", $valorCampo);
                             echo '<tr>';
 							echo '<td>';
 							if (in_array("Editar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
-								echo '<a href="?editar=' . $registro['id'] . '&id=' . $formularioId . '"><button style="margin-right:5px;margin-bottom:5px;width:40px" class="btn btn-primary" data-toggle="modal" data-target="#modalEditar"><i class="fas fa-edit"></i></button></a>';
+								echo '<a href="?editar=' . $registro['id'] . '&id=' . $formularioId . '&pagina='.$paginaActual.'"><button style="margin-right:5px;margin-bottom:5px;width:40px" class="btn btn-primary" data-toggle="modal" data-target="#modalEditar"><i class="fas fa-edit"></i></button></a>';
 
 							}
 
 							if (in_array("Eliminar", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {
-								echo '<a href="#" style="width:40px;margin-bottom:5px" onclick="confirmarEliminar(' . $registro['id'] . ');" class="btn btn-danger"><i class="fas fa-trash"></i></a>';
+								echo '<a href="#" style="width:40px;margin-bottom:5px" onclick="confirmarEliminar(' . $registro['id'] . ','.$paginaActual.'lllll);" class="btn btn-danger"><i class="fas fa-trash"></i></a>';
 							}
                             echo '</td>';
                             foreach ($camposTabla as $campo) {
@@ -774,9 +774,9 @@ $valorCampo = explode(",", $valorCampo);
 <?php include 'scripts.php'; ?>
 <script>
     // Función para mostrar la confirmación de eliminación
-function confirmarEliminar(id) {
+function confirmarEliminar(id, pagincaACtual) {
     var formularioId = <?php echo $formularioId; ?>;
     $('#modalEliminar').modal('show');
-    $('#eliminarRegistro').attr('href', '?id=' + formularioId + '&eliminar=' + id);
+    $('#eliminarRegistro').attr('href', '?id=' + formularioId + '&eliminar=' + id + '&pagina=' + $paginaActual);
 }
 </script>
