@@ -37,10 +37,10 @@ if(!empty($_GET["eliminar"])){
         // Insertar los datos en la tabla menu_items
         $sql_crear_menu = "INSERT INTO menu_items (nombre, enlace, padre_id, empresa,fecha,fechayhora,usuario,icono) VALUES ('$nombre', '$enlace', '$padre','$empresa','$fecha','$fechayhora','$idusuario','$icono')";
 
-        if (sqlsrv_query( $mysqli,$sql_crear_menu, array(), array('Scrollable' => 'buffered'))===TRUE){
+        if (sqlsrv_query( $mysqli,$sql_crear_menu, array(), array('Scrollable' => 'buffered'))){
 echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu guardado correctamente.</div>';
         } else {
-           echo '<div class="alert alert-danger"><strong>¡Ups!</strong> El menu tiene un error: </div>'. $conn->error;
+           echo '<div class="alert alert-danger"><strong>¡Ups!</strong> El menu tiene un error: </div>'. sqlsrv_errors();
 
         }
     }
@@ -99,6 +99,7 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
 
   <select class="form-control" name="icono"  data-live-search="true">
 
+       <option value="" data-content="">Ninguno</option>
        <option value="3d_rotation" data-content="<i class='material-icons' style='margin-left: 15px;'>3d_rotation</i> Rotación 3D">Rotación 3D</option>
 <option value="ac_unit" data-content="<i class='material-icons' style='margin-left: 15px;'>ac_unit</i> Unidad de Aire Acondicionado">Unidad de Aire Acondicionado</option>
 <option value="access_alarm" data-content="<i class='material-icons' style='margin-left: 15px;'>access_alarm</i> Acceso a Alarma">Acceso a Alarma</option>

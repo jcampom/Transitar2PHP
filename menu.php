@@ -488,7 +488,7 @@ echo generarMenu($menuItems);
 
 ?>
 <?php  if (in_array("Form Mov", $opcionesPerfil) or in_array("Todos", $opcionesPerfil)) {  ?>
-                      <li>
+                      <!-- <li>
                         <a href="javascript:void(0);" class="menu-toggle">
                          <i class="material-icons">settings</i>
                             <span>ForMov Pro</span>
@@ -511,7 +511,7 @@ echo generarMenu($menuItems);
                             <?php } ?>
 
                         </ul>
-                    </li>
+                    </li> -->
 
                     <?php } ?>
 
