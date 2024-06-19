@@ -3,8 +3,9 @@
 if(!empty($_POST)){
 $identificacion = $_POST['identificacion'];
 
+} else {
+    $identificacion = $_GET['identificacion'] ?? '';
 }
-$identificacion = $_GET['identificacion'] ?? '';
 $infractor = $_GET['infractor'] ?? '';
 
 if(!empty($_POST['referencia'])){
@@ -27,8 +28,7 @@ if(!empty($_POST['referencia'])){
 
 
 
-    $insertQuery = "INSERT INTO citaciones (idref, fechahora, comparendo, estado, comentario, infractor, consultor, archivo, username) VALUES ('".$_POST['fecha']."', '$fechahora', '".$_POST['referencia']."', 1, '".$_POST['comentario']."', '".$_POST['infractor']."', '".$_POST['consultor2']."', '$rutaCompleta', '$idusuario')";
-
+    $insertQuery = "INSERT INTO citaciones (idref, fechahora, comparendo, estado, comentario, infractor, consultor, archivo, username) VALUES ('".str_replace('-', '', $_POST['fecha'])."', '$fechahora', '".$_POST['referencia']."', 1, '".$_POST['comentario']."', '".$_POST['infractor']."', '".$_POST['consultor2']."', '$rutaCompleta', '$idusuario')";
     // Ejecutar la consulta de inserción
     if (sqlsrv_query( $mysqli,$insertQuery, array(), array('Scrollable' => 'buffered'))){
         echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> Los datos se han guardado correctamente.</div>';
@@ -252,7 +252,7 @@ if(isset($_GET['eliminar']) == 1){
 
 
                 <th>
-                        <a  href="perfil_usuarios.php?id=<?php echo $row['id'] ?>"> <button style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" type="button" class="btn btn-info" ><i class="fa fa-pencil-alt"></i></button></a>
+                        <!-- <a  href="perfil_usuarios.php?id=<?php //echo $row['id'] ?>"> <button style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" type="button" class="btn btn-info" ><i class="fa fa-pencil-alt"></i></button></a> -->
  <a onclick="return confirm('Estas seguro de eliminar esta citación');" href="agendar.php?id=<?php echo $row['id'] ?>&eliminar=1&identificacion=<?php echo $row['infractor'] ?>"> <button type="button" class="btn btn-danger" style="margin-bottom:8px;margin-left:5px;width:45px;height:40px" ><i class="fa fa-times" style="margin:3px"></i></button></a>
 
                       </th>

@@ -95,7 +95,7 @@ include 'sessiones/seguridadempresa.php';
         }
 
         .slimScrollDiv {
-            height: 70% !important;
+            height: 67% !important;
         }
 
         .dataTables_wrapper .dataTables_paginate {
