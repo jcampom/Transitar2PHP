@@ -191,8 +191,8 @@ jQuery(document).ready(function() {
         clearTimeout(temporizadorInactividad);
         
         temporizadorInactividad = setTimeout(function() {
-            alert("¡Has estado inactivo durante demasiado tiempo! Por seguridad se cerrará su sesión");
             window.location.href = 'cerrar.php';
+            alert("¡Has estado inactivo durante demasiado tiempo! Por seguridad se cerrará su sesión");
         }, tiempoMaximoInactividad);
     }
 

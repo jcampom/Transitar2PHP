@@ -59,8 +59,13 @@ $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 
     // Obtener el nuevo ID
     $num = $row['nuevo_id'];
-    
-    $numres = "(SELECT ISNULL(MAX(ressan_numero), 0) FROM resolucion_sancion WHERE ressan_tipo = '$tipo_noti' AND ressan_ano = '$ano')";
+    $sqlNumRes = "(SELECT ISNULL(MAX(ressan_numero), 0) as num FROM resolucion_sancion WHERE ressan_tipo = '$tipo_noti' AND ressan_ano = '$ano')";
+    $stmtNumRes = sqlsrv_query($mysqli, $sqlNumRes, array(), array('Scrollable' => 'buffered'));
+    $numres = '';
+    if($stmtNumRes) {
+        $rowNumres = sqlsrv_fetch_array($stmtNumRes, SQLSRV_FETCH_ASSOC);
+        $numres = $rowNumres['num']; 
+    }
     $desfijar = "DiasHabil(CAST('$fecha' AS DATE), (SELECT Tnotifparams_autodesfdias FROM Tnotifparams))";
     
 $sql = "
@@ -88,16 +93,16 @@ $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
     $row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
     // Obtener el nuevo ID
-    $aviso = $row['id'];
+    $aviso = $row ? $row['id'] : 0;
  
 
 // Insertar en la tabla resolucion_sancion
 $sqlInsertResolucion = "
     INSERT INTO resolucion_sancion
         (ressan_ano, ressan_numero, ressan_tipo, ressan_comparendo, ressan_archivo, ressan_fecha, ressan_exportado, ressan_compid, ressan_usuario)
-    SELECT $ano, (ROW_NUMBER() OVER(ORDER BY Tnotifica_ID ASC)) + '$numres', '$tipo_noti', Tnotifica_comparendo, '$archivoind', '$fecha', 1, Tnotifica_compid, '$idusuario'
+    SELECT $ano, (ROW_NUMBER() OVER(ORDER BY Tnotifica_ID ASC)), '$numres', '$tipo_noti', Tnotifica_comparendo, '$archivoind', '$fecha', 1, Tnotifica_compid, '$idusuario'
     FROM Tnotifica WHERE Tnotifica_estado = 0 AND Tnotifica_compid IN ($compsid)";
-    
+    //revisar este insert o select, no sé qué es
 
     
 if (sqlsrv_query( $mysqli,$sqlInsertResolucion, array(), array('Scrollable' => 'buffered'))){
@@ -109,10 +114,11 @@ if (sqlsrv_query( $mysqli,$sqlInsertResolucion, array(), array('Scrollable' => '
     echo "Error en la consultas 0: " . serialize(sqlsrv_errors());
 }
 
+
 // Insertar en la tabla avisos_resoluciones
 $sqlInsertAvisosResoluciones = "
     INSERT INTO avisos_resoluciones (aviso, resolucion, notifica)
-    SELECT $aviso, ressan_id, Tnotifica_ID
+    SELECT ".$aviso.", ressan_id, Tnotifica_ID
     FROM Tnotifica 
         INNER JOIN resolucion_sancion ON Tnotifica_compid = ressan_compid AND ressan_tipo = '29'
     WHERE Tnotifica_estado = 0 AND Tnotifica_compid IN ($compsid)";
