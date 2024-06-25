@@ -54,7 +54,7 @@ echo '<div class="alert alert-success"><strong>¡Bien hecho!</strong> El menu gu
     <br>
 
             <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                <div class="row">
+                <div class="row" style="padding-left: 18px;">
                     <div class="col-md-6">
                         <div class="form-group form-float">
                             <div class="form-line">
