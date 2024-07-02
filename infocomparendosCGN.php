@@ -12,9 +12,7 @@ if (isset($_POST['Generar'])) {
         $OK = "";
     } else {
     	$qry1="SELECT MAX(creado) AS creado, DATEDIFF(MONTH, CAST('".$_POST['fechainicial']."' AS DATE), MAX(creado)) AS diffecha FROM morososCGN_semestral WHERE borrado IS NULL";
-        $sqldiffecha=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
-
-        echo $qry1;
+        $sqldiffecha=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));;
 
         if($sqldiffecha) {
             if (sqlsrv_num_rows($sqldiffecha) > 0) {
@@ -30,8 +28,6 @@ if (isset($_POST['Generar'])) {
                 $OK = "OK";
             }
         }
-        echo "<br/>";
-        echo $OK;
     }
 }
 
