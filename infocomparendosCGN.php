@@ -11,8 +11,10 @@ if (isset($_POST['Generar'])) {
         $mesliq = "<div class='campoRequerido'>No ha seleccionado o digitado ningun filtro</div>";
         $OK = "";
     } else {
-    	$qry1="SELECT MAX(creado) AS creado, DATEDIFF(CAST('".$_POST['fechainicial']."' AS DATE), MAX(creado)) AS diffecha FROM morososCGN_semestral WHERE borrado IS NULL";
+    	$qry1="SELECT MAX(creado) AS creado, DATEDIFF(MONTH, CAST('".$_POST['fechainicial']."' AS DATE), MAX(creado)) AS diffecha FROM morososCGN_semestral WHERE borrado IS NULL";
         $sqldiffecha=sqlsrv_query( $mysqli,$qry1, array(), array('Scrollable' => 'buffered'));
+
+        echo $qry1;
 
         if($sqldiffecha) {
             if (sqlsrv_num_rows($sqldiffecha) > 0) {
@@ -28,6 +30,8 @@ if (isset($_POST['Generar'])) {
                 $OK = "OK";
             }
         }
+        echo "<br/>";
+        echo $OK;
     }
 }
 
@@ -158,7 +162,7 @@ if (sqlsrv_num_rows($sqldatos) > 0) {
                 OR tc.Tcomparendos_estado NOT IN (2,3,7,9,12,13,14))
             GROUP BY tcomparendos_idinfractor
             HAVING SUM((s.smlv /30) * cc.TTcomparendoscodigos_valorSMLV) >=
-            (SELECT ISNULL(Ts2.smlvoriginal, Ts2.smlv) * 5 FROM [smlv] Ts2 WHERE Ts2.ano=YEAR(CAST('" . $_POST['fechainicial'] . "' AS DATE)))
+            (SELECT ISNULL(Ts2.smlv_original, Ts2.smlv) * 5 FROM [smlv] Ts2 WHERE Ts2.ano=YEAR(CAST('" . $_POST['fechainicial'] . "' AS DATE)))
         ) AS g1
         GROUP BY g1.tcomparendos_idinfractor
     ) AS g2
@@ -202,6 +206,14 @@ ini_set('memory_limit', '1024M');
 $query_totconc1=sqlsrv_query( $mysqli,$sql_totconc1, array(), array('Scrollable' => 'buffered'));
 $query_totconc2=sqlsrv_query( $mysqli,$sql_totconc2, array(), array('Scrollable' => 'buffered'));
 $query_totconc=sqlsrv_query( $mysqli,$sql_totconc3, array(), array('Scrollable' => 'buffered'));
+
+// echo $sql_totconc1;
+// echo "<br/>";
+// echo "<br/>";
+// echo $sql_totconc2;
+// echo "<br/>";
+// echo "<br/>";
+// echo $sql_totconc3;
 
 if($query_totconc){if (sqlsrv_num_rows($query_totconc) > 0) {
     $salida .= "<table width='100%' bgcolor='#FFFFFF' border='0.5' bordercolor='#0000CC'>";
