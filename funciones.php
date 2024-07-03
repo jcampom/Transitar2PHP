@@ -2836,8 +2836,8 @@ function gen_num_comparendo($comparendo){
 	$sql = "SELECT  Tcomparendos_origen AS origen,  (SELECT TOP 1 Tsedes_divipo FROM Tsedes WHERE Tsedes_ppal = 1) AS divipo
 			FROM  Tcomparendos 
 			WHERE  Tcomparendos_comparendo = '$comparendo'";
-	$query_compa = mssql_query($sql);
-	$result_compa= mssql_fetch_array($query_compa);		
+	$query_compa = sqlsrv_query($mysqli, $sql, array(), array('Scrollable' => 'buffered'));
+	$result_compa= sqlsrv_fetch_array($query_compa, SQLSRV_FETCH_ASSOC);		
 	$divipo = $result_compa['origen'] == 1 ? $result_compa['divipo'] : str_pad($result_compa['origen'], 8 , 0);
 	return trim($divipo).str_pad(trim($comparendo), 12, 0,  STR_PAD_LEFT);
 }

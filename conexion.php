@@ -281,6 +281,17 @@ function ValDiaHabil($fecha, $tipo = 0) {
     }
 }
 
+function gen_num_comparendo($comparendo){
+    global $mysqli;
+	$sql = "SELECT  Tcomparendos_origen AS origen,  (SELECT TOP 1 divipo FROM sedes WHERE ppal = 1) AS divipo
+			FROM  comparendos 
+			WHERE  Tcomparendos_comparendo = '$comparendo'";
+	$query_compa = sqlsrv_query($mysqli, $sql, array(), array('Scrollable' => 'buffered'));
+	$result_compa= sqlsrv_fetch_array($query_compa, SQLSRV_FETCH_ASSOC);		
+	$divipo = $result_compa['origen'] == 1 ? $result_compa['divipo'] : str_pad($result_compa['origen'], 8 , 0);
+	return trim($divipo).str_pad(trim($comparendo), 12, 0,  STR_PAD_LEFT);
+}
+
 
 function getCompDate($ncomparendo) {
         global $mysqli; // Usar la conexión global $mysqli

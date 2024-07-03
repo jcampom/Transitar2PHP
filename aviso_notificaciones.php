@@ -99,8 +99,8 @@ $result=sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'));
 // Insertar en la tabla resolucion_sancion
 $sqlInsertResolucion = "
     INSERT INTO resolucion_sancion
-        (ressan_ano, ressan_numero, ressan_tipo, ressan_comparendo, ressan_archivo, ressan_fecha, ressan_exportado, ressan_compid, ressan_usuario)
-    SELECT $ano, (ROW_NUMBER() OVER(ORDER BY Tnotifica_ID ASC)), '$numres', '$tipo_noti', Tnotifica_comparendo, '$archivoind', '$fecha', 1, Tnotifica_compid, '$idusuario'
+        (ressan_ano, ressan_numero, ressan_tipo ,ressan_comparendo, ressan_archivo, ressan_fecha, ressan_exportado, ressan_compid, ressan_usuario)
+    SELECT $ano, '$numres', '$tipo_noti', Tnotifica_comparendo, '$archivoind', '$fecha', 1, Tnotifica_compid, '$idusuario'
     FROM Tnotifica WHERE Tnotifica_estado = 0 AND Tnotifica_compid IN ($compsid)";
     //revisar este insert o select, no sé qué es
 
@@ -136,13 +136,17 @@ if (sqlsrv_query( $mysqli,$sqlInsertAvisosResoluciones, array(), array('Scrollab
 
 // Actualizar Tnotifica
 $sqlUpdateTnotifica = "
-    UPDATE Tnotifica SET Tnotifica_estado = 2, Tnotifica_faviso = CAST($fecha AS DATE)
+    UPDATE Tnotifica SET Tnotifica_estado = 2, Tnotifica_faviso = CAST('$fecha' AS DATE)
     WHERE Tnotifica_estado = 0 AND Tnotifica_compid IN ($compsid)";
 
+
         
-        $result=sqlsrv_query( $mysqli,$sqlUpdateTnotifica, array(), array('Scrollable' => 'buffered'));
-        
-          echo "<br>Error en la consultas 3 : " . serialize(sqlsrv_errors());
+    $result=sqlsrv_query( $mysqli,$sqlUpdateTnotifica, array(), array('Scrollable' => 'buffered'));
+    
+    if(!$result) {
+        echo $sqlUpdateTnotifica;
+        echo "<br>Error en la consultas 3 : " . serialize(sqlsrv_errors());
+    }
  
  
 if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))){
@@ -154,26 +158,26 @@ if (sqlsrv_query( $mysqli,$sql, array(), array('Scrollable' => 'buffered'))){
 }
             
             
-        $result = serialize(sqlsrv_errors());
+        //$result = serialize(sqlsrv_errors());
 
-        if ($result == "") {
-        $qry3 = "SELECT COUNT(*) AS total, A.id
+        if ($result) {
+            $qry3 = "SELECT COUNT(*) AS total, A.id
                     FROM avisos A
                         INNER JOIN avisos_resoluciones R ON A.id = R.aviso 
                     WHERE A.tipo = 29 AND A.numero = (SELECT MAX(numero) AS numero FROM avisos WHERE tipo = 29) 
                     GROUP BY A.id";
             $querya=sqlsrv_query( $mysqli,$qry3, array(), array('Scrollable' => 'buffered'));
                     
-    if ($querya) {
-       $aviso = sqlsrv_fetch_array($querya, SQLSRV_FETCH_ASSOC);
-    // Resto del código
-     } else {
-      // Manejar el caso cuando la consulta no se ejecuta correctamente
-      echo "Error en la consulta: " . serialize(sqlsrv_errors());
-    }
+            if ($querya) {
+            $aviso = sqlsrv_fetch_array($querya, SQLSRV_FETCH_ASSOC);
+            // Resto del código
+            } else {
+            // Manejar el caso cuando la consulta no se ejecuta correctamente
+            echo "Error en la consulta: " . serialize(sqlsrv_errors());
+            }
           
             $menspost3 = "Se generaron documentos de aviso a  {$aviso['total']} comparendos, documento generado." .
-                    ' <a href="../sanciones/gdp_avisonot_pdf.php?refId=' . $aviso['id'] . '" target="_blank">Ver Aviso</a>';
+                    ' <a href="gdp_notifica_pdf.php?ref_not=' . $aviso['id'] . '" target="_blank">Ver Aviso</a>';
         } else {
             $menspost3 = "A ocurrido un error, no se generaron avisos de comparendo. Consulte al administrador.";
         }
