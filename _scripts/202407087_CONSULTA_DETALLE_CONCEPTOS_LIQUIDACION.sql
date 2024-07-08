@@ -1,7 +1,6 @@
 --4	Comparendos         
 --6	Acuerdos pago       
 --7	Derechos de transito
-insert into detalle_conceptos_liquidaciones(
 insert into db.detalle_conceptos_liquidaciones (
 liquidacion
 ,tramite
