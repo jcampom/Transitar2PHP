@@ -16,7 +16,7 @@ liquidacion
 ,cobranza
 )
 select 
-t1.Tliqconcept_tipodoc as liquidacion,
+t1.Tliqconcept_liq as liquidacion,
 t1.Tliqconcept_tramite as tramite,
 ISNULL(t1.Tliqconcept_conceptoID,-1) as concepto,
 t1.Tliqconcept_valor as valor,
@@ -34,7 +34,7 @@ and t1.Tliqconcept_tipodoc not in (4,6)
 -----
 UNION 
 select 
-t1.Tliqconcept_tipodoc as liquidacion,
+t1.Tliqconcept_liq as liquidacion,
 t1.Tliqconcept_tramite as tramite,
 ISNULL(t1.Tliqconcept_conceptoID,-1) as concepto,
 t1.Tliqconcept_valor as valor,
@@ -54,7 +54,7 @@ and t3.Tcomparendos_ID > 0
 -----
 UNION
 select 
-t1.Tliqconcept_tipodoc as liquidacion,
+t1.Tliqconcept_liq as liquidacion,
 t1.Tliqconcept_tramite as tramite,
 ISNULL(t1.Tliqconcept_conceptoID,-1) as concepto,
 t1.Tliqconcept_valor as valor,
