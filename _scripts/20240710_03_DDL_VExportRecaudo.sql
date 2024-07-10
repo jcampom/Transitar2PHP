@@ -7,9 +7,12 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-DROP VIEW [dbo].[VExportRecaudo]
+IF (select count(*) FROM sys.views where name = 'VExportRecaudo')>0
+BEGIN
+	DROP VIEW [dbo].[VExportRecaudo]
+END
 GO
-
+-----------------------------------------------
 CREATE VIEW [dbo].[VExportRecaudo]
 AS
 SELECT RTRIM(V.doc) AS doc

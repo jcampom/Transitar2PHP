@@ -7,8 +7,12 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-DROP VIEW [dbo].[VCompApVDIA]
+IF (select count(*) FROM sys.views where name = 'VExportRecaudo')>0
+BEGIN
+	DROP VIEW [dbo].[VCompApVDIA]
+END
 GO
+-----------------------------------------------
 
 CREATE VIEW [dbo].[VCompApVDIA]
 AS
