@@ -7,6 +7,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+DROP VIEW [dbo].[VExportRecaudo]
+GO
+
 CREATE VIEW [dbo].[VExportRecaudo]
 AS
 SELECT RTRIM(V.doc) AS doc
