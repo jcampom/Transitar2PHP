@@ -11,7 +11,7 @@ and tc.Tliqconcept_ID = d.id
 from u859387114_transitar..detalle_conceptos_liquidaciones d
 -------------------------------------------------------------
 update d
-set d.cuota = (
+set d.dt = (
 select  tc.Tliqconcept_doc 
 from cienaga..Tliqconcept tc
 where tc.Tliqconcept_tipodoc=6   --acuerdos
@@ -20,7 +20,7 @@ and tc.Tliqconcept_ID = d.id
 from u859387114_transitar..detalle_conceptos_liquidaciones d
 -------------------------------------------------------------
 update d
-set d.dt = (
+set d.cuota = (
 select  tc.Tliqconcept_doc 
 from cienaga..Tliqconcept tc
 where tc.Tliqconcept_tipodoc =7 --derechos de tránsito
